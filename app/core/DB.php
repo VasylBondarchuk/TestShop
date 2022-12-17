@@ -32,7 +32,6 @@ class DB
         }
         return self::$pdo;
     }
-
     public function getLastId()
     {
         
