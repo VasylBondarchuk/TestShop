@@ -40,7 +40,7 @@ class Controller
         }
         $this->view = $view;
     }
-    
+
     // Метод отримання назви вигляду
     public function getView()
     {        
