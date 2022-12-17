@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Class Controller
  */
@@ -7,13 +6,11 @@ class Controller
 {  
     // Заголовок сторінки
     protected $title = null;
-   
     // Назва вигляду
     protected $view = null;
-    
     // Масив для виводу данних у вигляди (views)
-    protected $registry = [];
 
+    protected $registry = [];
     // Ім'я моделі, що буде використовуватися
     protected $modelName = '';     
   
