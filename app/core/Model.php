@@ -38,7 +38,7 @@ class Model
 	}
 	
 	//МЕТОД СОРТУВАННЯ
-	public function sort($params)
+	public function sort($params): Model
     {	
 		//формування частини sql-запиту "ORDER BY колонка тип сортування"
 		$this->sql .= " ORDER BY ";
@@ -53,8 +53,8 @@ class Model
 	}
 
 	//МЕТОД ФІЛЬТРУВАННЯ
-    public function filter($params)
-	{
+    public function filter($params): Model
+    {
 		$param = array_keys($params)[0];
 		
 		//мінімальне значення
@@ -79,7 +79,7 @@ class Model
 		$db = new DB();
         $q = [];
 		//формування частини запиту зі знаками питання
-		foreach($this->getEditableColumn() as &$column){
+		foreach($this->getEditableColumns() as &$column){
 			$q[] = "$column = ?";
 		}
 		$qMarks = implode(',', $q);
@@ -194,8 +194,8 @@ class Model
 	}
 
 	//отримання верхнього значення введеного параметра
-	public function HigherPrice($param)
-	{
+	public function HigherPrice($param): int
+    {
 		//максимально можливе значення параметру
 		$max = $this->MaxValue($param);
 		
@@ -206,7 +206,7 @@ class Model
 				: floatval($_POST[$param][1]);
 			}	
 		}	
-		return 100;
+		return $max;
 	}
 
 	//отримання нижнього значення введеного параметра
@@ -216,7 +216,9 @@ class Model
 		$min = 0;				
 	  	if(isset($_POST[$param][0])){//отримання нижнього значення сортування
 			if (!empty($_POST[$param][0])) {
-				$min = floatval($_POST[$param][0])>=$this->HigherPrice($param)? $min:floatval($_POST[$param][0]);
+				$min = floatval($_POST[$param][0])>=$this->HigherPrice($param)
+                    ? $min
+                    : floatval($_POST[$param][0]);
 			}	
 		}
 		return $min;
@@ -231,11 +233,11 @@ class Model
     }
 
 	//метод перевірки порожніх введеннь
-	public function isEmpty(array $params)
-	{
-		foreach ($params as $element){
-			if ($element=='')return FALSE;
-		}
+	public function isEmpty(array $params): bool
+    {
+        if (in_array('', $params)) {
+            return FALSE;
+        }
 		return TRUE;	
 	}
 
@@ -260,7 +262,7 @@ class Model
     }
 
     // Метод отримання данних рядка таблиці table_name за id
-    public function getItemUniv($column,$value)
+    public function getItemUniv($column,$value): Model
     {
         $this->sql = "SELECT * FROM {$this->table_name} WHERE $column = ?;";        
         $db = new DB();
@@ -269,7 +271,7 @@ class Model
         return $this;
     }
 
-    public function getPostValues()
+    public function getPostValues(): array
     {
         $values = [];
         $columns = $this->getColumnsNames();
@@ -289,7 +291,7 @@ class Model
     }
 
     // Отримання масиву значень колонки $column_name таблиці $table_name БД
-    public function getOneColumnArray($column_name)
+    public function getOneColumnArray($column_name): array
     {
         $db = new DB();
         $sql = "select {$column_name} from {$this->table_name};";
@@ -323,7 +325,7 @@ class Model
 	}
 
 	// Отримання імен редагованих колонок
-	public function getEditableColumn(): array
+	public function getEditableColumns(): array
     {
 		//імена колонок
 		$columns = $this->getColumnsNames();		
@@ -332,11 +334,10 @@ class Model
 	}
 
 	// Перевірка, чи всі введення у формі клрректні
-
 	public function AllInputsCorrects()
 	{
 		// Отримання імен редагованих колонок
-		$columns = $this->getEditableColumn();
+		$columns = $this->getEditableColumns();
 		
 		// Перевірка правильності введення у кожній колнці
 		foreach($columns as $column)
