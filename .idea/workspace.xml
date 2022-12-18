@@ -4,16 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="44db09f3-ed29-422b-aa5b-d88e9206afce" name="Changes" comment="first commit">
+    <list default="true" id="44db09f3-ed29-422b-aa5b-d88e9206afce" name="Changes" comment="Edit product">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/controllers/ProductController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/controllers/ProductController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/core/DB.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/DB.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/core/Helper.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/Helper.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/CustomerController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/controllers/CustomerController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/core/Model.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/Model.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/Category.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/Category.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/views/category/list.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/views/category/list.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/views/customer/register.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/views/customer/register.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/views/product/edit.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/views/product/edit.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/customer/edit.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/views/customer/edit.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,7 +65,7 @@
       <workItem from="1670538126283" duration="130000" />
       <workItem from="1671287985426" duration="1436000" />
       <workItem from="1671364665321" duration="8265000" />
-      <workItem from="1671385544647" duration="978000" />
+      <workItem from="1671385544647" duration="4436000" />
     </task>
     <task id="LOCAL-00001" summary="Minor refactoring">
       <created>1670537533440</created>
@@ -86,7 +81,14 @@
       <option name="project" value="LOCAL" />
       <updated>1671296661451</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Edit product">
+      <created>1671386730213</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1671386730213</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -106,6 +108,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Minor refactoring" />
     <MESSAGE value="first commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="first commit" />
+    <MESSAGE value="Edit product" />
+    <option name="LAST_COMMIT_MESSAGE" value="Edit product" />
   </component>
 </project>

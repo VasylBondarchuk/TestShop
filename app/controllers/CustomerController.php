@@ -4,32 +4,32 @@
  * Class CustomerController
  */
 class CustomerController extends Controller
-{    
+{
     public function IndexAction()
     {
         $this->ListAction();
     }
-	
-	// метод для перегляду клієнтів
+
+    // метод для перегляду клієнтів
     public function ListAction()
     {
         $this->setTitle("Клієнти");
         $this->registry['customers'] = $this->getModel('Customer')->initCollection()
-               ->getCollection()->select();
+            ->getCollection()->select();
         $this->setView();
         $this->renderLayout();
     }
 
-	// Метод для авториації клієнта
-	public function LoginAction()
-    {       
+    // Метод для авториації клієнта
+    public function LoginAction()
+    {
         $this->setTitle("Вхід");
         // Повідомлення при порожньому введенні Email
-		$this->registry['empty_email']="Введіть Email";
+        $this->registry['empty_email']="Введіть Email";
         // Повідомлення при порожньому введенні паролю
         $this->registry['empty_password']="Введіть пароль";
         // змінна логування = успіх
-		$this->registry['user_login'] = FALSE; 
+        $this->registry['user_login'] = FALSE;
 
         if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST')
         {
@@ -38,37 +38,37 @@ class CustomerController extends Controller
 
             if($_POST['password'] && $_POST['email'])
             {
-				$params =array ('email'=>$email,'password'=> $password);            
-			    $customer = $this->getModel('customer')->initCollection()
-                ->getCollection()->getItemByParam('email',$params['email']);
-                                    
-			}
-			
+                $params =array ('email'=>$email,'password'=> $password);
+                $customer = $this->getModel('customer')->initCollection()
+                    ->getCollection()->getItemByParam('email',$params['email']);
+
+            }
+
             //якщо є хоча б один користувач з такою ел. адресою
-			if(!empty($customer))
+            if(!empty($customer))
             {
                 //якщо ел.пошта та пароль співпадають
-				//if(($email==$customer['email']) && ($password==$customer['password']))
+                //if(($email==$customer['email']) && ($password==$customer['password']))
                 if(TRUE)
-				{                    
+                {
                     // змінна логування = успіх
                     $this->registry['user_login'] = TRUE;
                     //отримання id
-                    $_SESSION['id'] = $customer['customer_id'];                
+                    $_SESSION['id'] = $customer['customer_id'];
                     //отримання повного імені користувача
                     $_SESSION['first_name']=$customer['first_name'];
                     $_SESSION['last_name']=$customer['last_name'];
                     // редирект на сторінку категорій
-                    Helper::redirect('/category/show');    
-				}              
-			}			
+                    Helper::redirect('/category/show');
+                }
+            }
         }
         $this->setView();
         $this->renderLayout();
-	}
+    }
 
-	//метод для регістрації нового клієнта
-	public function RegisterAction()
+    //метод для регістрації нового клієнта
+    public function RegisterAction()
     {
         $model = $this->getModel('Customer');
         $this->setTitle("Додавання клієнта");
@@ -77,12 +77,12 @@ class CustomerController extends Controller
         }
         $this->setView();
         $this->renderLayout();
-	}    
+    }
 
     public function LogoutAction()
-    {        
+    {
         $_SESSION = [];
-       // expire cookie
+        // expire cookie
         if (!empty($_COOKIE[session_name()]))
         {
             setcookie(session_name(), "", time() - 3600, "/");
@@ -91,27 +91,27 @@ class CustomerController extends Controller
         Helper::redirect('/category/show');
     }
 
-	// МЕТОД РЕДАГУВАННЯ КЛІЄНТА
+    // МЕТОД РЕДАГУВАННЯ КЛІЄНТА
     public function EditAction()
     {
         //Встановлюємо назву сторінки
-        $this->setTitle("Редагування клієнта");               
+        $this->setTitle("Редагування клієнта");
         // Повертає об'єкт класу Product extends Model
         $model = $this->getModel('Customer');
         // Отримуємо масив данних клієнта, що редагується    
-        $this->registry['customers'] = $model->getItem($this->getId('Customer'));        
+        $this->registry['customers'] = $model->getItem($this->getId('Customer'));
 
-        if(isset($_POST['Edit']) && $model->AllInputsCorrects()){
-		// Викликаємо метод класу Model редагування товару 
-        $model->editItem(($this->getId($this->getModelName())));
-		}
-
+        if(isset($_POST['Edit'])){
+            // Викликаємо метод класу Model редагування товару
+            $model->editItem(($this->getId($this->getModelName())));
+        }
+        //$model->editItem(($this->getId($this->getModelName())));
         // Отримуємо масив данних товару, що редагується    
         $this->registry['customers'] = $model->getItem($this->getId('Customer'));
 
         $this->setView();
         $this->renderLayout();
-       
+
     }
 
     // МЕТОД ВИДАЛЕННЯ КЛІЄНТА
@@ -142,7 +142,7 @@ class CustomerController extends Controller
         {
             //відображаємо шаблон
             $this->renderPartialview('layout');
-            echo("Нема такого клієнта"); 
-        }        
-    }  
+            echo("Нема такого клієнта");
+        }
+    }
 }

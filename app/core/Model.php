@@ -77,17 +77,16 @@ class Model
 	// АБСТРАКТНИЙ МЕТОД МЕТОД РЕДАГУВАННЯ ЗАПИСУ ТАБЛИЦІ table_name БД
     public function editItem(int $id): Model
     {
-		//данні введення форми редагування
 		$db = new DB();
 		$q = [];
 		//формування частини запиту зі знаками питання
-		foreach($this->getColumnsNames() as &$column){
+		foreach($this->getEditableColumn() as &$column){
 			$q[] = "$column = ?"; 
 		}
-		$q_marks = implode(',',$q);
-		$sql = "UPDATE {$this->table_name} SET $q_marks WHERE {$this->id_column}=?;";
-        $params =  array_merge([$id],$_POST,[$id]);
-        $db->query($sql, array_values($params));
+		$qMarks = implode(',', $q);
+		$sql = "UPDATE {$this->table_name} SET $qMarks WHERE {$this->id_column}=?;";
+        $params =  array_merge($this->FormData(),[$id]);
+        $db->query($sql, $params);
 	return $this;
 	}
 
@@ -118,7 +117,7 @@ class Model
 		{
 			$db  = new DB();
 			$sql = "DELETE FROM {$this->table_name} WHERE {$this->id_column} = ?;";
-			$results = $db->query($sql, [$id]);			
+			$db->query($sql, [$id]);
 		}
 		return $this;
 	}
