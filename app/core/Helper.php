@@ -388,8 +388,8 @@ class Helper
 	}
 
 	//метод визначення непорожніх введень форми  
-	public static function NotEmptyEnter()
-	{
+	public static function NotEmptyEnter(): bool
+    {
 		// масив данних введенних у форму
 		$form_values =(array_slice(array_values($_POST),0,count($_POST)-1));
 		

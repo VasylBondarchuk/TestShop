@@ -35,7 +35,7 @@ email: <input type="text" name="email" value="<?php echo $customers['email']?>" 
 Місто: <input type="text" name="city" value="<?php echo $customers['city']?>" >
 <span class="error"> <?php Helper::FormIcorrectInputMessage("city");?></span><br><br>
 
-<input class="button" type="submit" name="Edit" value="Редагувати">
+<input class="button" type="submit" name="Edit" value="Edit">
 </div>
 </form>
 

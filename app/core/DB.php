@@ -38,7 +38,6 @@ class DB
         echo self::$pdo->lastInsertId();
     }
 
-
     /**
      * @param $sql
      * @param array $parameters

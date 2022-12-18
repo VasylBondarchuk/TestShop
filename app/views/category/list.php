@@ -66,7 +66,7 @@ foreach($products as $product)  :
 	?>
 
 	<div class="product"></a>
-		​<table style="width:100%">
+		<table style="width:100%">
 			<tr>
 				<td width="20%"><img src="/img/t00009.png" alt="<?php echo $product['name']?>" width="" height=""></td>
 				<td width="80%>	
