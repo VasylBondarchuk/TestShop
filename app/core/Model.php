@@ -75,58 +75,45 @@ class Model
 
 
 	// АБСТРАКТНИЙ МЕТОД МЕТОД РЕДАГУВАННЯ ЗАПИСУ ТАБЛИЦІ table_name БД
-    public function editItem(int $id)
-	{
-		//імена редагованих колонок		
-		$edited_columns = $this->getEditableColumn();		
+    public function editItem(int $id): Model
+    {
 		//данні введення форми редагування
-		$params = $_POST
-		? $_POST
-		: $this->getItem($id);
-		
 		$db = new DB();
 		$q = [];
-		//$col = $this->columnsNames();		
 		//формування частини запиту зі знаками питання
 		foreach($this->getColumnsNames() as &$column){
 			$q[] = "$column = ?"; 
 		}
-		//array_pop($q);
-		//array_shift($q);
 		$q_marks = implode(',',$q);
-		echo $q_marks; 		
-		$sql = "UPDATE {$this->table_name} SET $q_marks WHERE {$this->id_column}=?;";		
-				
-		$results = $db->query($sql, array_merge($params,[$id]));
-			
+		$sql = "UPDATE {$this->table_name} SET $q_marks WHERE {$this->id_column}=?;";
+        $params =  array_merge([$id],$_POST,[$id]);
+        $db->query($sql, array_values($params));
 	return $this;
 	}
 
 	//отримання значень форми
-	public function FormData()
-	{		
+	public function FormData(): array
+    {
 		// імена колонок
 		$columns = $this->getColumnsNames();
 		
 		// масив для отримання данних з форми
 		$formData = [];
-		
-		print_r($_POST);
-		
+
 		// ітерація по масиву отриманих з форми данних
 		foreach($_POST as $key => $value)
 		{
 			// записуємо тільки ті, для яких є редагована колонка в БД
 			if(in_array($key, $columns)){
-				array_push($formData, $value);
+				$formData[] = $value;
 			}	 		
 		}		
 		return $formData;
 	}
 
 	// АБСТРАКТНИЙ МЕТОД ВИДАЛЕННЯ ЗАПИСУ З ТАБЛИЦІ table_name БД
-	public function deleteItem($id)
-	{
+	public function deleteItem($id): Model
+    {
 		if (isset($_POST['Delete']))
 		{
 			$db  = new DB();
@@ -241,7 +228,6 @@ class Model
     {
         $db = new DB();
         $this->sql .= ";";
-        //echo $this->sql ;exit;
         $this->collection = $db->query($this->sql, $this->params);		
         return $this;
     }
@@ -262,17 +248,15 @@ class Model
     
     public function selectFirst()
     {
-        return isset($this->collection[0])
-		? $this->collection[0]
-		: null;
+        return $this->collection[0] ?? null;
     }
 
     // Метод отримання данних рядка таблиці table_name за id
-    public function getItem($id)
+    public function getItem(int $id)
     {
         $sql = "SELECT * FROM {$this->table_name} WHERE {$this->id_column} = ?;";
         $db = new DB();
-        $results =$db->query($sql,[$id]);
+        $results = $db->query($sql , [$id]);
         // Повернути масив, що містить данні  
         return $results[0];
     }
@@ -321,8 +305,8 @@ class Model
 	    return $column_values_array;
 	}
 
-	public function IsEditProductFormInputCorrect()
-	{
+	public function IsEditProductFormInputCorrect(): bool
+    {
 			$params=array_merge(['id'],$this->FormData());
 			
 			// Введений sku 
@@ -330,28 +314,23 @@ class Model
         				
 				switch (FALSE)
 				{
-				    case ($entered_sku == $this->getItem(Helper::getId())['sku']
+                    case !$this->isEmpty($params):
+                    case (Helper::isNumericInput(array($_POST['price'], $_POST['qty']))):
+                    case ($entered_sku == $this->getItem(Helper::getId())['sku']
 				    || !($this->IsValueExists($entered_sku,"sku"))):
 				    return FALSE;break;
 
-				    case !$this->isEmpty($params):
-				    return FALSE;break;
-
-				    case (Helper::isNumericInput(array($_POST['price'],$_POST['qty']))):
-				        return FALSE;break;
-
-				    default: return TRUE;   
+                    default: return TRUE;
 				}
 	}
 
 	// Отримання імен редагованих колонок
-	public function getEditableColumn()
-	{
+	public function getEditableColumn(): array
+    {
 		//імена колонок
 		$columns = $this->getColumnsNames();		
 		//імена колонок, що редагуються
-		$edited_columns = array_intersect($columns,array_keys($_POST));				
-		return $edited_columns;
+        return array_intersect($columns,array_keys($_POST));
 	}
 
 	// Перевірка, чи всі введення у формі клрректні

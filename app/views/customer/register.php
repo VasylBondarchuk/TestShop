@@ -17,6 +17,8 @@
 
 <?php
 
+error_reporting(E_ALL);
+
 //якщо кнопка редагування ще не натиснута
 if (!isset($_POST['addcustomer'])){
 	echo ("<span class='warning'><center><h3>

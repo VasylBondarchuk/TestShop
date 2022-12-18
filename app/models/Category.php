@@ -15,7 +15,7 @@ class Category extends Model
 	// Масив імен категорій
 	public function getCategoriesNames() : array
 	{
-		return $this->getOneColumnArray('category_name');
+		return $this->getOneColumnArray('title');
 	}
 
 	// Масив id категорій

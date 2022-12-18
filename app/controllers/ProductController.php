@@ -53,7 +53,7 @@ class ProductController extends Controller
         $category_model = $this->getModel('Category');
 
 		// Масив імен категорій
-		$category_names = $category_model-> getOneColumnArray('category_name');
+		$category_names = $category_model-> getOneColumnArray('title');
 
 		// Масив id категорій		
 		$category_id = $category_model-> getOneColumnArray('category_id');
@@ -68,7 +68,7 @@ class ProductController extends Controller
         $this->registry['error'] = $this->registry['success'] = '';
         
         // Якщо не адмін
-		if(Helper::isAdmin()!=1){
+		if(Helper::isAdmin() != 1 ){
 			$this->registry['error'] = "Ви не маєте права редагувати товари!";
 		}        
                      
@@ -77,17 +77,17 @@ class ProductController extends Controller
 		
 		// Отримуємо масив данних товару, що редагується
 	    $this->registry['product'] = $model->getItem($this->getId('Product'));
-		
-		$model->editItem($this->getId('Product'));        
-        
-	        // виводимо відредаговані значення
-	        $this->registry['product'] = $model->getItem($this->getId('Product'));      
+
+		if($_POST){
+            $model->editItem($this->getId('Product'));
+        }
+        $this->registry['product'] = $model->getItem($this->getId('Product'));
 	       
-	        //відображаємо вигляд
-	        $this->setView();
+	    //відображаємо вигляд
+	    $this->setView();
 	        
-	        //відображаємо шаблон
-	        $this->renderLayout();	        
+	    //відображаємо шаблон
+	    $this->renderLayout();
 	}
 
     // МЕТОД ДОДАВАННЯ ТОВАРУ
