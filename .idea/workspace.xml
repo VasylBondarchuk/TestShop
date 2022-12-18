@@ -4,7 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="44db09f3-ed29-422b-aa5b-d88e9206afce" name="Changes" comment="Minor refactoring" />
+    <list default="true" id="44db09f3-ed29-422b-aa5b-d88e9206afce" name="Changes" comment="first commit">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/ProductController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/controllers/ProductController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/core/DB.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/DB.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/core/Helper.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/Helper.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/core/Model.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/Model.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Category.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/Category.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/category/list.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/views/category/list.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/customer/register.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/views/customer/register.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/views/product/edit.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/views/product/edit.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -16,7 +26,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -35,7 +45,7 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/var/www/html&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/var/www/magento&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -59,6 +69,8 @@
       <workItem from="1670532061967" duration="4992000" />
       <workItem from="1670538126283" duration="130000" />
       <workItem from="1671287985426" duration="1436000" />
+      <workItem from="1671364665321" duration="8265000" />
+      <workItem from="1671385544647" duration="978000" />
     </task>
     <task id="LOCAL-00001" summary="Minor refactoring">
       <created>1670537533440</created>
@@ -67,7 +79,14 @@
       <option name="project" value="LOCAL" />
       <updated>1670537533440</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="first commit">
+      <created>1671296661450</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1671296661451</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -86,6 +105,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Minor refactoring" />
-    <option name="LAST_COMMIT_MESSAGE" value="Minor refactoring" />
+    <MESSAGE value="first commit" />
+    <option name="LAST_COMMIT_MESSAGE" value="first commit" />
   </component>
 </project>
