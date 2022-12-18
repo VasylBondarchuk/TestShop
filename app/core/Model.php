@@ -73,15 +73,14 @@ class Model
 		return $this;
 	}
 
-
 	// АБСТРАКТНИЙ МЕТОД МЕТОД РЕДАГУВАННЯ ЗАПИСУ ТАБЛИЦІ table_name БД
     public function editItem(int $id): Model
     {
 		$db = new DB();
-		$q = [];
+        $q = [];
 		//формування частини запиту зі знаками питання
 		foreach($this->getEditableColumn() as &$column){
-			$q[] = "$column = ?"; 
+			$q[] = "$column = ?";
 		}
 		$qMarks = implode(',', $q);
 		$sql = "UPDATE {$this->table_name} SET $qMarks WHERE {$this->id_column}=?;";
