@@ -14,7 +14,7 @@ class DB
     /**
      * @return null|PDO
      */
-    public function getConnection()
+    public function getConnection(): ?PDO
     {
         if (!self::$pdo) {
             $dsn = 'mysql:host='. MYSQL_HOST .';port='. MYSQL_PORT .';dbname='. DB_NAME . ';charset=utf8';
@@ -34,8 +34,7 @@ class DB
     }
     public function getLastId()
     {
-        
-        echo self::$pdo->lastInsertId();
+        return self::$pdo->lastInsertId();
     }
 
     /**

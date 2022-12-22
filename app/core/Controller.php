@@ -5,7 +5,7 @@
 class Controller
 {  
     // Заголовок сторінки
-    protected $title = null;
+    protected ?string $title = null;
     // Назва вигляду
     protected $view = null;
     // Масив для виводу данних у вигляди (views)
@@ -27,7 +27,7 @@ class Controller
     }
   
     // Метод отримання назви сторінки
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }

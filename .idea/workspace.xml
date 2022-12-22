@@ -4,11 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="44db09f3-ed29-422b-aa5b-d88e9206afce" name="Changes" comment="Edit product">
+    <list default="true" id="44db09f3-ed29-422b-aa5b-d88e9206afce" name="Changes" comment="Minor refactoring">
+      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_18_12_22,_21_41_[Changes]/shelved.patch" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_18_12_22__21_41__Changes_.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_22_12_22,_22_41_[Changes]/shelved.patch" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_22_12_22__22_41__Changes_.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/models/ProductCategory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/controllers/CustomerController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/controllers/CustomerController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/controllers/ProductController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/controllers/ProductController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/core/Controller.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/Controller.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/core/DB.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/DB.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/core/Helper.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/Helper.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/core/Model.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/Model.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/views/customer/edit.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/views/customer/edit.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Product.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/Product.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,7 +49,7 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/var/www/magento&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/var/www/html&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -65,7 +74,9 @@
       <workItem from="1670538126283" duration="130000" />
       <workItem from="1671287985426" duration="1436000" />
       <workItem from="1671364665321" duration="8265000" />
-      <workItem from="1671385544647" duration="4436000" />
+      <workItem from="1671385544647" duration="7248000" />
+      <workItem from="1671474740023" duration="607000" />
+      <workItem from="1671738254408" duration="9277000" />
     </task>
     <task id="LOCAL-00001" summary="Minor refactoring">
       <created>1670537533440</created>
@@ -88,7 +99,28 @@
       <option name="project" value="LOCAL" />
       <updated>1671386730213</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Edit product">
+      <created>1671391232433</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1671391232433</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Merge remote-tracking branch 'origin/devDescTop' into devDescTop&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;#&#9;app/core/Model.php">
+      <created>1671392485773</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1671392485773</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Minor refactoring">
+      <created>1671393898188</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1671393898188</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -106,9 +138,10 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Minor refactoring" />
     <MESSAGE value="first commit" />
     <MESSAGE value="Edit product" />
-    <option name="LAST_COMMIT_MESSAGE" value="Edit product" />
+    <MESSAGE value="Merge remote-tracking branch 'origin/devDescTop' into devDescTop&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;#&#9;app/core/Model.php" />
+    <MESSAGE value="Minor refactoring" />
+    <option name="LAST_COMMIT_MESSAGE" value="Minor refactoring" />
   </component>
 </project>

@@ -25,21 +25,21 @@ class Product extends Model
 	
 	//МЕТОД ДОДАВАННЯ НОВОГО ТОВАРУ    
     public function addProduct()
-	{
-		//збільшуємо id нового товару на одницю
-		$product_id = $this->MaxValue($this->id_column) + 1;
-		
+    {
+		//print_r($_POST);exit;
+        //збільшуємо id нового товару на одницю
+		$productId = $this->MaxValue($this->id_column) + 1;
 		//параметри введеного товару
-		$params = array_merge([$product_id],$this->FormData());				
-		$this->addItem($this->getColumnsNames(), $params);
+		$params = array_merge([$productId],$this->FormData());
+		$productId = $this->addItem($this->getColumnsNames(), $params);
 		//якщо корректно введені всі поля - додати
 		if (isset($_POST['add']) && !Helper::isEmpty('product') &&
 		Helper::isNumericInput(['price','qty']))
 		{
 			$this->addItem($this->getColumnsNames(), $params);
-			Helper::$var['message']="ok";
+			Helper::$var['message'] = "ok";
 		}		
-		return $this;
+		return $productId;
 	}
 	
 	//МЕТОД ФІЛЬТРУВАННЯ

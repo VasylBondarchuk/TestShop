@@ -1,0 +1,580 @@
+Index: app/core/DB.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?php\n\n/**\n * Class DB\n */\nclass DB\n{\n\n    /**\n     * @var null\n     */\n    private static $pdo = null;\n\n    /**\n     * @return null|PDO\n     */\n    public function getConnection()\n    {\n        if (!self::$pdo) {\n            $dsn = 'mysql:host='. MYSQL_HOST .';port='. MYSQL_PORT .';dbname='. DB_NAME . ';charset=utf8';\n            $options = array(\n                PDO::MYSQL_ATTR_INIT_COMMAND => \"SET NAMES 'utf8'\",\n                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,\n                PDO::ATTR_EMULATE_PREPARES => false\n            );\n            try {\n                self::$pdo = new PDO($dsn, DB_USERNAME , DB_PASSWORD, $options);\n            } catch (PDOException $e) {\n                echo \"Connection failed: \".$e->getMessage();\n                exit();\n            }\n        }\n        return self::$pdo;\n    }\n    public function getLastId()\n    {\n        \n        echo self::$pdo->lastInsertId();\n    }\n\n    /**\n     * @param $sql\n     * @param array $parameters\n     * @return array|bool\n     */\n    public function query($sql, array $parameters = [])\n    {\n        $dbh = $this->getConnection();\n        $stmt = $dbh->prepare($sql);\n        $result = $stmt->execute($parameters);\n\n        if ($result !== false){\n            return $stmt->fetchAll(PDO::FETCH_ASSOC);\n        }\n        else {\n            return false;\n        }\n    }    \n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/core/DB.php b/app/core/DB.php
+--- a/app/core/DB.php	(revision dec022faebf265f9b8cdde27cd7ea0fe397b076b)
++++ b/app/core/DB.php	(date 1671741658456)
+@@ -14,7 +14,7 @@
+     /**
+      * @return null|PDO
+      */
+-    public function getConnection()
++    public function getConnection(): ?PDO
+     {
+         if (!self::$pdo) {
+             $dsn = 'mysql:host='. MYSQL_HOST .';port='. MYSQL_PORT .';dbname='. DB_NAME . ';charset=utf8';
+Index: app/models/Product.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?php\n\n/**\n * Class Product\n */\nclass Product extends Model\n{\n    /**\n     * Product constructor.\n     */\n    function __construct()\n    {\n        $this->table_name = \"product\";\n        $this->id_column = \"product_id\";\n    }\n\t\n\tpublic function initProductCollection(int $categoryId) : Product\n    {        \n\t\t$this->sql = \"SELECT * FROM $this->table_name INNER JOIN product_category ON product_category.product_id = $this->table_name.$this->id_column\n\t\tWHERE product_category.category_id = $categoryId\";\n\t\t//echo $this->sql; exit;\n        return $this;\n    }\n\t\n\t\n\t//МЕТОД ДОДАВАННЯ НОВОГО ТОВАРУ    \n    public function addProduct()\n\t{\n\t\t//збільшуємо id нового товару на одницю\n\t\t$product_id = $this->MaxValue($this->id_column) + 1;\n\t\t\n\t\t//параметри введеного товару\n\t\t$params = array_merge([$product_id],$this->FormData());\t\t\t\t\n\t\t$this->addItem($this->getColumnsNames(), $params);\n\t\t//якщо корректно введені всі поля - додати\n\t\tif (isset($_POST['add']) && !Helper::isEmpty('product') &&\n\t\tHelper::isNumericInput(['price','qty']))\n\t\t{\n\t\t\t$this->addItem($this->getColumnsNames(), $params);\n\t\t\tHelper::$var['message']=\"ok\";\n\t\t}\t\t\n\t\treturn $this;\n\t}\n\t\n\t//МЕТОД ФІЛЬТРУВАННЯ\n    public function filter($params): Product\n    {\n\t\t$param = array_keys($params)[0];\n\t\t\n\t\t//мінімальне значення\n\t\tHelper::$var['min_price'] = $this->LowerPrice($param);\n\n\t\t//максимальне значення\n\t\tHelper::$var['max_price'] = $this->HigherPrice($param);\n\t\t\n\t\t//межі фільтрування \n\t\t$max = $this -> HigherPrice($param);\n\t\t$min = $this -> LowerPrice($param);\n\t\t\n\t\t//формування частини sql-запиту \"WHERE price BETWEEN\"\n\t\t$this -> sql .= \" AND $param BETWEEN \". $min.\" AND \". $max;\t\t\n\t\t\n\t\treturn $this;\n\t}\n   \n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/models/Product.php b/app/models/Product.php
+--- a/app/models/Product.php	(revision dec022faebf265f9b8cdde27cd7ea0fe397b076b)
++++ b/app/models/Product.php	(date 1671740934106)
+@@ -24,20 +24,21 @@
+ 	
+ 	
+ 	//МЕТОД ДОДАВАННЯ НОВОГО ТОВАРУ    
+-    public function addProduct()
+-	{
+-		//збільшуємо id нового товару на одницю
+-		$product_id = $this->MaxValue($this->id_column) + 1;
++    public function addProduct(): Product
++    {
++		//print_r($_POST);exit;
++        //збільшуємо id нового товару на одницю
++		$productId = $this->MaxValue($this->id_column) + 1;
+ 		
+ 		//параметри введеного товару
+-		$params = array_merge([$product_id],$this->FormData());				
++		$params = array_merge([$productId],$this->FormData());
+ 		$this->addItem($this->getColumnsNames(), $params);
+ 		//якщо корректно введені всі поля - додати
+ 		if (isset($_POST['add']) && !Helper::isEmpty('product') &&
+ 		Helper::isNumericInput(['price','qty']))
+ 		{
+ 			$this->addItem($this->getColumnsNames(), $params);
+-			Helper::$var['message']="ok";
++			Helper::$var['message'] = "ok";
+ 		}		
+ 		return $this;
+ 	}
+Index: app/core/Model.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?php\n\n/**\n * Class Model\n */\nclass Model\n{  \n\t// ім'я таблиці БД\n    protected $table_name;\n    \n    // назва id-колонки таблиці\n    protected $id_column;\n    \n    // масив імен колонок таблиці БД\n    protected $columns = [];\n    \n    protected $collection;\n    \n    // рядок sql-запита\n    protected $sql;\n    \n    protected $params = [];\n\t\n\t// Метод отримання назва id-колонки таблиці\n\tpublic function getIdColumn()\n\t{\n\t\treturn $this->id_column;\n\t}\n\n\t// АБСТРАКТНИЙ МЕТОД МЕТОД ДОДАВАННЯ ЗАПИСУ ДО ТАБЛИЦІ table_name БД\n\tpublic function addItem($columns, $params)\n\t{\t\t\t\n\t\t$db = new DB();\t\t\n\t\t//отримання рядку \"(?,?,?,?......,?,?)\"\n\t\t$questionMarks = trim(str_repeat('?,',count($columns)),',');\t\t\n\t\t$sql = \"INSERT INTO {$this->table_name} VALUES ($questionMarks);\";\t\t\n\t\treturn $db->query($sql, $params);\n\t}\n\t\n\t//МЕТОД СОРТУВАННЯ\n\tpublic function sort($params): Model\n    {\t\n\t\t//формування частини sql-запиту \"ORDER BY колонка тип сортування\"\n\t\t$this->sql .= \" ORDER BY \";\n\n\t\tforeach($params as $sortParam => $sortOrder)\n\t\t{\n\t\t\t$this->sql .= $sortParam .' '. $sortOrder . ',';\n\t\t}\n\t\t$this->sql = rtrim($this->sql,',');\t\t\t\t\t\t\n\t\t\t\n\t\treturn $this;\t\t\n\t}\n\n\t//МЕТОД ФІЛЬТРУВАННЯ\n    public function filter($params): Model\n    {\n\t\t$param = array_keys($params)[0];\n\t\t\n\t\t//мінімальне значення\n\t\tHelper::$var['min_price'] = $this->LowerPrice($param);\n\n\t\t//максимальне значення\n\t\tHelper::$var['max_price'] = $this->HigherPrice($param);\n\t\t\n\t\t//межі фільтрування \n\t\t$max = $this -> HigherPrice($param);\n\t\t$min = $this -> LowerPrice($param);\n\t\t\n\t\t//формування частини sql-запиту \"WHERE price BETWEEN\"\n\t\t$this -> sql .= \" AND $param BETWEEN \". $min.\" AND \". $max;\t\t\n\t\t\n\t\treturn $this;\n\t}\n\n\t// АБСТРАКТНИЙ МЕТОД МЕТОД РЕДАГУВАННЯ ЗАПИСУ ТАБЛИЦІ table_name БД\n    public function editItem(int $id): Model\n    {\n\t\t$db = new DB();\n        $q = [];\n\t\t//формування частини запиту зі знаками питання\n\t\tforeach($this->getEditableColumns() as &$column){\n\t\t\t$q[] = \"$column = ?\";\n\t\t}\n\t\t$qMarks = implode(',', $q);\n\t\t$sql = \"UPDATE {$this->table_name} SET $qMarks WHERE {$this->id_column}=?;\";\n        $params =  array_merge($this->FormData(),[$id]);\n        $db->query($sql, $params);\n\treturn $this;\n\t}\n\n\t//отримання значень форми\n\tpublic function FormData(): array\n    {\n\t\t// імена колонок\n\t\t$columns = $this->getColumnsNames();\n\t\t\n\t\t// масив для отримання данних з форми\n\t\t$formData = [];\n\n\t\t// ітерація по масиву отриманих з форми данних\n\t\tforeach($_POST as $key => $value)\n\t\t{\n\t\t\t// записуємо тільки ті, для яких є редагована колонка в БД\n\t\t\tif(in_array($key, $columns)){\n\t\t\t\t$formData[] = $value;\n\t\t\t}\t \t\t\n\t\t}\t\t\n\t\treturn $formData;\n\t}\n\n\t// АБСТРАКТНИЙ МЕТОД ВИДАЛЕННЯ ЗАПИСУ З ТАБЛИЦІ table_name БД\n\tpublic function deleteItem($id): Model\n    {\n\t\tif (isset($_POST['Delete']))\n\t\t{\n\t\t\t$db  = new DB();\n\t\t\t$sql = \"DELETE FROM {$this->table_name} WHERE {$this->id_column} = ?;\";\n\t\t\t$db->query($sql, [$id]);\n\t\t}\n\t\treturn $this;\n\t}\n\n\t\n\tpublic function initCollection(): Model\n    {\n        $this->sql = \"SELECT * FROM \" . $this->table_name ;\n\t\treturn $this;\n    }\t\n\n    // Отримання масиву значень колонки $column_name таблиці $table_name БД\n    public function getColumnArray($column_name): array\n    {\n        $db = new DB();\n        $sql = \"SELECT {$column_name} FROM {$this->table_name};\";\n        $results = $db->query($sql);        \n        // створюємо і повертаємо масив зі значеннями колонки $column_name\n        foreach($results as $result => $value)\n        {\n            $column_values_array[] = $value[$column_name];\n        }\n\t    return $column_values_array;\n\t}\n\n    // Перевірка чи введенне значення є унікальним (не належить масиву існуючих значень, крім вже введеного)\n    public function IsValueExists($check, $column_name): bool\n    {\n        $db = new DB();\n        $sql = \"SELECT {$column_name} from {$this->table_name};\";\n        $results = $db->query($sql);        \n        $column_values_array = [];\n        // створюємо і повертаємо масив зі значеннями колонки $column_name\n        foreach($results as $result => $value)\n        {            \n            $column_values_array[] = $value[$column_name];\n        }\t    \n\t    return in_array($check, $column_values_array);\n\t}\n\n   \tpublic function getColumnsNames(): array\n    {\n\t\t$db = new DB();\n\t\t$sql = \"SELECT * FROM $this->table_name;\";\n\t\t$results = $db->query($sql);\n\t\treturn array_keys($results[0]);\n\t}\n\t\n\t// отримання запису з бази за конкретним значенням певної колонки таблиці table_name БД\n    public function getItemByParam($column,$value)\n    {\n        $db  = new DB();\n\t\t$sql = \"SELECT * FROM $this->table_name WHERE $column=?\";\n\t\t$params = [$value];\n\t\treturn empty($db->query($sql, $params )[0])? array():\n\t\t$db->query($sql, $params)[0];\n    }\n\t\n\t// Метод отримання макс. значення конкретної колонки таблиці table_name БД\n\tpublic function MaxValue($column)\n\t{\n\t\t$db = new DB();\n\t\t$sql = \"SELECT MAX($column)FROM {$this->table_name};\"; \n\t\t$results = $db->query($sql);\n\t \treturn $results[0][\"MAX($column)\"];\n\t}\n\n\t// Метод отримання макс. значення конкретної колонки таблиці table_name БД\n\tpublic function MinValue($column)\n\t{\n\t\t$db = new DB();\n\t\t$sql = \"SELECT MIN($column)FROM {$this->table_name};\"; \n\t\t$results = $db->query($sql);\n\t \treturn floatval($results[0][\"MIN($column)\"]);\n\t}\n\n\t//отримання верхнього значення введеного параметра\n\tpublic function HigherPrice($param): int\n    {\n\t\t//максимально можливе значення параметру\n\t\t$max = $this->MaxValue($param);\n\t\t\n\t\tif(isset($_POST[$param][1])){//отримання верхнього значення сортування\n\t\t\tif (!empty($_POST[$param][1])){\n\t\t\t\t$max = floatval($_POST[$param][1])>= $max\n\t\t\t\t? $max\n\t\t\t\t: floatval($_POST[$param][1]);\n\t\t\t}\t\n\t\t}\t\n\t\treturn $max;\n\t}\n\n\t//отримання нижнього значення введеного параметра\n\tpublic function LowerPrice($param)\n\t{\n\t\t//мінімально можливе значення параметру\n\t\t$min = 0;\t\t\t\t\n\t  \tif(isset($_POST[$param][0])){//отримання нижнього значення сортування\n\t\t\tif (!empty($_POST[$param][0])) {\n\t\t\t\t$min = floatval($_POST[$param][0])>=$this->HigherPrice($param)\n                    ? $min\n                    : floatval($_POST[$param][0]);\n\t\t\t}\t\n\t\t}\n\t\treturn $min;\n\t}\n\t\n\tpublic function getCollection(): Model\n    {\n        $db = new DB();\n        $this->sql .= \";\";\n        $this->collection = $db->query($this->sql, $this->params);\t\t\n        return $this;\n    }\n\n\t//метод перевірки порожніх введеннь\n\tpublic function isEmpty(array $params): bool\n    {\n        if (in_array('', $params)) {\n            return FALSE;\n        }\n\t\treturn TRUE;\t\n\t}\n\n    public function select()\n    {\n        return $this->collection;\n    }\n    \n    public function selectFirst()\n    {\n        return $this->collection[0] ?? null;\n    }\n\n    // Метод отримання данних рядка таблиці table_name за id\n    public function getItem(int $id)\n    {\n        $sql = \"SELECT * FROM {$this->table_name} WHERE {$this->id_column} = ?;\";\n        $db = new DB();\n        $results = $db->query($sql , [$id]);\n        // Повернути масив, що містить данні  \n        return $results[0];\n    }\n\n    // Метод отримання данних рядка таблиці table_name за id\n    public function getItemUniv($column,$value): Model\n    {\n        $this->sql = \"SELECT * FROM {$this->table_name} WHERE $column = ?;\";        \n        $db = new DB();\n        $results =$db->query($this->sql,array($value));\n        // Повернути масив, що містить данні  \n        return $this;\n    }\n\n    public function getPostValues(): array\n    {\n        $values = [];\n        $columns = $this->getColumnsNames();\n        foreach ($columns as $column) {\n            $column_value = filter_input(INPUT_POST, $column);\n            if ($column_value && $column !== $this->id_column ) {\n                $values[$column] = $column_value;\n            }\n        }        \n        return $values;\n    }\n\n    // Метод отримання імені колонки з id\n    public function getIdName()\n    {\n        return $this->id_column;\n    }\n\n    // Отримання масиву значень колонки $column_name таблиці $table_name БД\n    public function getOneColumnArray($column_name): array\n    {\n        $db = new DB();\n        $sql = \"select {$column_name} from {$this->table_name};\";\n        $results = $db->query($sql);\n        \n        // створюємо і повертаємо масив зі значеннями колонки $column_name\n        foreach($results as $result => $value)\n        {\n            $column_values_array[] = $value[$column_name];\n        }\n\t    return $column_values_array;\n\t}\n\n\tpublic function IsEditProductFormInputCorrect(): bool\n    {\n\t\t\t$params=array_merge(['id'],$this->FormData());\n\t\t\t\n\t\t\t// Введений sku \n        \t$entered_sku = Helper::ClearInput($_POST['sku']);  \t\n        \t\t\t\t\n\t\t\t\tswitch (FALSE)\n\t\t\t\t{\n                    case !$this->isEmpty($params):\n                    case (Helper::isNumericInput(array($_POST['price'], $_POST['qty']))):\n                    case ($entered_sku == $this->getItem(Helper::getId())['sku']\n\t\t\t\t    || !($this->IsValueExists($entered_sku,\"sku\"))):\n\t\t\t\t    return FALSE;break;\n\n                    default: return TRUE;\n\t\t\t\t}\n\t}\n\n\t// Отримання імен редагованих колонок\n\tpublic function getEditableColumns(): array\n    {\n\t\t//імена колонок\n\t\t$columns = $this->getColumnsNames();\t\t\n\t\t//імена колонок, що редагуються\n        return array_intersect($columns,array_keys($_POST));\n\t}\n\n\t// Перевірка, чи всі введення у формі клрректні\n\tpublic function AllInputsCorrects()\n\t{\n\t\t// Отримання імен редагованих колонок\n\t\t$columns = $this->getEditableColumns();\n\t\t\n\t\t// Перевірка правильності введення у кожній колнці\n\t\tforeach($columns as $column)\n\t\t{\n\t\t\treturn Helper::FormIcorrectInputMessage($column);\n\t\t}\n\t\treturn TRUE;\n\t}\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/core/Model.php b/app/core/Model.php
+--- a/app/core/Model.php	(revision dec022faebf265f9b8cdde27cd7ea0fe397b076b)
++++ b/app/core/Model.php	(date 1671741670032)
+@@ -6,24 +6,24 @@
+ class Model
+ {  
+ 	// ім'я таблиці БД
+-    protected $table_name;
++    protected string $table_name;
+     
+     // назва id-колонки таблиці
+-    protected $id_column;
++    protected string $id_column;
+     
+     // масив імен колонок таблиці БД
+-    protected $columns = [];
++    protected array $columns = [];
+     
+     protected $collection;
+     
+     // рядок sql-запита
+     protected $sql;
+     
+-    protected $params = [];
++    protected array $params = [];
+ 	
+ 	// Метод отримання назва id-колонки таблиці
+-	public function getIdColumn()
+-	{
++	public function getIdColumn(): string
++    {
+ 		return $this->id_column;
+ 	}
+ 
+@@ -32,7 +32,7 @@
+ 	{			
+ 		$db = new DB();		
+ 		//отримання рядку "(?,?,?,?......,?,?)"
+-		$questionMarks = trim(str_repeat('?,',count($columns)),',');		
++		$questionMarks = trim(str_repeat('?,', count($columns)),',');
+ 		$sql = "INSERT INTO {$this->table_name} VALUES ($questionMarks);";		
+ 		return $db->query($sql, $params);
+ 	}
+@@ -94,7 +94,7 @@
+     {
+ 		// імена колонок
+ 		$columns = $this->getColumnsNames();
+-		
++
+ 		// масив для отримання данних з форми
+ 		$formData = [];
+ 
+@@ -120,7 +120,6 @@
+ 		}
+ 		return $this;
+ 	}
+-
+ 	
+ 	public function initCollection(): Model
+     {
+@@ -185,8 +184,8 @@
+ 	}
+ 
+ 	// Метод отримання макс. значення конкретної колонки таблиці table_name БД
+-	public function MinValue($column)
+-	{
++	public function MinValue($column): float
++    {
+ 		$db = new DB();
+ 		$sql = "SELECT MIN($column)FROM {$this->table_name};"; 
+ 		$results = $db->query($sql);
+@@ -285,7 +284,7 @@
+     }
+ 
+     // Метод отримання імені колонки з id
+-    public function getIdName()
++    public function getIdName(): string
+     {
+         return $this->id_column;
+     }
+@@ -334,8 +333,8 @@
+ 	}
+ 
+ 	// Перевірка, чи всі введення у формі клрректні
+-	public function AllInputsCorrects()
+-	{
++	public function AllInputsCorrects(): ?bool
++    {
+ 		// Отримання імен редагованих колонок
+ 		$columns = $this->getEditableColumns();
+ 		
+Index: app/core/Helper.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?php\n\nclass Helper\n{\n\t// універсальна змінна-масив  \n\tpublic static $var = array();\t\n\n\t// метод перевірки правильності укр. введення\n\tpublic static function isUkrainian($input): bool\n    {\n\t\tif(isset($_POST[$input]))\n\t\t{\n\t\t\tif (!empty($_POST[$input]))\n\t\t\t{\n\t\t\t\tif (!preg_match(\"/^[-а-яіїєґА-ЯІЇЄҐ']+$/iu\", $_POST[$input]))\n\t\t\t\t{\n\t\t\t\t\treturn FALSE;\n\t\t\t\t}\t\n\t\t\t}\n\t\t}\n\t\treturn TRUE;\t\t\n\t}\n\t\n\t//метод перевірки правильності телефону\n\tpublic static function isCorrectPhone($input): bool\n    {\n\t\tif(isset($_POST[$input]))\n\t\t{\n\t\t\tif (!empty($_POST[$input]))\n\t\t\t{\n\t\t\t\tif (!preg_match(\"/^[0-9]*$/\", $_POST[$input]))\n\t\t\t\t{\n\t\t\t\t\treturn FALSE;\n\t\t\t\t}\t\n\t\t\t}\n\t\t}\n\t\treturn TRUE;\n\t}\n\n\t//метод перевірки правильності email\n\tpublic static function isCorrectEmail($input)\n\t{\n\t\tif(isset($_POST[$input]))\n\t\t{\n\t\t\tif (!empty($_POST[$input]))\n\t\t\t{\n\t\t\t\tif (!filter_var($_POST[$input], FILTER_VALIDATE_EMAIL))\n\t\t\t\t{\n\t\t\t\t\treturn FALSE;\n\t\t\t\t}\t\n\t\t\t}\n\t\t}\n\t\treturn TRUE;\t\t\t\t\n\t}\n\n\t//метод перевірки правильності введення паролю та підтвердження\n\tpublic static function isCorrectPassword($password)\n\t{\n\t\tif(isset($_POST[$password]))\n\t\t{\n\t\t\t\tif ((strlen($_POST[$password]) >= 8) &&\n\t\t\t\t\tpreg_match(\"#[0-9]+#\",$_POST[$password])&&\n\t\t\t\t\t\tpreg_match(\"#[a-zA-Z]+#\",$_POST[$password]))\n\t\t\t\t\t{\n\t\t\t\t\t\treturn TRUE;\n\t\t\t\t\t}\n\t\t}\t\n\t\treturn FALSE;      \n\t}\t\t\n\n\t//метод перевірки правильності підтвердження паролю\n\tpublic static function isConfirmOk($password,$confirm)\n\t{\n\t\treturn (self::CleanInput($_POST[$password])==\n\t\tself::CleanInput($_POST[$confirm]));\t\t\n\t}\n\n\t//метод перевірки нецифрових введеннь\n\tpublic static function isNumericInput(array $params)\n\t{\n\t\tforeach($params as $element){\n\t\t\tif(isset($element) && (!is_numeric($element) || ($element < 0))){\t\t\t\t\n\t\t\t\treturn FALSE;\n\t\t\t}\t\t\n\t\t}\n\treturn TRUE;\t\n\t}\n\n\t//метод перевірки нецифрових введеннь\n\tpublic static function Numeric($input)\n\t{\t\t\n\t\tif(isset($_POST[$input]) && !empty($_POST[$input]) && (!is_numeric($_POST[$input]) || ($_POST[$input] < 0))){\n\t\treturn FALSE;}\t\n\treturn TRUE;\t\n\t}\n\n\t//метод перевірки корректності данних форми регістрації\n\tpublic function CorrectCustomerInput($name1,$name2,$telephone,$email,$password,$confirm,$city)\n\t{\n\t\tif(self::isUkrainian($name1)\n\t\t&& self::isUkrainian($name2)==TRUE\n\t\t&& self::isCorrectPhone($telephone)==TRUE\n\t\t&& self::isCorrectEmail($email)==TRUE\n\t\t&& self::isCorrectPassword($password)==TRUE\n\t\t&& self::isCorrectPassword($confirm)==TRUE\n\t\t&& self::isConfirmOk($password,$confirm)==TRUE\n\t\t&& self::isUkrainian($city)==TRUE)\n\t\t{\n\t\t\treturn TRUE;\n\t\t}\n\t\telse\n\t\t{\n\t\t\treturn FALSE;\n\t\t}\n\t}\n\n\n\tpublic static function getModel($name)\n\t{\n\t$model = new $name();\n\treturn $model;\n\t}\n\n\tpublic static function getMenu()\n\t{\n\t\treturn self::getModel('menu')->initCollection()\n\t\t\t   ->sort(array('sort_order'=>'ASC'))->getCollection()->select();\n\t}\n\n\tpublic static function simpleLink($path, $name, $params = []): string\n    {\n\t\tif (!empty($params)) {\n\t\t\t$firts_key = array_keys($params)[0];\n\t\t\tforeach($params as $key => $value) {\n\t\t\t\t$path .= ($key === $firts_key ? '?' : '&');\n\t\t\t\t$path .= \"$key=$value\";\n\t\t\t}\n\t\t}\n\t\treturn '<a href=\"' . route::getBP() . $path .'\">' .$name . '</a>';\n\t}\n\n\t//---------------------------------------------------------------------------------------------- \t\n\n\t// Метод перенаправлення\n\n\tpublic static function redirect($path)\n\t{\n\t\t$server_host = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];\n\t\t$url = $server_host . route::getBP() . $path;\n\t\theader(\"Location: $url\");\n\t}\n\n\t//----------------------------------------------------------------------------------------------     \n\t\t\n\tpublic static function getCustomer()\n\t{\n\t\tif (!empty($_SESSION['id'])) {\n\t\treturn self::getModel('customer')->initCollection()\n\t\t\t->filter(array('customer_id'=>$_SESSION['id']))\n\t\t\t->getCollection()\n\t\t\t->selectFirst();\n\t\t} else {\n\t\t\treturn null;\n\t\t}\n\n\t}\n\n\t//отримання макс. значення конкретної колонки конкретної таблиці\n\tpublic static function MaxValue($param,$table_name)\n\t{\n\t\t$db = new DB();\n\t\t$sql = \"SELECT MAX(\".$param.\")FROM $table_name;\"; \n\t\t$results = $db->query($sql);\n\t\treturn floatval($results[0][\"MAX(\".$param.\")\"]);\n\t}\n\n\n\t//---------------------------------------------------------------------------------------------- \t\n\n\t// Метод обробки данних форми\n\n\tpublic static function CleanInput($data)\n\t{\n\t\t//обрізка пробілів з країв \n\t\t$data = trim($data);\n\t\t//обрізка зворотніх слешів\n\t\t$data = stripslashes($data);\n\t\t//перетворення спецсимволів\n\t\t$data = htmlspecialchars($data);\n\t\t\n\t\treturn $data;\n\t}\n\n\t//---------------------------------------------------------------------------------------------- \n\n\t//отримання значень форми\n\n\tpublic function FormData()\n\t{\n\t\t$form_data = [];\n\n\t\tforeach($_POST as $key=>$value)\n\t\t{\n\t\t\tif(isset($_POST[$key]))\n\t\t\t{\n\t\t\t\tarray_push($form_data,self::CleanInput($value));\n\t\t\t}\n\t\t}\n\t\t//print_r($form_data);\n\t\treturn $form_data;\n\t}\n\n\t//---------------------------------------------------------------------------------------------- \n\n\t//метод виведення попереджень при нецифрових введеннях\n\n\tpublic static function isNumeric(){\n\t\t//масив помилок\n\t\t$params = array('price'=>'','qty'=>'');\t\n\t\t\t\n\t\tforeach($params as $column=>&$error){\t\n\t\t\tif(isset($_POST[$column])){\n\t\t\t\tif (!empty($_POST[$column])) {\n\t\t\t\t\tif(!is_numeric($_POST[$column]) || $_POST[$column] < 0){\n\t\t\t\t\t$error = \"Некорректне введення!\";}\t\t\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\treturn \tarray_values($params);\n\t}\n\n\t//метод виведення попереджень при нецифрових введеннях\n\n\tpublic static function isInputNumeric($input)\n\t{\n\t\tif(isset($_POST[$input])&& !empty($_POST[$column]))\n\t\t{\n\t\t\tif(!is_numeric($_POST[$column]) || $_POST[$column] < 0)\n\t\t\t{\n\t\t\t\t\techo \"Значення має бути маєбути невід'ємним числом\";\n\t\t\t}\t\t\n\t\t}\t\n\t}\n\n\n\t//---------------------------------------------------------------------------------------------- \n\n\t//метод виведення попереджень при введеннях укр. мовою\n\n\tpublic static function isUkrInput(){\n\t\t//масив помилок\n\t\t$params = array('last_name'=>'','first_name'=>'','city'=>'');\t\n\t\t\t\n\t\tforeach($params as $column=>&$error){\t\n\t\t\tif(isset($_POST[$column])){\n\t\t\t\tif (!empty($_POST[$column])) {\n\t\t\t\t\tif (!preg_match(\"/^[-а-яіїєґА-ЯІЇЄҐ']+$/iu\", $_POST[$column])){\n\t\t\t\t\t\t$error = \"Некорректне введення\";}\n\t\t\t\t}\t\t\n\t\t\t}\n\t\t}\n\t\treturn \tarray_values($params);\n\t}\n\n\t//метод виведення попереджень при введені телефону\n\tpublic static function isCorrectPhoneInput()\n\t{\n\t\t//масив помилок\n\t\t$params = array('telephone'=> '');\n\t\t\n\t\tforeach($params as $column=>&$error)\n\t\t{\n\t\t\tif(isset($_POST[$column]) && !empty($_POST[$column]) &&\n\t\t\t!preg_match(\"/^[0-9]*$/\", $_POST['telephone']))\n\t\t\t{\n\t\t\t\t$error = \"Некорректне введення. Введення має містити лише цифри\";\n\t\t\t}\t\t\t\t\n\t\t}\n\t\treturn array_values($params);\n\t}\n\t//вивід помилок при введенні email\n\tpublic static function isCorrectEmailInput()\n\t{\n\t\t//масив помилок\n\t\t$params = array('email'=>'');\t\t\n\t\tforeach($params as $column=>&$error){\t\t\t\n\t\t\tif(!empty($_POST[$column])){\n\t\t\t\tif (!filter_var($_POST[$column], FILTER_VALIDATE_EMAIL)){\n\t\t\t\t$error = \"Некорректне введення\";}\n\t\t\t}\n\t\t}\t\n\t\treturn array_values($params);\n\t}\n\n\t//вивід помилок при введенні паролів\n\tpublic static function isCorrectPasswordInput()\n\t{\n\t\t//масив помилок\n\t\t$params = array('password'=>'','pass_confirm'=>'');\t\t\n\t\tforeach($params as $column=>&$error){\t\t\t\n\t\t\tif(!empty($_POST[$column])){\n\t\t\t\tif (strlen($_POST[$column]) < 8){\n\t\t\t\t\t$error = \"Пароль має містити мінімум 8 символів!\";\n\t\t\t\t}\n\t\t\t\telseif(!preg_match(\"#[0-9]+#\",$_POST[$column]))\n\t\t\t\t{\n\t\t\t\t\t$error = \"Пароль має містити хочаб одну цифру!\";\n\t\t\t\t}\n\t\t\t\telseif(!preg_match(\"#[a-zA-Z]+#\",$_POST[$column]))\n\t\t\t\t{\n\t\t\t\t\t$error = \"Пароль має містити лише англійські літери(мінімум одну)!\";\n\t\t\t\t}\n\t\t\t}\n\t\t\t\t\t\n\t\t}\n\t\treturn array_values($params);\t\t\n\t}\n\n\tpublic static function isConfirmedInput($password,$confirmation)\n\t{\n\t\tif(isset($_POST[$password]) && isset($_POST[$confirmation])){\n\t\t\tif(!empty($_POST[$password]) && !empty($_POST[$confirmation])){\n\t\t\t\tif ($_POST[$password] !== $_POST[$confirmation]) {\n\t\t\t\t\treturn \"Пароль і підтверження не співпадають!\";\n\t\t\t\t}\n\t\t\t}\t\n\t\t}\n\t}\n\t//метод отримання назв колонок\n\tpublic static function getColumnsNames($table_name)\n\t{\n\t\t$columns =[];\n\t\t$db = new DB();\n\t\t$sql = \"show columns from  $table_name;\";\n\t\t$results = $db->query($sql);\n\t\tforeach($results as $result){\n\t\t\tarray_push($columns,$result['Field']);\n\t\t}\n\t\treturn $columns;\n\n\t}\n\n\t//метод обробки данних форми\n\tpublic static function ClearInput($data){\n\t\t//обрізка пробілів з країв \n\t\t$data = trim($data);\n\t\t//обрізка зворотніх слешів\n\t\t$data = stripslashes($data);\n\t\t//перетворення спецсимволів\n\t\t$data = htmlspecialchars($data);\n\t\t\n\t\treturn $data;\n\t}\n\n\t//отримання значень форми\n\tpublic static function FormDataInput(array $params): array\n    {\n\t\t//массив данних форми; $params - масив назв полів\n\t\t$form_data = array_fill(0,count($params),'');\n\t\t\n\t\t//ітерація по полям форми\n\t\tfor($i=0; $i < count($params);$i++){\n\t\t\tif(isset($_POST[$params[$i]])){\n\t\t\t\tif(!empty($_POST[$params[$i]])){\n\t\t\t\t\t$form_data[$i]=Helper::ClearInput($_POST[$params[$i]]);\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\treturn $form_data;\n\t}\n\n\n\t//метод виведення попереджень при порожніх введенях \n\tpublic static function isEmpty($table_name)\n\t{\t\t\n\t\t//массив назв колонок\n\t\t$columns = Helper::getColumnsNames($table_name);\t\t\n\t\t//массив помилок Array ( [0] => '' [1] => '' [2] => '' ... )\n\t\t$errors = array_fill (0, count($columns),'' ) ;\t\t\n\t\t//масив колонка => помилка\n\t\t$params = array_combine ($columns,$errors);\t\t\t\t\t\t\n\t\tforeach($params as $column=>&$error){\t\n\t\t\tif(isset($_POST[$column]) && empty($_POST[$column])){\n\t\t\t\t$error = \"Введіть данні!\";\n\t\t\t}\n\t\t}\n\t\treturn array_values($params);\n\t}\n\n\t//метод визначення непорожніх введень форми  \n\tpublic static function NotEmptyEnter(): bool\n    {\n\t\t// масив данних введенних у форму\n\t\t$form_values =(array_slice(array_values($_POST),0,count($_POST)-1));\n\t\t\n\t\t// якщо хоч одне значення у формі не було введено = FALSE\n\t\t/*foreach ($form_values as $form_value)\n\t\t{\n\t\t\tif(!$form_value)return FALSE;\n\t\t}*/\n\t\treturn TRUE;\t\n\t}\n\n\t/*метод виведення попереджень при порожніх введенях \n\tдля окремоого поля*/\n\tpublic static function isSeparateEmpty($field): array\n    {\n\t\t\n\t\t//масив помилок\n\t\t$params = array($field=>'');\t\t\n\t\tforeach($params as $column=>&$error){\t\t\t\n\t\t\tif(isset($_POST[$column])){\n\t\t\t\tif (empty($_POST[$column])){$error = \"Введіть данні!\";}\n\t\t\t}\n\t\t}\t\n\t\treturn array_values($params);\n\t}\n\n\t//метод отримання данних за номером\n\tpublic static function getItem($id)\n\t{\n\t\t$db  = new DB();\n\t\t$sql = \"SELECT * FROM products WHERE id=?\"; \n\t\t$results =$db->query($sql,array($id));\t\t\n\t\treturn $results[0];\n\t}\n\n\t//метод отримання id\n\tpublic static function getId()\n\t{\n\t\treturn filter_input(INPUT_GET, 'id');\n\t}\n\n\t//виведення попередження для не адміна\n\tpublic static function isNotAdmin($message)\n\t{\n\t\tif (Helper::isAdmin()==0)\n\t\t{\n\t\t\techo(\"<span class='warning'><center><h3>\".$message.\"</h3></center></span><br>\");\n\t\t}\n\t}\n\n\t//отримання записів з бази за конкретним значенням певної колонки\n\tpublic static function getItemByValue($column,$value,$table)\n\t{\n\t\t$db  = new DB();\n\t\t$sql = \"SELECT * FROM $table WHERE $column=?\";\n\t\t$params = array($value);\n\t\treturn empty($db->query($sql, $params ))? array():\n\t\t$db->query($sql, $params);\n\t}\n\n\t//перевірка чи відвідувач є адміном\n\tpublic static function isAdmin()\n\t{\n\t\t//масив адмінів\n\t\t$admin_array = \tHelper::getItemByValue('admin_role',1,'customer');\n\t\t\n\t\t//якщо відвідувач авторизувався, перевірити значеня колонки admin_role\n\t\tif (!empty($_SESSION['id']) && !empty($admin_array)){\n\t\t\tforeach($admin_array as $admin){\n\t\t\t\tif($admin['customer_id']==$_SESSION['id']){return TRUE;}\n\t\t\t}\n\t\treturn FALSE;\t\n\t\t}\n\t}\n\t\t\n\t//метод створення кошика\n\tpublic static function сartStart()\n\t{\n\t\t$_SESSION['cart']=isset($_SESSION['cart'])? $_SESSION['cart']:array();\n\t\tHelper::emptyCart();Helper::addTheSame();Helper::delCartItem();\n\t}\n\n\t//метод видалення товару\n\tpublic static function delCartItem()\n\t{\n\t\t//видалення позиції\n\t\tfor($i=0; $i< count($_SESSION['cart']);$i++){\n\t\t\tif(isset($_POST[$i])){unset($_SESSION['cart'][$i]);unset($_SESSION['qty'][$i]);}\n\t\t\t$_SESSION['cart'] = array_values($_SESSION['cart']);\n\t\t\t\t$_SESSION['qty'] = array_values($_SESSION['qty']);\n\t\t}\t\n\t}\n\n\t//метод очищення кошика\n\tpublic static function emptyCart()\n\t{\n\t\t//якщо натиснуто кнопку очищення - закрити сесії\n\t\tif(!empty($_POST['empty'])){\n\t\t\t$_SESSION['cart']=[];\n\t\t\t$_SESSION['qty']=[];\n\t\t\t$_SESSION['total_qty']=[];\n\t\t}\n\t}\n\n\t//метод повторного додавання товару\n\tpublic static function addTheSame()\n\t{\n\t//якщо додається товар, який вже є в кошику\n\t\tfor($i = 0; $i < count($_SESSION['cart']);$i++){\n\t\t\tfor($j = 0; $j < count($_SESSION['cart']),$j!=$i;$j++){\n\t\t\t\tif(empty(array_diff($_SESSION['cart'][$i],$_SESSION['cart'][$j]))){\n\t\t\t\t\t$_SESSION['qty'][$j]+=$_SESSION['qty'][$i];}\n\t\t\t}\n\t\t}\n\t\t$_SESSION['cart'] = array_unique($_SESSION['cart'],SORT_REGULAR);\n\t}\n\n\t//загальна кількість конкретного замовленого товару\n\tpublic static function itemTotalQty($num,$max_qty)\n\t{\n\t\t$item_total_qty=0;\n\t\t$item_total_qty = $_SESSION['qty'][$num] > $max_qty ?\n\t\t$max_qty : $_SESSION['qty'][$num];\n\t\t\n\t\treturn $item_total_qty;\n\t}\n\n\t//загальна сумма конкретного замовленого товару\n\tpublic static function itemTotalAmount($num,$max_qty,$item_price)\n\t{\n\t\t$item_total_amount=0;\n\t\t$item_total_amount= Helper::itemTotalQty($num,$max_qty) * $item_price;\n\t\treturn $item_total_amount;\n\t}\n\n\t//загальна кількість всіх замовлених товарів\n\tpublic static function cartTotalQty()\n\t{\n\t\t$total_qty = 0;\n\t\tif(!empty($_SESSION['cart'])){\n\t\t\tforeach($_SESSION['cart'] as $num=>$product){\n\t\t\t//загальна кількість всіх замовлених товарів\n\t\t\t$total_qty += Helper::itemTotalQty($num,$product['qty']);\n\t\t\t}\n\t\t}\t\n\t\treturn $total_qty;\n\t}\n\t//загальна сумма всіх замовлених товарів\n\tpublic static function cartTotalAmount()\n\t{\n\t\t$total_amount = 0;\n\n\t\tforeach($_SESSION['cart'] as $num=>$product)\n\t\t{\n\t\t\t//загальна кількість всіх замовлених товарів\n\t\t\t$total_amount += Helper::itemTotalQty($num,$product['qty']) * $product['price'];\n\t\t}\n\t\treturn $total_amount;\n\t}\n\n\t\t\n\t//оформлення замовлення\n\tpublic static function orderDetails()\n\t{\t\n\t\t//час оформлення замовлення\n\t\t$datetime = date_create()->format('Y-m-d H:i:s');\n\t\t\n\t\t//id замовника\n\t\t$customer_id = $_SESSION['id'];\n\t\t\n\t\t//змінні замовлення\n\t\t$orderitem_id = $order_id  = $product_id =$qty = '';\n\t\t\n\t\t//максим. id замовлення на момент замовлення\t\t\t\t\t\t\n\t\t$max_order_id = Helper::MaxValue('order_id','sales_orderitem')!=null ?\n\t\t\n\t\tHelper::MaxValue('order_id','sales_orderitem'):0;\n\t\t\n\t\t//запис в БД\t\t\n\t\t$db = new DB();\n\t\t$sql=\"INSERT INTO sales_order VALUES (?,?,?);\";\n\t\t$db->query($sql,array($order_id,$customer_id,$datetime));\n\t\t\n\t\tforeach($_SESSION['cart'] as $num=>$product){\n\t\t\n\t\t\t//максим. id позиції в межах одного замовлення\n\t\t\t\t\t\t\n\t\t\t$max_orderitem_id = Helper::MaxValue('orderitem_id','sales_orderitem')!=null ?\n\t\t\tHelper::MaxValue('orderitem_id','sales_orderitem'):0;\n\t\t\n\t\t\n\t\t\t//збільшуємо id нового замовлення\n\t\t\t$order_id = $max_order_id + 1;\n\t\t\t$orderitem_id = $max_orderitem_id + 1;\n\t\t\t\n\t\t\t//id замовленого товару\n\t\t\t$product_id = $product['id'];\n\t\t\t\n\t\t\t//к-сть замовленого товару\n\t\t\t$qty=Helper::itemTotalQty($num,$product['qty']);\n\t\t\t\n\t\t\t//запис в БД\n\t\t\t\t\t\t\t\t\t\n\t\t\t$sql=\"INSERT INTO sales_orderitem VALUES (?,?,?,?);\";\n\t\t\t$db->query($sql,array($orderitem_id,$order_id,$product_id,$qty));\n\t\t\t\t\t\t\t\t\t\n\t\t}\n\t\t\n\t}\n\n\t\t//метод, який реагує на натискання кнопок купити\n\t\tpublic static function buttonListener($products)\n\t\t{\n\t\t\t$names = [];\n\t\t\tfor($i=0; $i<count($products);$i++){\n\t\t\t\t$names[]=$products[$i]['id'];\n\t\t\t}\n\t\t\tforeach($names as $name){\n\t\t\t\tif (!empty($_POST[$name])){\n\t\t\t\t\techo (\"<div id ='order'><h3>Товар <strong>\".\n\t\t\t\t\t(array_values($_POST)[1]).\n\t\t\t\t\t\"</strong> додано до Вашого кошика! </h3></div>\");}\n\t\t\t}\n\t\t}\n\n\t// Перевірка непорожності введення, якщо порожнє повертає TRUE \n\tpublic static function Empty($input)\n\t{\n\t\treturn (isset($_POST[$input]) && empty($_POST[$input]))? TRUE : FALSE ;\n\t\t\t\n\t}\n\n\t// Перевірка непорожності введення, якщо порожнє повертає TRUE \n\tpublic static function FormIcorrectInputMessage($input)\n\t{\n\t\tswitch ($input)\n\t\t{   \n\t\t\tcase \"sku\":\n\t\t\tif(self::Empty($input)){echo \"Введіть данні\";};\t\t\n\t\t\tbreak;\n\n\t\t\tcase \"name\":\n\t\t\tif(self::Empty($input)){echo \"Введіть данні\";};\t\t\t\n\t\t\tbreak;\n\n\t\t\tcase \"price\":\n\t\t\tif(self::Empty($input)){echo \"Введіть данні\";};\t\t\t\n\t\t\tif (!self::Numeric($input)){echo \"Введіть невід'ємне число\";}\n\t\t\tbreak;\n\n\t\t\tcase \"qty\":\n\t\t\tif(self::Empty($input)){echo \"Введіть данні\";};\n\t\t\tif (!self::Numeric($input)){echo \"Введіть невід'ємне число\";}\n\t\t\tbreak;\n\n\t\t\tcase \"last_name\":\n\t\t\tif(self::Empty($input)){echo \"Введіть данні\";};\n\t\t\tif (!self::isUkrainian($input)){echo \"Прізвище має бути введено українською мовою\";}\n\t\t\tbreak;\n\t\t\t\n\n\t\t\tcase \"first_name\":\n\t\t\tif(self::Empty($input)){echo \"Введіть данні\";};\n\t\t\tif(!self::isUkrainian($input)){echo \"Ім'я має бути введено українською мовою\";}\n\t\t\tbreak;\n\n\t\t\tcase \"telephone\":\n\t\t\tif(self::Empty($input)){echo \"Введіть данні\";};\n\t\t\tif(!self::isCorrectPhone($input)){echo \"Телефон має містити лише цифри\";}\n\t\t\tbreak;\n\n\t\t\tcase \"email\":\n\t\t\tif(self::Empty($input)){echo \"Введіть данні\";};\n\t\t\tif(!self::isCorrectEmail($input)){echo \"Введіть корректний email\";}\n\t\t\tbreak;\n\n\t\t\tcase \"email\":\n\t\t\tif(self::Empty($input)){echo \"Введіть данні\";};\n\t\t\tif(!self::isCorrectEmail($input)){echo \"Введіть корректний email\";}\n\t\t\tbreak;\n\n\t\t\tcase \"city\":\n\t\t\tif(self::Empty($input)){echo \"Введіть данні\";};\n\t\t\tif(!self::isUkrainian($input)){echo \"Ім'я має бути введено українською мовою\";}\n\t\t\tbreak;\n\n\t\t\tdefault:\n\t\t\techo \"\";\n\t\t\treturn TRUE;   \n\t\t}\n\t}\n\n\n}\n\n\n\n\n\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/core/Helper.php b/app/core/Helper.php
+--- a/app/core/Helper.php	(revision dec022faebf265f9b8cdde27cd7ea0fe397b076b)
++++ b/app/core/Helper.php	(date 1671741658448)
+@@ -3,7 +3,7 @@
+ class Helper
+ {
+ 	// універсальна змінна-масив  
+-	public static $var = array();	
++	public static array $var = 	[];
+ 
+ 	// метод перевірки правильності укр. введення
+ 	public static function isUkrainian($input): bool
+@@ -247,7 +247,8 @@
+ 
+ 	//метод виведення попереджень при введеннях укр. мовою
+ 
+-	public static function isUkrInput(){
++	public static function isUkrInput(): array
++    {
+ 		//масив помилок
+ 		$params = array('last_name'=>'','first_name'=>'','city'=>'');	
+ 			
+@@ -263,8 +264,8 @@
+ 	}
+ 
+ 	//метод виведення попереджень при введені телефону
+-	public static function isCorrectPhoneInput()
+-	{
++	public static function isCorrectPhoneInput(): array
++    {
+ 		//масив помилок
+ 		$params = array('telephone'=> '');
+ 		
+@@ -279,8 +280,8 @@
+ 		return array_values($params);
+ 	}
+ 	//вивід помилок при введенні email
+-	public static function isCorrectEmailInput()
+-	{
++	public static function isCorrectEmailInput(): array
++    {
+ 		//масив помилок
+ 		$params = array('email'=>'');		
+ 		foreach($params as $column=>&$error){			
+@@ -293,8 +294,8 @@
+ 	}
+ 
+ 	//вивід помилок при введенні паролів
+-	public static function isCorrectPasswordInput()
+-	{
++	public static function isCorrectPasswordInput(): array
++    {
+ 		//масив помилок
+ 		$params = array('password'=>'','pass_confirm'=>'');		
+ 		foreach($params as $column=>&$error){			
+@@ -616,9 +617,9 @@
+ 		}
+ 
+ 	// Перевірка непорожності введення, якщо порожнє повертає TRUE 
+-	public static function Empty($input)
+-	{
+-		return (isset($_POST[$input]) && empty($_POST[$input]))? TRUE : FALSE ;
++	public static function Empty($input): bool
++    {
++		return isset($_POST[$input]) && empty($_POST[$input]);
+ 			
+ 	}
+ 
+@@ -626,32 +627,26 @@
+ 	public static function FormIcorrectInputMessage($input)
+ 	{
+ 		switch ($input)
+-		{   
+-			case "sku":
++		{
++            case "name":
++            case "sku":
+ 			if(self::Empty($input)){echo "Введіть данні";};		
+ 			break;
+ 
+-			case "name":
+-			if(self::Empty($input)){echo "Введіть данні";};			
+-			break;
+-
+-			case "price":
++            case "qty":
++            case "price":
+ 			if(self::Empty($input)){echo "Введіть данні";};			
+ 			if (!self::Numeric($input)){echo "Введіть невід'ємне число";}
+ 			break;
+ 
+-			case "qty":
+-			if(self::Empty($input)){echo "Введіть данні";};
+-			if (!self::Numeric($input)){echo "Введіть невід'ємне число";}
+-			break;
+-
+-			case "last_name":
++            case "last_name":
+ 			if(self::Empty($input)){echo "Введіть данні";};
+ 			if (!self::isUkrainian($input)){echo "Прізвище має бути введено українською мовою";}
+ 			break;
+-			
++
+ 
+-			case "first_name":
++            case "city":
++            case "first_name":
+ 			if(self::Empty($input)){echo "Введіть данні";};
+ 			if(!self::isUkrainian($input)){echo "Ім'я має бути введено українською мовою";}
+ 			break;
+@@ -661,22 +656,13 @@
+ 			if(!self::isCorrectPhone($input)){echo "Телефон має містити лише цифри";}
+ 			break;
+ 
+-			case "email":
+-			if(self::Empty($input)){echo "Введіть данні";};
+-			if(!self::isCorrectEmail($input)){echo "Введіть корректний email";}
+-			break;
+-
+-			case "email":
++            case "email":
++            case "email":
+ 			if(self::Empty($input)){echo "Введіть данні";};
+ 			if(!self::isCorrectEmail($input)){echo "Введіть корректний email";}
+ 			break;
+-
+-			case "city":
+-			if(self::Empty($input)){echo "Введіть данні";};
+-			if(!self::isUkrainian($input)){echo "Ім'я має бути введено українською мовою";}
+-			break;
+ 
+-			default:
++            default:
+ 			echo "";
+ 			return TRUE;   
+ 		}
+Index: app/controllers/ProductController.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?php\n\nclass ProductController extends Controller\n{\n\tpublic function IndexAction()\n\t{\n\t    $this->ListAction();\n\t} \n\n    // МЕТОД ВИВЕДЕННЯ ВСІХ ТОВАРІВ\n    public function ListAction()\n    {        \n\t\t// Встановлюємо назву сторінки\n\t\t$this->setTitle(\"Товари\");\n\t\t\n        $this->registry['products'] =\n\n        \t\t/*повертає обєкт класу Product зі значеннями полів\n        \t\ttable_name = products та id_column = id\n        \t\t*/        \t\t\n        \t\t$this->getModel('Product')    \t\t        \t\t\n        \t\t\n        \t\t->initProductCollection($this->getId('Category'))\n        \t\t\n        \t\t/*метод фільтрування*/\n        \t\t//->filter($this->getSortParams())\n\t\t\t\t\n\t\t\t\t/*метод сортування*/\n        \t\t->sort($this->getSortParams())\n\t\t\t\t\n        \t\t/*повертає обєкт класу Product зі значенням властивості $collection */\n        \t\t->getCollection()\n\t\t\t\t\n        \t\t/*повертає значення властивості $collection класу Product */\n        \t\t->select();\n\n        //print_r($this->registry);\n\n\t\t// завантаження вигляду\n\t\t$this->setView();\n\n\t\t// завантаження шаблону\n        $this->renderLayout();\t\t\t\t\n    }\n   \n    // МЕТОД РЕДАГУВАННЯ ТОВАРУ\n    public function EditAction()\n    {             \n        // Встановлюємо назву сторінки\n\t\t$this->setTitle(\"Редагування товару\");\n\n        // Повертає об'єкт класу Category extends Model\n        $category_model = $this->getModel('Category');\n\n\t\t// Масив імен категорій\n\t\t$category_names = $category_model-> getOneColumnArray('title');\n\n\t\t// Масив id категорій\t\t\n\t\t$category_id = $category_model-> getOneColumnArray('category_id');\n        \n        // Масив де ключі - id категорій, значення - імена категорій\n\t\t$this->registry['categories'] = array_combine($category_id, $category_names);\n\n        // Введений sku \n        $entered_sku = Helper::ClearInput($_POST['sku']);\n       \t        \n        // Змінна для виводу помилок \n        $this->registry['error'] = $this->registry['success'] = '';\n        \n        // Якщо не адмін\n\t\tif(Helper::isAdmin() != 1 ){\n\t\t\t$this->registry['error'] = \"Ви не маєте права редагувати товари!\";\n\t\t}        \n                     \n        // Повертає об'єкт класу Product extends Model\n        $model = $this->getModel('Product');\n\t\t\n\t\t// Отримуємо масив данних товару, що редагується\n\t    $this->registry['product'] = $model->getItem($this->getId('Product'));\n\n\t\tif($_POST){\n            $model->editItem($this->getId('Product'));\n        }\n        $this->registry['product'] = $model->getItem($this->getId('Product'));\n\t       \n\t    //відображаємо вигляд\n\t    $this->setView();\n\t        \n\t    //відображаємо шаблон\n\t    $this->renderLayout();\n\t}\n\n    // МЕТОД ДОДАВАННЯ ТОВАРУ\n    public function AddAction()\n    {\n        // Встановлюємо назву сторінки\n        $this->setTitle(\"Додавання товару\");\n\n        // Повертає об'єкт класу Product extends Model\n        $model = $this->getModel('Product');\n\n        // Повертає об'єкт класу Category extends Model\n        $categoryModel = $this->getModel('Category');\n        \n        // Масив де ключі - id категорій, значення - імена категорій\n\t\t$this->registry['categories'] = array_combine(\n\t\t\t$categoryModel->getCategoriesIds(), $categoryModel->getCategoriesNames());\n\t\t\n\t\t$this->registry['error'] = '';\n\n        // введений sku \n        $entered_sku = $_POST['sku'];\n\t\t\n        // Якщо введений sku не унікальний \n        if($values=$model->getPostValues() && !($model->IsValueExists($entered_sku,\"sku\")))\n        {\n            //Викликаємо метод класу Model додавання товару \n            $model->addProduct();\n        }\n        else {$this->registry['error'] =\n\t\t\"Товар з sku = $entered_sku вже існує.<br>Введіть інший sku та спробуйте знову\";}\n               \n\t    //відображаємо вигляд\n\t    $this->setView();\n\t    \n\t    //відображаємо шаблон\n\t    $this->renderLayout();\n\t}\n\n    // МЕТОД ВИДАЛЕННЯ ТОВАРУ\n    public function DeleteAction()\n    {\n        // Встановлюємо назву сторінки\n        $this->setTitle(\"Видалення товару\");\n\n        // Повертає об'єкт класу Product extends Model\n        $model = $this->getModel('Product');\t\t\n\n\t\t// Отримуємо масив данних товару, що редагується \t\n\t    $this->registry['product'] = $model->getItem($this->getId('Product'));\n\t\t\n        // Якщо отриманий з запиту id існує в БД - видаляємо\n        if (in_array(\n\t\t$this->getId('Product'),\n\t\t$model->getColumnArray($this->getIdColumnName('Product'))))\n        {\n        \t// Викликаємо метод класу Model видалення товару\n        \t$model->deleteItem($this->getId('Product'));\n\n\t        //відображаємо вигляд\n\t        $this->setView();\n\t        \n\t        //відображаємо шаблон\n\t        $this->renderLayout();\n        }\n\n\t\t// Якщо отриманий з запиту id неіснує в БД    \n\t    else\n\t    {\n\t    \t//відображаємо шаблон\n\t        $this->renderPartialview('layout');\n\t        echo(\"Нема такого товару\"); \n\t    }\t \n\t}\n\t\n\tpublic function CartAction()\n    {\n    \t// Повертає об'єкт класу Product extends Model\n        $model = $this->getModel('Product');\n\t\t\t\t       \n        // Встановлюємо назву сторінки\n        $this->setTitle(\"Додавання до кошику\");\n\t\t\n\t\t$this->registry['cart'] = $model->initCollection()->getCollection()->getItemByParam('id',$this->getId($this->getModelName()));\n\t\t\n\t\t$this->setView();\n        $this->renderLayout();\n\t} \n\n    public function getSortParams()\n    {        \n\t\t//змінна оновлення сторінки (0 - не оновлена, 1 - оновлена)\n\t\t$pageRefreshed = isset($_SERVER['HTTP_CACHE_CONTROL']) &&\n\t\t($_SERVER['HTTP_CACHE_CONTROL'] === 'max-age=0' ||\n\t\t$_SERVER['HTTP_CACHE_CONTROL'] == 'no-cache'); \n\t\t\n\t\t$params = [];\n\t\t\n        $sortfirst = filter_input(INPUT_POST, 'sortfirst');\n\t\t\t\t\n        if ($sortfirst === \"price_DESC\"){\n            $params['price'] = 'DESC';\t\t\t\n\t\t\t//запис cookie для ціни\n\t\t\tsetcookie('price', 'DESC',time()+3600,'/');\n\t    }\n        else\n        {\n            $params['price'] = 'ASC';\n\t\t\t//запис cookie для ціни\n\t\t\tsetcookie('price', 'ASC',time()+3600,'/');\t\t\t\n        }\n        \n\t\t$sortsecond = filter_input(INPUT_POST, 'sortsecond');\n\t\t\n        if ($sortsecond === \"qty_DESC\"){\n            $params['qty'] = 'DESC';\n\t\t\t//запис cookie для к-сті\n\t\t\tsetcookie('qty', 'DESC', time()+3600,'/');\n\t\t\t\t\n        }\n        else\n        {\n            $params['qty'] = 'ASC';\t\t\t\n\t\t\t//запис cookie для к-сті\n\t\t\tsetcookie('qty', 'ASC', time()+3600,'/');\t\t\t\n        }\n\t\t\n\t\t//масив cookie \t\n\t\t$cookies = ['price' => isset($_COOKIE['price'])\n\t\t? $_COOKIE['price']\n\t\t: $params['price'],'qty'=>isset($_COOKIE['qty'])? $_COOKIE['qty']:$params['qty']];\t\n\t\t\n\t\t//якщо сторінку оновили=сортуємо, якщо ні показуємо cookie \n\t\treturn $pageRefreshed == 0 ? $cookies : $params;\n\t}\n\n\t//МЕТОД ЕКСПОРТУ З XML\t\n\tpublic function UnloadAction()\n\t{\n\t\t$products = $this->getModel('Product')\n            ->initCollection()\n            ->getCollection()->select();\n\t\t\t\n\t\t//повідомлення про помилку або успіх\n\t\t$this->registry['export_message']='';\t\n\t\t\t\n\t\tif(isset($_POST['export'])){\n\t\t\t$xml = new SimpleXMLElement('<?xml version=\"1.0\" encoding=\"UTF-8\" ?><products/>');\n\n\t\tforeach ($products as $product)\n\t\t{\n\t\t\t$xmlProduct = $xml->addChild('product');\n\t\t\t$xmlProduct->addChild('id',$product['id']);\n\t\t\t$xmlProduct->addChild('sku',$product['sku']);\n\t\t\t$xmlProduct->addChild('name',$product['name']);\n\t\t\t$xmlProduct->addChild('price',$product['price']);\n\t\t\t$xmlProduct->addChild('qty',$product['qty']);\n\t\t\t$xmlProduct->addChild('description',$product['description']);\n\t\t}\t\t\t\n\n\t\t$dom = new DOMDocument(\"1.0\");\n\t\t$dom->preserveWhiteSpace = false;\n\t\t$dom->formatOutput = true;\n\t\t$dom->loadXML($xml->asXML());\n\t\t$dom->saveXML();\n\t\t\n\t\t$dirName='public';\n\t\t\n\t\t//якщо папки $dirName немає\n\t\tif(!is_dir($dirName)){\n\t\t//створюємо папку $dirName\n\t\tmkdir($dirName, 0755);\n\t\t}\n\t\t\t$this->registry['export_message']='Файл не вдалося створити!';\n\t\t\t$file = fopen('public/products.xml','w');\n\t\t\tfwrite($file, $dom->saveXML());\n\t\t\tfclose($file);\n\t\t\t$this->registry['export_message']='Файл створено успішно!';\n\t\t}\n\t\t\n        $this->setView();\n        $this->renderLayout();\n    }\n\n\t//МЕТОД ІМПОРТУ З XML\t\n\tpublic function UploadAction()\n    {\n\t\t$products = $this->getModel('Product')\n\t\t->initCollection()->getCollection()->select();\n        \t\t\t\t\t\n\t\t//повідомлення про помилку або успіх\n\t\t$this->registry['import_message']='';\n\t\t\n\t\t//отримання масиву id\n\t\t$id_array =[];\n\t\t\n\t\tforeach ($products as $key=>$value) {\n\t\t\t$id_array[] = $value['id'] ;\t\n\t\t}\n\t\t\n\t\tif(isset($_POST['import'])){\n\t\t\tif(file_exists (\"public/import.xml\")){\n\t\t\t//завантаження файлу\n\t\t\t$xml = simplexml_load_file(\"public/import.xml\") or die(\"Помилка завантаження файлу!\");\n\t\t\t$invalid_id_array = [];\n\t\t\t//отримання записів з файлу\n\t\t\tforeach ($xml->children() as $row)\n\t\t\t{\n\t\t\t\t$id = $row->id;\n\t\t\t\t$sku = $row->sku;\n\t\t\t\t$name = $row->name;\n\t\t\t\t$price = $row->price;\n\t\t\t\t$qty = $row->qty;\n\t\t\t\t$description = $row->description;\n\t\t\t\t\n\t\t\t\t//запис в БД\n\t\t\t\t$db = new DB();\n\t\t\t\t\n\t\t\t\t//якщо ціна та кількість некорректні - пропускаємо і записуємо в маисв\n\t\t\t\tif($price < 0 || $qty < 0){$invalid_id_array[] = $id;continue;}\n\t\t\t\t\n\t\t\t\t//якщо id не унікальний - оновлюємо запис\n\t\t\t\telseif(in_array($id, $id_array)){\n\t\t\t\t\t$sql = \"UPDATE products SET id=?,sku=?,name=?,price=?,qty=?,description=? WHERE id=?;\";\n\t\t\t\t\t$db->query($sql,array($id,$sku,$name,$price,$qty,$description,$id));\t\t\t\t\t\n\t\t\t\t}\n\t\t\t\t\n\t\t\t\t//якщо id унікальний - додаємо запис\n\t\t\t\telse{\n\t\t\t\t\t$sql=\"INSERT INTO products VALUES (?,?,?,?,?,?);\";\n\t\t\t\t\t$db->query($sql,array($id,$sku,$name,$price,$qty,$description));\n\t\t\t\t}\n\t\t\t\t\t\t\n\t\t\t}\n\t\t\t\t\t\n\t\t\t//рядок з id товарів з невалідними параметрами\n\t\t\t$invalid_id_str = implode(\",\", $invalid_id_array);\n\t\t\t\n\t\t\t$this->registry['import_message']=empty($invalid_id_array) ? \"Файл імпортовано успішно!\":\n\t\t\t\"Файл імпортовано успішно!<br><br>Товар(и) з id =  $invalid_id_str не були імпортовані\n\t\t\tчерез некорректні значення ціни або (та) к-сті\";\t\n\t\t}\n\t\telse $this->registry['import_message']=\"Файлу import.xml в папці public не знайдено! \";\n\t\t}\n\t\t\n\t\t$this->setView();\n\t\t$this->renderLayout();\t\n\t}  \n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/controllers/ProductController.php b/app/controllers/ProductController.php
+--- a/app/controllers/ProductController.php	(revision dec022faebf265f9b8cdde27cd7ea0fe397b076b)
++++ b/app/controllers/ProductController.php	(date 1671741658464)
+@@ -97,7 +97,7 @@
+         $this->setTitle("Додавання товару");
+ 
+         // Повертає об'єкт класу Product extends Model
+-        $model = $this->getModel('Product');
++        $productModel = $this->getModel('Product');
+ 
+         // Повертає об'єкт класу Category extends Model
+         $categoryModel = $this->getModel('Category');
+@@ -112,10 +112,12 @@
+         $entered_sku = $_POST['sku'];
+ 		
+         // Якщо введений sku не унікальний 
+-        if($values=$model->getPostValues() && !($model->IsValueExists($entered_sku,"sku")))
++        if($values = $productModel->getPostValues() && !($productModel->IsValueExists($entered_sku,"sku")))
+         {
+             //Викликаємо метод класу Model додавання товару 
+-            $model->addProduct();
++            $productModel->addProduct();
++
++            $productId
+         }
+         else {$this->registry['error'] =
+ 		"Товар з sku = $entered_sku вже існує.<br>Введіть інший sku та спробуйте знову";}
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_18_12_22__21_41__Changes_.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_18_12_22__21_41__Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Update_at_18_12_22__21_41__Changes_.xml
+new file mode 100644
+--- /dev/null	(date 1671738257274)
++++ b/.idea/shelf/Uncommitted_changes_before_Update_at_18_12_22__21_41__Changes_.xml	(date 1671738257274)
+@@ -0,0 +1,4 @@
++<changelist name="Uncommitted_changes_before_Update_at_18_12_22,_21_41_[Changes]" date="1671392497535" recycled="true" deleted="true">
++  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_18_12_22,_21_41_[Changes]/shelved.patch" />
++  <option name="DESCRIPTION" value="Uncommitted changes before Update at 18.12.22, 21:41 [Changes]" />
++</changelist>
+\ No newline at end of file
+Index: app/models/ProductCategory.php
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/models/ProductCategory.php b/app/models/ProductCategory.php
+new file mode 100644
+--- /dev/null	(date 1671740669455)
++++ b/app/models/ProductCategory.php	(date 1671740669455)
+@@ -0,0 +1,26 @@
++<?php
++
++/**
++ * Class ProductCategory
++ */
++class ProductCategory extends Model
++{
++    /**
++     * Product constructor.
++     */
++    function __construct()
++    {
++        $this->table_name = "product_category";
++        $this->id_column = "product_id";
++    }
++
++//МЕТОД ДОДАВАННЯ НОВОГО ТОВАРУ
++    public function assignProductToCategory(int $productId): Product
++    {
++        $categoryId = $this->FormData()['category_id'];
++        //параметри введеного товару
++        $params = [$productId,$categoryId];
++        $this->addItem($this->getColumnsNames(), $params);
++        return $this;
++    }
++}
+\ No newline at end of file
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"AutoImportSettings\">\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\n  </component>\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"44db09f3-ed29-422b-aa5b-d88e9206afce\" name=\"Changes\" comment=\"Edit product\">\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/app/controllers/CustomerController.php\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/app/controllers/CustomerController.php\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/app/core/Model.php\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/app/core/Model.php\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/app/views/customer/edit.php\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/app/views/customer/edit.php\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"ComposerSettings\">\n    <execution />\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_BRANCH_BY_REPOSITORY\">\n      <map>\n        <entry key=\"$PROJECT_DIR$\" value=\"main\" />\n      </map>\n    </option>\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"MarkdownSettingsMigration\">\n    <option name=\"stateVersion\" value=\"1\" />\n  </component>\n  <component name=\"ProjectId\" id=\"2IbGF0r3fmskdSsEtNqUNj83crJ\" />\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\">{\n  &quot;keyToString&quot;: {\n    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,\n    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,\n    &quot;last_opened_file_path&quot;: &quot;/var/www/magento&quot;,\n    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,\n    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,\n    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,\n    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,\n    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,\n    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;,\n    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;\n  }\n}</component>\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"44db09f3-ed29-422b-aa5b-d88e9206afce\" name=\"Changes\" comment=\"\" />\n      <created>1670442761406</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1670442761406</updated>\n      <workItem from=\"1670442762485\" duration=\"2547000\" />\n      <workItem from=\"1670476255677\" duration=\"4973000\" />\n      <workItem from=\"1670510938742\" duration=\"1129000\" />\n      <workItem from=\"1670532061967\" duration=\"4992000\" />\n      <workItem from=\"1670538126283\" duration=\"130000\" />\n      <workItem from=\"1671287985426\" duration=\"1436000\" />\n      <workItem from=\"1671364665321\" duration=\"8265000\" />\n      <workItem from=\"1671385544647\" duration=\"4436000\" />\n    </task>\n    <task id=\"LOCAL-00001\" summary=\"Minor refactoring\">\n      <created>1670537533440</created>\n      <option name=\"number\" value=\"00001\" />\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1670537533440</updated>\n    </task>\n    <task id=\"LOCAL-00002\" summary=\"first commit\">\n      <created>1671296661450</created>\n      <option name=\"number\" value=\"00002\" />\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1671296661451</updated>\n    </task>\n    <task id=\"LOCAL-00003\" summary=\"Edit product\">\n      <created>1671386730213</created>\n      <option name=\"number\" value=\"00003\" />\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1671386730213</updated>\n    </task>\n    <option name=\"localTasksCounter\" value=\"4\" />\n    <servers />\n  </component>\n  <component name=\"TypeScriptGeneratedFilesManager\">\n    <option name=\"version\" value=\"3\" />\n  </component>\n  <component name=\"Vcs.Log.Tabs.Properties\">\n    <option name=\"TAB_STATES\">\n      <map>\n        <entry key=\"MAIN\">\n          <value>\n            <State />\n          </value>\n        </entry>\n      </map>\n    </option>\n  </component>\n  <component name=\"VcsManagerConfiguration\">\n    <MESSAGE value=\"Minor refactoring\" />\n    <MESSAGE value=\"first commit\" />\n    <MESSAGE value=\"Edit product\" />\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"Edit product\" />\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision dec022faebf265f9b8cdde27cd7ea0fe397b076b)
++++ b/.idea/workspace.xml	(date 1671741670204)
+@@ -4,11 +4,17 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="44db09f3-ed29-422b-aa5b-d88e9206afce" name="Changes" comment="Edit product">
++    <list default="true" id="44db09f3-ed29-422b-aa5b-d88e9206afce" name="Changes" comment="Minor refactoring">
++      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_18_12_22,_21_41_[Changes]/shelved.patch" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_18_12_22__21_41__Changes_.xml" afterDir="false" />
++      <change afterPath="$PROJECT_DIR$/app/models/ProductCategory.php" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/app/controllers/CustomerController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/controllers/CustomerController.php" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/app/controllers/ProductController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/controllers/ProductController.php" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/app/core/DB.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/DB.php" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/app/core/Helper.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/Helper.php" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/app/core/Model.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/Model.php" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/app/views/customer/edit.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/views/customer/edit.php" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/app/models/Product.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/Product.php" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -35,21 +41,21 @@
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent">{
+-  &quot;keyToString&quot;: {
+-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+-    &quot;last_opened_file_path&quot;: &quot;/var/www/magento&quot;,
+-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+-    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;,
+-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
++  <component name="PropertiesComponent"><![CDATA[{
++  "keyToString": {
++    "RunOnceActivity.OpenProjectViewOnStart": "true",
++    "RunOnceActivity.ShowReadmeOnStart": "true",
++    "WebServerToolWindowFactoryState": "false",
++    "last_opened_file_path": "/var/www/html",
++    "node.js.detected.package.eslint": "true",
++    "node.js.detected.package.tslint": "true",
++    "node.js.selected.package.eslint": "(autodetect)",
++    "node.js.selected.package.tslint": "(autodetect)",
++    "nodejs_package_manager_path": "npm",
++    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
++    "vue.rearranger.settings.migration": "true"
+   }
+-}</component>
++}]]></component>
+   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+   <component name="TaskManager">
+     <task active="true" id="Default" summary="Default task">
+@@ -65,7 +71,9 @@
+       <workItem from="1670538126283" duration="130000" />
+       <workItem from="1671287985426" duration="1436000" />
+       <workItem from="1671364665321" duration="8265000" />
+-      <workItem from="1671385544647" duration="4436000" />
++      <workItem from="1671385544647" duration="7248000" />
++      <workItem from="1671474740023" duration="607000" />
++      <workItem from="1671738254408" duration="3416000" />
+     </task>
+     <task id="LOCAL-00001" summary="Minor refactoring">
+       <created>1670537533440</created>
+@@ -88,7 +96,28 @@
+       <option name="project" value="LOCAL" />
+       <updated>1671386730213</updated>
+     </task>
+-    <option name="localTasksCounter" value="4" />
++    <task id="LOCAL-00004" summary="Edit product">
++      <created>1671391232433</created>
++      <option name="number" value="00004" />
++      <option name="presentableId" value="LOCAL-00004" />
++      <option name="project" value="LOCAL" />
++      <updated>1671391232433</updated>
++    </task>
++    <task id="LOCAL-00005" summary="Merge remote-tracking branch 'origin/devDescTop' into devDescTop&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;#&#9;app/core/Model.php">
++      <created>1671392485773</created>
++      <option name="number" value="00005" />
++      <option name="presentableId" value="LOCAL-00005" />
++      <option name="project" value="LOCAL" />
++      <updated>1671392485773</updated>
++    </task>
++    <task id="LOCAL-00006" summary="Minor refactoring">
++      <created>1671393898188</created>
++      <option name="number" value="00006" />
++      <option name="presentableId" value="LOCAL-00006" />
++      <option name="project" value="LOCAL" />
++      <updated>1671393898188</updated>
++    </task>
++    <option name="localTasksCounter" value="7" />
+     <servers />
+   </component>
+   <component name="TypeScriptGeneratedFilesManager">
+@@ -106,9 +135,10 @@
+     </option>
+   </component>
+   <component name="VcsManagerConfiguration">
+-    <MESSAGE value="Minor refactoring" />
+     <MESSAGE value="first commit" />
+     <MESSAGE value="Edit product" />
+-    <option name="LAST_COMMIT_MESSAGE" value="Edit product" />
++    <MESSAGE value="Merge remote-tracking branch 'origin/devDescTop' into devDescTop&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;#&#9;app/core/Model.php" />
++    <MESSAGE value="Minor refactoring" />
++    <option name="LAST_COMMIT_MESSAGE" value="Minor refactoring" />
+   </component>
+ </project>
+\ No newline at end of file
+Index: .idea/php.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"MessDetectorOptionsConfiguration\">\n    <option name=\"transferred\" value=\"true\" />\n  </component>\n  <component name=\"PHPCSFixerOptionsConfiguration\">\n    <option name=\"transferred\" value=\"true\" />\n  </component>\n  <component name=\"PHPCodeSnifferOptionsConfiguration\">\n    <option name=\"transferred\" value=\"true\" />\n  </component>\n  <component name=\"PhpProjectSharedConfiguration\" php_language_level=\"7.0\">\n    <option name=\"suggestChangeDefaultLanguageLevel\" value=\"false\" />\n  </component>\n  <component name=\"PhpStanOptionsConfiguration\">\n    <option name=\"transferred\" value=\"true\" />\n  </component>\n  <component name=\"PsalmOptionsConfiguration\">\n    <option name=\"transferred\" value=\"true\" />\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/php.xml b/.idea/php.xml
+--- a/.idea/php.xml	(revision dec022faebf265f9b8cdde27cd7ea0fe397b076b)
++++ b/.idea/php.xml	(date 1671738481680)
+@@ -9,7 +9,7 @@
+   <component name="PHPCodeSnifferOptionsConfiguration">
+     <option name="transferred" value="true" />
+   </component>
+-  <component name="PhpProjectSharedConfiguration" php_language_level="7.0">
++  <component name="PhpProjectSharedConfiguration" php_language_level="7.4">
+     <option name="suggestChangeDefaultLanguageLevel" value="false" />
+   </component>
+   <component name="PhpStanOptionsConfiguration">
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_18_12_22,_21_41_[Changes]/shelved.patch
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_18_12_22,_21_41_[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Update_at_18_12_22,_21_41_[Changes]/shelved.patch
+new file mode 100644
+--- /dev/null	(date 1671392497478)
++++ b/.idea/shelf/Uncommitted_changes_before_Update_at_18_12_22,_21_41_[Changes]/shelved.patch	(date 1671392497478)
+@@ -0,0 +1,45 @@
++Index: .idea/workspace.xml
++IDEA additional info:
++Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
++<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"AutoImportSettings\">\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\n  </component>\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"44db09f3-ed29-422b-aa5b-d88e9206afce\" name=\"Changes\" comment=\"Edit product\">\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/app/controllers/CustomerController.php\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/app/controllers/CustomerController.php\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/app/core/Model.php\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/app/core/Model.php\" afterDir=\"false\" />\n      <change beforePath=\"$PROJECT_DIR$/app/views/customer/edit.php\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/app/views/customer/edit.php\" afterDir=\"false\" />\n    </list>\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"ComposerSettings\">\n    <execution />\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_BRANCH_BY_REPOSITORY\">\n      <map>\n        <entry key=\"$PROJECT_DIR$\" value=\"main\" />\n      </map>\n    </option>\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"MarkdownSettingsMigration\">\n    <option name=\"stateVersion\" value=\"1\" />\n  </component>\n  <component name=\"ProjectId\" id=\"2IbGF0r3fmskdSsEtNqUNj83crJ\" />\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\">{\n  &quot;keyToString&quot;: {\n    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,\n    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,\n    &quot;last_opened_file_path&quot;: &quot;/var/www/magento&quot;,\n    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,\n    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,\n    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,\n    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,\n    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,\n    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;,\n    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;\n  }\n}</component>\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"44db09f3-ed29-422b-aa5b-d88e9206afce\" name=\"Changes\" comment=\"\" />\n      <created>1670442761406</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1670442761406</updated>\n      <workItem from=\"1670442762485\" duration=\"2547000\" />\n      <workItem from=\"1670476255677\" duration=\"4973000\" />\n      <workItem from=\"1670510938742\" duration=\"1129000\" />\n      <workItem from=\"1670532061967\" duration=\"4992000\" />\n      <workItem from=\"1670538126283\" duration=\"130000\" />\n      <workItem from=\"1671287985426\" duration=\"1436000\" />\n      <workItem from=\"1671364665321\" duration=\"8265000\" />\n      <workItem from=\"1671385544647\" duration=\"4436000\" />\n    </task>\n    <task id=\"LOCAL-00001\" summary=\"Minor refactoring\">\n      <created>1670537533440</created>\n      <option name=\"number\" value=\"00001\" />\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1670537533440</updated>\n    </task>\n    <task id=\"LOCAL-00002\" summary=\"first commit\">\n      <created>1671296661450</created>\n      <option name=\"number\" value=\"00002\" />\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1671296661451</updated>\n    </task>\n    <task id=\"LOCAL-00003\" summary=\"Edit product\">\n      <created>1671386730213</created>\n      <option name=\"number\" value=\"00003\" />\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\n      <option name=\"project\" value=\"LOCAL\" />\n      <updated>1671386730213</updated>\n    </task>\n    <option name=\"localTasksCounter\" value=\"4\" />\n    <servers />\n  </component>\n  <component name=\"TypeScriptGeneratedFilesManager\">\n    <option name=\"version\" value=\"3\" />\n  </component>\n  <component name=\"Vcs.Log.Tabs.Properties\">\n    <option name=\"TAB_STATES\">\n      <map>\n        <entry key=\"MAIN\">\n          <value>\n            <State />\n          </value>\n        </entry>\n      </map>\n    </option>\n  </component>\n  <component name=\"VcsManagerConfiguration\">\n    <MESSAGE value=\"Minor refactoring\" />\n    <MESSAGE value=\"first commit\" />\n    <MESSAGE value=\"Edit product\" />\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"Edit product\" />\n  </component>\n</project>
++Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
++<+>UTF-8
++===================================================================
++diff --git a/.idea/workspace.xml b/.idea/workspace.xml
++--- a/.idea/workspace.xml	(revision 20d198c957b9eebd5e26588408f8d227c2094501)
+++++ b/.idea/workspace.xml	(date 1671392265840)
++@@ -6,9 +6,7 @@
++   <component name="ChangeListManager">
++     <list default="true" id="44db09f3-ed29-422b-aa5b-d88e9206afce" name="Changes" comment="Edit product">
++       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++-      <change beforePath="$PROJECT_DIR$/app/controllers/CustomerController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/controllers/CustomerController.php" afterDir="false" />
++       <change beforePath="$PROJECT_DIR$/app/core/Model.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/Model.php" afterDir="false" />
++-      <change beforePath="$PROJECT_DIR$/app/views/customer/edit.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/views/customer/edit.php" afterDir="false" />
++     </list>
++     <option name="SHOW_DIALOG" value="false" />
++     <option name="HIGHLIGHT_CONFLICTS" value="true" />
++@@ -65,7 +63,7 @@
++       <workItem from="1670538126283" duration="130000" />
++       <workItem from="1671287985426" duration="1436000" />
++       <workItem from="1671364665321" duration="8265000" />
++-      <workItem from="1671385544647" duration="4436000" />
+++      <workItem from="1671385544647" duration="5606000" />
++     </task>
++     <task id="LOCAL-00001" summary="Minor refactoring">
++       <created>1670537533440</created>
++@@ -88,7 +86,14 @@
++       <option name="project" value="LOCAL" />
++       <updated>1671386730213</updated>
++     </task>
++-    <option name="localTasksCounter" value="4" />
+++    <task id="LOCAL-00004" summary="Edit product">
+++      <created>1671391232433</created>
+++      <option name="number" value="00004" />
+++      <option name="presentableId" value="LOCAL-00004" />
+++      <option name="project" value="LOCAL" />
+++      <updated>1671391232433</updated>
+++    </task>
+++    <option name="localTasksCounter" value="5" />
++     <servers />
++   </component>
++   <component name="TypeScriptGeneratedFilesManager">

@@ -3,7 +3,7 @@
 class Helper
 {
 	// універсальна змінна-масив  
-	public static $var = array();	
+	public static array $var = 	[];
 
 	// метод перевірки правильності укр. введення
 	public static function isUkrainian($input): bool
@@ -247,7 +247,8 @@ class Helper
 
 	//метод виведення попереджень при введеннях укр. мовою
 
-	public static function isUkrInput(){
+	public static function isUkrInput(): array
+    {
 		//масив помилок
 		$params = array('last_name'=>'','first_name'=>'','city'=>'');	
 			
@@ -263,8 +264,8 @@ class Helper
 	}
 
 	//метод виведення попереджень при введені телефону
-	public static function isCorrectPhoneInput()
-	{
+	public static function isCorrectPhoneInput(): array
+    {
 		//масив помилок
 		$params = array('telephone'=> '');
 		
@@ -279,8 +280,8 @@ class Helper
 		return array_values($params);
 	}
 	//вивід помилок при введенні email
-	public static function isCorrectEmailInput()
-	{
+	public static function isCorrectEmailInput(): array
+    {
 		//масив помилок
 		$params = array('email'=>'');		
 		foreach($params as $column=>&$error){			
@@ -293,8 +294,8 @@ class Helper
 	}
 
 	//вивід помилок при введенні паролів
-	public static function isCorrectPasswordInput()
-	{
+	public static function isCorrectPasswordInput(): array
+    {
 		//масив помилок
 		$params = array('password'=>'','pass_confirm'=>'');		
 		foreach($params as $column=>&$error){			
@@ -616,9 +617,9 @@ class Helper
 		}
 
 	// Перевірка непорожності введення, якщо порожнє повертає TRUE 
-	public static function Empty($input)
-	{
-		return (isset($_POST[$input]) && empty($_POST[$input]))? TRUE : FALSE ;
+	public static function Empty($input): bool
+    {
+		return isset($_POST[$input]) && empty($_POST[$input]);
 			
 	}
 
@@ -626,32 +627,26 @@ class Helper
 	public static function FormIcorrectInputMessage($input)
 	{
 		switch ($input)
-		{   
-			case "sku":
+		{
+            case "name":
+            case "sku":
 			if(self::Empty($input)){echo "Введіть данні";};		
 			break;
 
-			case "name":
-			if(self::Empty($input)){echo "Введіть данні";};			
-			break;
-
-			case "price":
+            case "qty":
+            case "price":
 			if(self::Empty($input)){echo "Введіть данні";};			
 			if (!self::Numeric($input)){echo "Введіть невід'ємне число";}
 			break;
 
-			case "qty":
-			if(self::Empty($input)){echo "Введіть данні";};
-			if (!self::Numeric($input)){echo "Введіть невід'ємне число";}
-			break;
-
-			case "last_name":
+            case "last_name":
 			if(self::Empty($input)){echo "Введіть данні";};
 			if (!self::isUkrainian($input)){echo "Прізвище має бути введено українською мовою";}
 			break;
-			
 
-			case "first_name":
+
+            case "city":
+            case "first_name":
 			if(self::Empty($input)){echo "Введіть данні";};
 			if(!self::isUkrainian($input)){echo "Ім'я має бути введено українською мовою";}
 			break;
@@ -661,22 +656,13 @@ class Helper
 			if(!self::isCorrectPhone($input)){echo "Телефон має містити лише цифри";}
 			break;
 
-			case "email":
+            case "email":
+            case "email":
 			if(self::Empty($input)){echo "Введіть данні";};
 			if(!self::isCorrectEmail($input)){echo "Введіть корректний email";}
 			break;
 
-			case "email":
-			if(self::Empty($input)){echo "Введіть данні";};
-			if(!self::isCorrectEmail($input)){echo "Введіть корректний email";}
-			break;
-
-			case "city":
-			if(self::Empty($input)){echo "Введіть данні";};
-			if(!self::isUkrainian($input)){echo "Ім'я має бути введено українською мовою";}
-			break;
-
-			default:
+            default:
 			echo "";
 			return TRUE;   
 		}

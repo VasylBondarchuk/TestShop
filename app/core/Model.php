@@ -6,24 +6,24 @@
 class Model
 {  
 	// ім'я таблиці БД
-    protected $table_name;
+    protected string $table_name;
     
     // назва id-колонки таблиці
-    protected $id_column;
+    protected string $id_column;
     
     // масив імен колонок таблиці БД
-    protected $columns = [];
+    protected array $columns = [];
     
     protected $collection;
     
     // рядок sql-запита
     protected $sql;
     
-    protected $params = [];
+    protected array $params = [];
 	
 	// Метод отримання назва id-колонки таблиці
-	public function getIdColumn()
-	{
+	public function getIdColumn(): string
+    {
 		return $this->id_column;
 	}
 
@@ -32,9 +32,10 @@ class Model
 	{			
 		$db = new DB();		
 		//отримання рядку "(?,?,?,?......,?,?)"
-		$questionMarks = trim(str_repeat('?,',count($columns)),',');		
+		$questionMarks = trim(str_repeat('?,', count($columns)),',');
 		$sql = "INSERT INTO {$this->table_name} VALUES ($questionMarks);";		
-		return $db->query($sql, $params);
+		$db->query($sql, $params);
+        return $db->getLastId();
 	}
 	
 	//МЕТОД СОРТУВАННЯ
@@ -94,7 +95,7 @@ class Model
     {
 		// імена колонок
 		$columns = $this->getColumnsNames();
-		
+
 		// масив для отримання данних з форми
 		$formData = [];
 
@@ -120,7 +121,6 @@ class Model
 		}
 		return $this;
 	}
-
 	
 	public function initCollection(): Model
     {
@@ -185,8 +185,8 @@ class Model
 	}
 
 	// Метод отримання макс. значення конкретної колонки таблиці table_name БД
-	public function MinValue($column)
-	{
+	public function MinValue($column): float
+    {
 		$db = new DB();
 		$sql = "SELECT MIN($column)FROM {$this->table_name};"; 
 		$results = $db->query($sql);
@@ -285,7 +285,7 @@ class Model
     }
 
     // Метод отримання імені колонки з id
-    public function getIdName()
+    public function getIdName(): string
     {
         return $this->id_column;
     }
@@ -334,8 +334,8 @@ class Model
 	}
 
 	// Перевірка, чи всі введення у формі клрректні
-	public function AllInputsCorrects()
-	{
+	public function AllInputsCorrects(): ?bool
+    {
 		// Отримання імен редагованих колонок
 		$columns = $this->getEditableColumns();
 		
