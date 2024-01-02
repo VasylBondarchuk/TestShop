@@ -267,7 +267,7 @@ class Model {
     public function getOneColumnArray($column_name) {
         $db = new DB();
         $sql = "select {$column_name} from {$this->table_name};";
-        $results = $db->query($sql);
+        $results = $db->query($sql); 
 
         // створюємо і повертаємо масив зі значеннями колонки $column_name
         foreach ($results as $result => $value) {

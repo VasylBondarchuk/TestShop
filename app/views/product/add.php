@@ -60,23 +60,22 @@ if(Helper::isAdmin()==1):
 <form method="POST" action="<?php $_SERVER['PHP_SELF']; ?>">
 <div class="container">
 
-Sku: <input type="text" name="sku" value="<?php echo $product["sku"]?>">
+Sku: <input type="text" name="sku" value="<?= ($product["sku"] ?? '')?>">
 <span class="error"> <?php echo Helper::isEmpty('product')[1];?></span><br><br>
 
-Назва: <input type="text" name="name" value="<?php echo $product["name"]?>">
+Назва: <input type="text" name="name" value="<?= ($product["name"] ?? '')?>">
 <span class="error"> <?php echo Helper::isEmpty('product')[2];?></span><br><br>
 
 <label for="category_id">Категорія:</label>
 <select name="category_id">
 <?php
-
 // Масив де ключі - id категорій, значення - імена категорій
 $categories = $this->registry['categories'];
-
+array_shift($categories);
 // Вивід опцій випадаючого списку Категорія
 foreach($categories as $categoryId => $categoryName): ?>	
 	<option value="<?= $categoryId;?>"
-		<?php if($categoryId == $product['category_id'])echo('selected');?>>
+		>
 		<?= $categoryName;?>
 	</option>
 <?php endforeach; ?>
@@ -84,7 +83,7 @@ foreach($categories as $categoryId => $categoryName): ?>
 
 </br></br>
 
-Ціна: <input type="text" name="price" value="<?php echo $product["price"]?>">
+Ціна: <input type="text" name="price" value="<?= ($product["price"] ?? '')?>">
 <span class="error"><?php echo Helper::isEmpty('product')[3];
 echo Helper::isNumeric()[0];?></span><br><br>
 

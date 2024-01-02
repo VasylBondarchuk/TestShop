@@ -516,7 +516,7 @@ class Helper {
     public static function buttonListener($products) {
         $names = [];
         for ($i = 0; $i < count($products); $i++) {
-            $names[] = $products[$i]['id'];
+            $names[] = $products[$i]['product_id'];
         }
         foreach ($names as $name) {
             if (!empty($_POST[$name])) {

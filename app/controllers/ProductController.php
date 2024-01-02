@@ -43,13 +43,13 @@ class ProductController extends Controller {
         $this->setTitle("Редагування товару");
 
         // Повертає об'єкт класу Category extends Model
-        $category_model = $this->getModel('Category');
+        $categoryModel = $this->getModel('Category');
 
         // Масив імен категорій
-        $category_names = $category_model->getOneColumnArray('title');
+        $category_names = $categoryModel->getCategoriesNames();
 
         // Масив id категорій		
-        $category_id = $category_model->getOneColumnArray('category_id');
+        $category_id = $categoryModel->getCategoriesIds();
 
         // Масив де ключі - id категорій, значення - імена категорій
         $this->registry['categories'] = array_combine($category_id, $category_names);
