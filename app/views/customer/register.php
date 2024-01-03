@@ -1,7 +1,7 @@
 <style>
 .warning{color: LightSeaGreen ;}
 .error {color: #FF0000;}
-.container {width: 500px;clear: both;}
+.container {width: 50%;clear: both;}
 .container input {width: 100%;clear: both;}
 .button {
 	font-size: 25px;

@@ -12,14 +12,17 @@ ini_set('display_startup_errors', 1);
 class Model {
 
     // ім'я таблиці БД
-    protected $table_name;
+    protected string $table_name;
     // назва id-колонки таблиці
-    protected $id_column;
+    protected string $id_column;
     // масив імен колонок таблиці БД
-    protected $columns = [];
-    protected $collection;
+    protected array $columns = [];
+    
+    protected array $collection;
+    
     // рядок sql-запита
     protected $sql;
+    
     protected $params = [];
 
     // Метод отримання назва id-колонки таблиці
@@ -33,12 +36,12 @@ class Model {
     }
 
     // АБСТРАКТНИЙ МЕТОД МЕТОД ДОДАВАННЯ ЗАПИСУ ДО ТАБЛИЦІ table_name БД
-    public function addItem($columns, $params) {
+    public function addItem($columns) {
         $db = new DB();
         //отримання рядку "(?,?,?,?......,?,?)"
         $questionMarks = trim(str_repeat('?,', count($columns)), ',');
         $sql = "INSERT INTO {$this->table_name} VALUES ($questionMarks);";
-        return $db->query($sql, $params);
+        return $db->query($sql, $this->params);
     }
 
     //МЕТОД СОРТУВАННЯ
@@ -103,6 +106,9 @@ class Model {
             if (in_array($key, $columns)) {
                 $formData[] = $value;
             }
+        }
+        if($_FILES['product_image']['name']!= ''){
+            $formData[] = $_FILES['product_image']['name']; 
         }
         return $formData;
     }

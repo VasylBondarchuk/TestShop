@@ -22,7 +22,9 @@
 if(Helper::isAdmin()==1)
 {
 	//виведення попередження
-	echo "<span class='warning'><center><h3>
+	echo "<span class='warning'>
+            <center>
+            <h3>
 	Ви збираєтеся видалити товар з id = $id.".'<br>'.
 	"Якщо ви впевнені, натисніть кнопку 'Видалити'
 	</h3></center></span>";

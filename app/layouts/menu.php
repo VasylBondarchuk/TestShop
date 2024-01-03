@@ -14,7 +14,7 @@
             $register = isset($_SESSION['first_name']) == "" ? "login":"register";
 
             //лінк на регістрацію
-            $link = isset($_SESSION['first_name']) == "" ? "<a href=".route::getBP()."/customer/register/>":"<a/>";
+            $link = isset($_SESSION['first_name']) == "" ? "<a href=". route::getBP() ."/customer/register/>":"<a/>";
 
             //лінк на кошик
             $cart = "<a href=".route::getBP()."/cart/add>";

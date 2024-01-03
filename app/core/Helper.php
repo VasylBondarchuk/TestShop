@@ -3,7 +3,7 @@
 class Helper {
 
     // універсальна змінна-масив  
-    public static $var = array();
+    public static $var = [];
 
     // метод перевірки правильності укр. введення
     public static function isUkrainian($input): bool {
@@ -353,7 +353,7 @@ class Helper {
 
     //метод отримання id
     public static function getId() {
-        return filter_input(INPUT_GET, 'id');
+        return filter_input(INPUT_GET, 'product_id');
     }
 
     //виведення попередження для не адміна

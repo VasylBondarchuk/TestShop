@@ -27,16 +27,16 @@ class Product extends Model
     public function addProduct()
 	{
 		//збільшуємо id нового товару на одницю
-		$product_id = $this->MaxValue($this->id_column) + 1;
+		$product_id = $this->MaxValue($this->id_column) + 1;		
 		
-		//параметри введеного товару
-		$params = array_merge([$product_id],$this->FormData());				
-		$this->addItem($this->getColumnsNames(), $params);
+                //параметри введеного товару
+		$this->params = array_merge([$product_id],$this->FormData());                                
+		$this->addItem($this->getColumnsNames());                
 		//якщо корректно введені всі поля - додати
 		if (isset($_POST['add']) && !Helper::isEmpty('product') &&
 		Helper::isNumericInput(['price','qty']))
 		{
-			$this->addItem($this->getColumnsNames(), $params);
+			$this->addItem($this->getColumnsNames());
 			Helper::$var['message']="ok";
 		}		
 		return $this;
