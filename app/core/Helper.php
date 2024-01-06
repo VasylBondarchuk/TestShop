@@ -106,14 +106,14 @@ class Helper {
         }
         return '<a href="' . route::getBP() . $path . '">' . $name . '</a>';
     }
-   
+
     // Метод перенаправлення
     public static function redirect($path) {
         $server_host = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];
         $url = $server_host . route::getBP() . $path;
         header("Location: $url");
     }
-    
+
     public static function getCustomer() {
         if (!empty($_SESSION['id'])) {
             return self::getModel('customer')->initCollection()
@@ -132,7 +132,7 @@ class Helper {
         $results = $db->query($sql);
         return floatval($results[0]["MAX(" . $param . ")"]);
     }
-    
+
     // Метод обробки данних форми
     public static function CleanInput($data) {
         //обрізка пробілів з країв 
@@ -144,7 +144,7 @@ class Helper {
 
         return $data;
     }
-    
+
     //отримання значень форми
     public static function FormData() {
         $form_data = [];
@@ -352,8 +352,8 @@ class Helper {
     }
 
     //метод отримання id
-    public static function getId() {
-        return filter_input(INPUT_GET, 'product_id');
+    public static function getParamFromUrl(string $paramNane) {
+        return filter_input(INPUT_GET, $paramNane);
     }
 
     //виведення попередження для не адміна
@@ -530,6 +530,15 @@ class Helper {
     // Перевірка непорожності введення, якщо порожнє повертає TRUE 
     public static function Empty($input) {
         return (isset($_POST[$input]) && empty($_POST[$input])) ? TRUE : FALSE;
+    }
+
+    // Перевірка непорожності введення, якщо порожнє повертає TRUE 
+    public static function getFilteringInput(string $filteringInputName) {
+        // Check if the form has been submitted
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            // Retrieve the POST input
+            return $_POST[$filteringInputName];
+        }
     }
 
     // Перевірка непорожності введення, якщо порожнє повертає TRUE 

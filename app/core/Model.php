@@ -17,12 +17,9 @@ class Model {
     protected string $id_column;
     // масив імен колонок таблиці БД
     protected array $columns = [];
-    
     protected array $collection;
-    
     // рядок sql-запита
     protected $sql;
-    
     protected $params = [];
 
     // Метод отримання назва id-колонки таблиці
@@ -58,24 +55,11 @@ class Model {
     }
 
     //МЕТОД ФІЛЬТРУВАННЯ
-    public function filter($params) {
-        $param = array_keys($params)[0];
-
-        //мінімальне значення
-        Helper::$var['min_price'] = $this->LowerPrice($param);
-
-        //максимальне значення
-        Helper::$var['max_price'] = $this->HigherPrice($param);
-
-        //межі фільтрування 
-        $max = $this->HigherPrice($param);
-        $min = $this->LowerPrice($param);
-
-        //формування частини sql-запиту "WHERE price BETWEEN"
-        $this->sql .= " AND $param BETWEEN " . $min . " AND " . $max;
-
-        return $this;
-    }
+     public function filter($column, $min, $max) {        
+      //формування частини sql-запиту "WHERE price BETWEEN"
+      $this->sql .= " AND $column BETWEEN " . $min . " AND " . $max;
+      return $this;
+      } 
 
     // АБСТРАКТНИЙ МЕТОД МЕТОД РЕДАГУВАННЯ ЗАПИСУ ТАБЛИЦІ table_name БД
     public function editItem(int $id): Model {
@@ -107,8 +91,8 @@ class Model {
                 $formData[] = $value;
             }
         }
-        if($_FILES['product_image']['name']!= ''){
-            $formData[] = $_FILES['product_image']['name']; 
+        if ($_FILES['product_image']['name'] != '') {
+            $formData[] = $_FILES['product_image']['name'];
         }
         return $formData;
     }
@@ -235,12 +219,18 @@ class Model {
     }
 
     // Метод отримання данних рядка таблиці table_name за id
-    public function getItem(int $id) {
-        $sql = "SELECT * FROM {$this->table_name} WHERE {$this->id_column} = ?;";
-        $db = new DB();
-        $results = $db->query($sql, [$id]);
+    public function getItem(int $itemId) {
+
+        try {
+            $sql = "SELECT * FROM {$this->table_name} WHERE {$this->id_column} = ?;";
+            $db = new DB();
+            $itemDetails = $db->query($sql, [$itemId]);
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            $itemDetails = [];
+        }
         // Повернути масив, що містить данні  
-        return $results[0];
+        return array_shift($itemDetails);
     }
 
     // Метод отримання данних рядка таблиці table_name за id
@@ -273,7 +263,7 @@ class Model {
     public function getOneColumnArray($column_name) {
         $db = new DB();
         $sql = "select {$column_name} from {$this->table_name};";
-        $results = $db->query($sql); 
+        $results = $db->query($sql);
 
         // створюємо і повертаємо масив зі значеннями колонки $column_name
         foreach ($results as $result => $value) {
@@ -318,5 +308,33 @@ class Model {
             return Helper::FormIcorrectInputMessage($column);
         }
         return TRUE;
+    }
+
+    public function getMaxValue(string $column) : string {
+        try {
+            $sql = "SELECT MAX($column) AS max_value FROM $this->table_name";            
+            $db = new DB();
+            $result = $db->query($sql);
+            $maxValue = array_shift($result)['max_value'];
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            $maxValue = '0';
+        }
+        // Повернути масив, що містить данні  
+        return $maxValue;
+    }
+
+    public function getMinValue(string $column) : string {
+        try {
+            $sql = "SELECT MIN($column) AS minValue FROM $this->table_name";
+            $db = new DB();
+            $result = $db->query($sql);
+            $minValue = array_shift($result)['minValue'];
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            $minValue = '0';
+        }
+        // Повернути масив, що містить данні  
+        return $minValue;
     }
 }

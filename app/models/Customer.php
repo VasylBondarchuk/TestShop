@@ -65,4 +65,11 @@ class Customer extends Model
 		}	
 		return $this;
 	}
+        
+        // Масив id категорій
+	public function getCustomersDetails() : array
+	{
+            $customers = $this->initCollection()->getCollection()->select();
+            return $customers;
+	} 
 }

@@ -1,5 +1,6 @@
 <?php
-$customers = $this->registry['customers'];
+$customers = $this->getModel('Customer')->getCustomersDetails();
+print_r($customers);
 
 foreach ($customers as $customer) :
     ?>
@@ -14,9 +15,9 @@ foreach ($customers as $customer) :
         <?php
         if (Helper::isAdmin() == 1) {
             echo '<span class="glyphicon glyphicon-pencil"></span>' . " ";
-            echo Helper::simpleLink('/customer/edit', 'Редагувати', array('id' => $customers['id'])) . " ";
+            echo Helper::simpleLink('/customer/edit', 'Редагувати', array('customer_id' => $customer['customer_id'])) . " ";
             echo '<span class="glyphicon glyphicon-trash"></span>' . " ";
-            echo Helper::simpleLink('/customer/delete', 'Видалити', array('id' => $customers['id']));
+            echo Helper::simpleLink('/customer/delete', 'Видалити', array('customer_id' => $customer['customer_id']));
         }
         ?>    
     </div>

@@ -36,7 +36,7 @@ class AdminController extends Controller
             if(!empty($customer))
             {
                 //якщо ел.пошта та пароль співпадають
-                if(($email==$customer['email']) && ($password==$customer['password']))
+                if(($email == $customer['email']) && ($password==$customer['password']))
                 {                    
                     // змінна логування = успіх
                     $this->registry['user_login']=TRUE;

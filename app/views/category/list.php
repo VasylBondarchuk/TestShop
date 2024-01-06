@@ -61,10 +61,9 @@ Helper::buttonListener($products);
 	</p></div>
 <?php endif; ?>
 
-<?php
-foreach($products as $product)  :
-	?>
 
+<?php
+foreach($products as $product):	?>
 	<div class="product"></a>
 		<table style="width:100%">
 			<tr>
@@ -75,7 +74,7 @@ foreach($products as $product)  :
 					<h4><?php echo $product['name']?><h4>
 						<p> Ціна: <span class="price"><?php echo $product['price']?></span> грн</p>
 						<p> <?php
-								if($product['qty'] != 0){echo("Кількість:".$product['qty']."");}
+								if($product['qty'] != 0){echo("Кількість:" . $product['qty']."");}
 								else{echo('Нема в наявності');}
 							?>
 						</p>		 
@@ -89,20 +88,17 @@ foreach($products as $product)  :
 						<?php
 						if(!empty($_POST[$product['id']])){
 							$_SESSION['cart'][]=$product;
-							$_SESSION['qty'][]= $_POST["quantity".$product['id']]!=0 ? $_POST["quantity".$product['id']]:1;
+							$_SESSION['qty'][]= $_POST["quantity".$product['id']]!= 0 ? $_POST["quantity".$product['id']]:1;
 						}
 
 						if(Helper::isAdmin()==1){
-							echo '<span class="glyphicon glyphicon-pencil"></span>'." ";
-							echo Helper::simpleLink('/product/edit', 'Редагувати', array('id'=>$product['id']))." ";
-							echo '<span class="glyphicon glyphicon-trash"></span>'." ";				
-							echo Helper::simpleLink('/product/delete', 'Видалити', array('id'=>$product['id']));
+							$this->renderProductEditView($product['id']);
 						}
 						?>
-					</td>
-				</tr>
-			</table>
-		</div>
+                                </td>
+			</tr>
+		</table>
+	</div>
 
 	<?php endforeach; ?>
 

@@ -15,13 +15,19 @@ class Category extends Model
 	// Масив імен категорій
 	public function getCategoriesNames() : array
 	{
-		return $this->getOneColumnArray('category_name');
+            return $this->getOneColumnArray('category_name');
 	}
 
 	// Масив id категорій
 	public function getCategoriesIds() : array
 	{
-		return $this->getOneColumnArray('category_id');
-	}       
+            return $this->getOneColumnArray('category_id');
+	}
         
+        // Масив id категорій
+	public function getCategoriesDetails() : array
+	{
+            $categories = $this->initCollection()->getCollection()->select();
+            return $categories;
+	} 
 }

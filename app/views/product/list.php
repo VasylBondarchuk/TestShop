@@ -8,6 +8,16 @@
     }
 </style>
 
+<?php
+// Метод виведення повідомлення про додавання товару до кошика
+$products = $this->registry['products'];
+$minPrice = $this->registry['products'] ? min(array_column($this->registry['products'], 'price')) : 0;
+$maxPrice = $this->registry['products'] ? max(array_column($this->registry['products'], 'price')) : 0;
+
+Helper::buttonListener($products);
+?>
+
+
 <form method="POST" action="<?php $_SERVER['PHP_SELF']; ?>">
     <select name='sortfirst'>
         <?php if (isset($_COOKIE['price'])): ?>
@@ -38,44 +48,33 @@
     <select name='sortsecond'>
         <?php if (isset($_COOKIE['qty'])): ?>
             <?php if ($_COOKIE['qty'] == 'ASC'): ?>
-                <option <?php echo filter_input(INPUT_POST, 'sortsecond') === 'qty_ASC' ? 'selected' : ''; ?>
+                <option <?= filter_input(INPUT_POST, 'sortsecond') === 'qty_ASC' ? 'selected' : ''; ?>
                     value="qty_ASC">по зростанню кількості</option>
-                <option <?php echo filter_input(INPUT_POST, 'sortsecond') === 'qty_DESC' ? 'selected' : ''; ?>
+                <option <?= filter_input(INPUT_POST, 'sortsecond') === 'qty_DESC' ? 'selected' : ''; ?>
                     value="qty_DESC">по спаданню кількості</option>
                 <?php endif; ?>
                 <?php if ($_COOKIE['qty'] == 'DESC'): ?>
-                <option <?php echo filter_input(INPUT_POST, 'sortsecond') === 'qty_DESC' ? 'selected' : ''; ?>
+                <option <?= filter_input(INPUT_POST, 'sortsecond') === 'qty_DESC' ? 'selected' : ''; ?>
                     value="qty_DESC">по спаданню кількості</option>
-                <option <?php echo filter_input(INPUT_POST, 'sortsecond') === 'qty_ASC' ? 'selected' : ''; ?>
+                <option <?= filter_input(INPUT_POST, 'sortsecond') === 'qty_ASC' ? 'selected' : ''; ?>
                     value="qty_ASC">по зростанню кількості</option>
                 <?php endif; ?>
             <?php else: ?>
-            <option <?php echo filter_input(INPUT_POST, 'sortsecond') === 'qty_ASC' ? 'selected' : ''; ?>
+            <option <?= filter_input(INPUT_POST, 'sortsecond') === 'qty_ASC' ? 'selected' : ''; ?>
                 value="qty_ASC">по зростанню кількості
             </option>
-            <option <?php echo filter_input(INPUT_POST, 'sortsecond') === 'qty_DESC' ? 'selected' : ''; ?>
+            <option <?= filter_input(INPUT_POST, 'sortsecond') === 'qty_DESC' ? 'selected' : ''; ?>
                 value="qty_DESC">по спаданню кількості
             </option>
         <?php endif; ?>
-    </select>
+    </select>   
 
-    <?php
-        $maxPrice = $this->registry['products'] ? max(array_column($this->registry['products'], 'price')) : 0;
-        $minPrice = $this->registry['products'] ? min(array_column($this->registry['products'], 'price')) : 0;
-    ?>
-
-    Ціна від: <input type="text" name="price[]" value="<?= $minPrice; ?>">
-    Ціна до: <input type="text" name="price[]" value="<?= $maxPrice; ?>"><br>
+    Ціна від: <input type="text" name="minPrice" value="<?= $minPrice; ?>">
+    Ціна до: <input type="text" name="maxPrice" value="<?= $maxPrice; ?>">    
     <input class="w3-button w3-black" type="submit" name="sort" value="Застосувати">
 
 </form>
 
-<?php
-// Метод виведення повідомлення про додавання товару до кошика
-$products = $this->registry['products'];
-//print_r($products);exit;
-Helper::buttonListener($products);
-?>
 
 <?php if (Helper::isAdmin() == 1) : ?>
 
@@ -101,12 +100,13 @@ Helper::buttonListener($products);
     </div>
 <?php endif; ?>
 
+
 <?php foreach ($products as $product): ?>
     <div class="product">
         <table style="width:100%">
             <tr>
-            <td width="20%"><img src="<?= "/img/products/". $product['product_image'] ?>" alt="<?php echo $product['name'] ?>" width="200" height=""></td>
-            <center><h1> <?= $product['name']; ?></h1></center>
+            <td width="20%"><img src="<?= "/img/products/". $product['product_image'] ?>" alt="<?= $product['name'] ?>" width="200" height=""></td>            
+            <center><h1> <?= Helper::simpleLink('/product/show', $product['name'], array('product_id' => $product['product_id']))?></h1></center>
             <td width="80%>                    
                 <p class="sku"> Код: <?= $product['sku'] ?></p>                    
                 <p> Ціна: <span class="price"><?= $product['price'] ?></span> грн</p>
@@ -132,7 +132,7 @@ Helper::buttonListener($products);
 
                 if (Helper::isAdmin() == 1) {
                     echo '<span class="glyphicon glyphicon-pencil"></span>' . " ";
-                    echo Helper::simpleLink('/product/edit', 'Редагувати', array('product_id' => $product['product_id'])) . " ";
+                    echo Helper::simpleLink('/product/edit', 'Редагувати', array('product_id' => $product['product_id'])) . ' ';
                     echo '<span class="glyphicon glyphicon-trash"></span>' . " ";
                     echo Helper::simpleLink('/product/delete', 'Видалити', array('product_id' => $product['product_id']));
                 }
