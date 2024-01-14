@@ -22,10 +22,9 @@ class Product extends Model {
     //МЕТОД ДОДАВАННЯ НОВОГО ТОВАРУ    
     public function addProduct() {
         //збільшуємо id нового товару на одницю
-        $product_id = $this->MaxValue($this->id_column) + 1;
-
+        $productId = $this->MaxValue($this->id_column) + 1;
         //параметри введеного товару
-        $this->params = array_merge([$product_id], $this->FormData());
+        $this->params = array_merge([$productId], $this->FormData());
         $this->addItem($this->getColumnsNames());
         //якщо корректно введені всі поля - додати
         if (isset($_POST['add']) && !Helper::isEmpty('product') &&
@@ -33,29 +32,53 @@ class Product extends Model {
             $this->addItem($this->getColumnsNames());
             Helper::$var['message'] = "ok";
         }
+        $this->addProductToCategory($productId, $_POST['category_id']);
         return $this;
+    }   
+    
+     public function editProduct(int $productId, array $categoryIds) { 
+        $data = $this->FormData();        
+        if($_FILES['product_image']['name'] == ''){           
+            $data[] = $this->getProductById($productId)['product_image'];            
+        }        
+        $this->editItem($productId, $data);  
+        $this->deleteProductFromCategory($productId);
+        $this->addProductToCategory($productId, $categoryIds);
+        return $this;
+    }    
+    
+    public function addProductToCategory(int $productId, array $categoryIds) {
+        $db = new DB();
+        $value = '';
+        foreach ($categoryIds as $categoryId) {
+            $value .= "($productId,$categoryId), ";
+        }
+        $productIdCategoryIdValues = rtrim($value, ", ");
+        $sql = "INSERT INTO `product_category` (`product_id`, `category_id`)
+        VALUES  $productIdCategoryIdValues;";
+        $db->query($sql);
+    }
+    
+        public function deleteProductFromCategory(int $productId) {
+        $db = new DB();        
+        $sql = "DELETE FROM `product_category` WHERE `product_id` = $productId";
+        $db->query($sql);
     }
 
-    public function deleteProduct() {
-        //параметри введеного товару
-        $this->params = array_merge([$product_id], $this->FormData());
-        $this->addItem($this->getColumnsNames());
-        //якщо корректно введені всі поля - додати
-        if (isset($_POST['add']) && !Helper::isEmpty('product') &&
-                Helper::isNumericInput(['price', 'qty'])) {
-            $this->addItem($this->getColumnsNames());
-            Helper::$var['message'] = "ok";
-        }
-        return $this;
+    public function deleteProduct(int $productId) {
+        $db = new DB();
+        $sql = "DELETE FROM product_category WHERE product_id = ?;";
+        $db->query($sql, [$productId]);
+        $this->deleteItem($productId);
     }
 
     //МЕТОД ФІЛЬТРУВАННЯ
-    public function filterByPrice() : Product {
+    public function filterByPrice(): Product {
         $min = $this->getMinValue('price');
-        $minIput = Helper::getFilteringInput('minPrice') ? : $min;
+        $minIput = Helper::getFilteringInput('minPrice') ?: $min;
 
         $max = $this->getMaxValue('price');
-        $maxIput = Helper::getFilteringInput('maxPrice') ? : $max;
+        $maxIput = Helper::getFilteringInput('maxPrice') ?: $max;
 
         if ($minIput > $maxIput) {
             $minIput = $min;
@@ -67,5 +90,20 @@ class Product extends Model {
         }
         $this->filter('price', $minIput, $maxIput);
         return $this;
+    }
+
+    public function getProductById(int $productId) {
+        return $this->getItem($productId);
+    }
+    
+    public function getProductCategories(int $productId) : array {
+        $db = new DB();
+        $sql = "SELECT `category_id` FROM `product_category` WHERE `product_id` = $productId;";
+        $result = $db->query($sql);
+        $categoryIds = [];
+        foreach($result as $category){
+            $categoryIds[] = $category['category_id'];
+        }
+        return $categoryIds;
     }
 }

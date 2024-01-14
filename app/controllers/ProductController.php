@@ -1,5 +1,11 @@
 <?php
 
+// Enable error reporting
+error_reporting(E_ALL);
+// Display errors on the screen
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+
 class ProductController extends Controller {
 
     public function IndexAction() {
@@ -16,103 +22,55 @@ class ProductController extends Controller {
 
                 //метод фільтрування 
                 ->filterByPrice()
-
                 /* метод сортування */
                 ->sort($this->getSortParams())
-
                 /* повертає обєкт класу Product зі значенням властивості $collection */
                 ->getCollection()
-
                 /* повертає значення властивості $collection класу Product */
                 ->select();
-
         // завантаження вигляду
         $this->setView();
-
         // завантаження шаблону
         $this->renderLayout();
     }
 
     // МЕТОД РЕДАГУВАННЯ ТОВАРУ
-    public function EditAction() {
-        // Встановлюємо назву сторінки
+    public function EditAction() {        
         $this->setTitle("Редагування товару");
-
-        // Повертає об'єкт класу Category extends Model
-        $categoryModel = $this->getModel('Category');
-
-        // Масив імен категорій
-        $category_names = $categoryModel->getCategoriesNames();
-
-        // Масив id категорій		
-        $category_id = $categoryModel->getCategoriesIds();
-
-        // Масив де ключі - id категорій, значення - імена категорій
-        $this->registry['categories'] = array_combine($category_id, $category_names);
-
-        // Введений sku 
-        $entered_sku = Helper::ClearInput($_POST['sku']);
-
-        // Змінна для виводу помилок 
-        $this->registry['error'] = $this->registry['success'] = '';
-
-        // Якщо не адмін
-        if (Helper::isAdmin() != 1) {
-            $this->registry['error'] = "Ви не маєте права редагувати товари!";
-        }
-
-        // Повертає об'єкт класу Product extends Model
+        $selectedCategoryIds = $_POST['category_id']; 
         $model = $this->getModel('Product');
-
-        // Отримуємо масив данних товару, що редагується
-        $this->registry['product'] = $model->getItem($this->getId('Product'));
-
-        if ($_POST) {
-            $model->editItem($this->getId('Product'));
-        }
-        $this->registry['product'] = $model->getItem($this->getId('Product'));
-
-        //відображаємо вигляд
-        $this->setView();
-
-        //відображаємо шаблон
+        if (isset($_POST['Edit'])) {
+            $model->editProduct($this->getId('Product'), $selectedCategoryIds);
+        }        
+        $this->setView();        
         $this->renderLayout();
     }
 
-    // МЕТОД РЕДАГУВАННЯ ТОВАРУ
+    // МЕТОД ПОКАЗУ ТОВАРУ
     public function ShowAction() {
         // Встановлюємо назву сторінки
         $this->setTitle("Показ товару");
-
         // Повертає об'єкт класу Category extends Model
         $categoryModel = $this->getModel('Category');
-
         // Масив імен категорій
         $category_names = $categoryModel->getCategoriesNames();
-
         // Масив id категорій		
         $category_id = $categoryModel->getCategoriesIds();
-
         // Масив де ключі - id категорій, значення - імена категорій
         $this->registry['categories'] = array_combine($category_id, $category_names);
-
         // Введений sku 
         $entered_sku = Helper::ClearInput($_POST['sku']);
-
         // Змінна для виводу помилок 
         $this->registry['error'] = $this->registry['success'] = '';
-
         // Якщо не адмін
         if (Helper::isAdmin() != 1) {
             $this->registry['error'] = "Ви не маєте права редагувати товари!";
+            
         }
-
         // Повертає об'єкт класу Product extends Model
         $model = $this->getModel('Product');
-
         // Отримуємо масив данних товару, що редагується
         $this->registry['product'] = $model->getItem($this->getId('Product'));
-
         if ($_POST) {
             $model->editItem($this->getId('Product'));
         }
@@ -126,23 +84,9 @@ class ProductController extends Controller {
     }
 
     // МЕТОД ДОДАВАННЯ ТОВАРУ
-    public function AddAction() {
-        // Встановлюємо назву сторінки
-        $this->setTitle("Додавання товару");
-
-        // Повертає об'єкт класу Product extends Model
-        $model = $this->getModel('Product');
-
-        // Повертає об'єкт класу Category extends Model
-        $categoryModel = $this->getModel('Category');
-
-        // Масив де ключі - id категорій, значення - імена категорій
-        $this->registry['categories'] = array_combine(
-                $categoryModel->getCategoriesIds(), $categoryModel->getCategoriesNames());
-
-        $this->registry['error'] = '';
-
-        // введений sku 
+    public function AddAction() {        
+        $this->setTitle("Додавання товару");        
+        $model = $this->getModel('Product');        
         $entered_sku = $_POST['sku'];
 
         // Якщо введений sku не унікальний 
@@ -151,12 +95,8 @@ class ProductController extends Controller {
             $model->addProduct();
         } else {
             $this->registry['error'] = "Товар з sku = $entered_sku вже існує.<br>Введіть інший sku та спробуйте знову";
-        }
-
-        //відображаємо вигляд
-        $this->setView();
-
-        //відображаємо шаблон
+        } 
+        $this->setView();        
         $this->renderLayout();
     }
 
@@ -364,4 +304,6 @@ class ProductController extends Controller {
         echo '<span class="glyphicon glyphicon-trash"></span>' . " ";
         echo Helper::simpleLink('/product/delete', 'Видалити', array('id' => $productId));
     }
+    
+    
 }

@@ -21,21 +21,22 @@
 </style>
 
 <?php if (Helper::isAdmin() == 1): ?>
-    <center><h2>
-            Видалення товару з id = <?php $id = Helper::getId();
-    echo $id; ?>
-        </h2></center>
+    <center>
+        <h2>
+            Видалення товару з id = <?= $this->getId('Product');?>
+        </h2>
+    </center>
 
     <span class='warning'>
         <center>
             <h3>
-                Ви збираєтеся видалити товар з id = <?= Helper::getId(); ?> <br>
+                Ви збираєтеся видалити товар з id = <?= $this->getId('Product'); ?> <br>
                 "Якщо ви впевнені, натисніть кнопку 'Видалити'
             </h3>
         </center>
     </span>
 
-    <?php $product = $this->registry['product']; ?>   
+    <?php $product = $this->getModel('Product')->getProductById($this->getId('Product')); ?>   
     <div class="product"></a>
     <p class="sku">Код: <?= $product['sku'] ?></p>
     <h4><?= $product['name'] ?></h4>
@@ -56,7 +57,8 @@
     <?php
     //здійснити редірект на сторінку продуктів
     if (isset($_POST['Delete'])) {
-        Helper::redirect("/product/list");
+        $product->deleteProduct($this->getId('Product'));
+        Helper::redirect("/category/show");        
     }
     ?>    
 

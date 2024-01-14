@@ -29,5 +29,12 @@ class Category extends Model
 	{
             $categories = $this->initCollection()->getCollection()->select();
             return $categories;
-	} 
+	}
+        
+         // Масив id категорій
+	public function getCategoryNameById(int $categoryId) : string
+	{
+            $categories = $this->initCollection()->getCollection()->select();
+            return $categories[$categoryId]['category_name'];
+	}
 }

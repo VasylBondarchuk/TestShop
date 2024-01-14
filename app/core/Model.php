@@ -62,16 +62,17 @@ class Model {
       } 
 
     // АБСТРАКТНИЙ МЕТОД МЕТОД РЕДАГУВАННЯ ЗАПИСУ ТАБЛИЦІ table_name БД
-    public function editItem(int $id): Model {
+    public function editItem(int $id, array $data): Model {
         $db = new DB();
         $q = [];
-        //формування частини запиту зі знаками питання
-        foreach ($this->getEditableColumn() as &$column) {
+        $editableColumns = $this->getColumnsNames();
+        array_shift($editableColumns);
+        foreach ($editableColumns as &$column) {
             $q[] = "$column = ?";
         }
         $qMarks = implode(',', $q);
-        $sql = "UPDATE {$this->table_name} SET $qMarks WHERE {$this->id_column}=?;";
-        $params = array_merge($this->FormData(), [$id]);
+        $sql = "UPDATE {$this->table_name} SET $qMarks WHERE {$this->id_column}=?;";        
+        $params = array_merge($data, [$id]);        
         $db->query($sql, $params);
         return $this;
     }
@@ -80,7 +81,7 @@ class Model {
     public function FormData(): array {
         // імена колонок
         $columns = $this->getColumnsNames();
-
+        
         // масив для отримання данних з форми
         $formData = [];
 
@@ -91,6 +92,7 @@ class Model {
                 $formData[] = $value;
             }
         }
+        //echo $_FILES['product_image']['name'];exit;
         if ($_FILES['product_image']['name'] != '') {
             $formData[] = $_FILES['product_image']['name'];
         }
@@ -98,12 +100,10 @@ class Model {
     }
 
     // АБСТРАКТНИЙ МЕТОД ВИДАЛЕННЯ ЗАПИСУ З ТАБЛИЦІ table_name БД
-    public function deleteItem($id): Model {
-        if (isset($_POST['Delete'])) {
+    public function deleteItem(int $id): Model {        
             $db = new DB();
             $sql = "DELETE FROM {$this->table_name} WHERE {$this->id_column} = ?;";
-            $db->query($sql, [$id]);
-        }
+            $db->query($sql, [$id]);        
         return $this;
     }
 
@@ -310,7 +310,7 @@ class Model {
         return TRUE;
     }
 
-    public function getMaxValue(string $column) : string {
+    public function getMaxValue(string $column) {
         try {
             $sql = "SELECT MAX($column) AS max_value FROM $this->table_name";            
             $db = new DB();
@@ -324,7 +324,7 @@ class Model {
         return $maxValue;
     }
 
-    public function getMinValue(string $column) : string {
+    public function getMinValue(string $column) {
         try {
             $sql = "SELECT MIN($column) AS minValue FROM $this->table_name";
             $db = new DB();

@@ -46,8 +46,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
+$categoryId = $this->getModel('Category')->getCategoriesIds();
+$categoryName = $this->getModel('Category')->getCategoriesNames();
+$categories = array_combine($categoryId, $categoryName);
 //збереження введень користувача
-$form_data = Helper::FormDataInput(array('sku', 'name', 'category_id', 'price', 'qty', 'password', 'description'));
+$form_data = Helper::FormDataInput(array('sku', 'name', 'price', 'qty', 'description', 'product_image'));
 
 //отримання id
 $id = Helper::MaxValue('product_id', 'product');
@@ -92,22 +95,16 @@ if (Helper::isAdmin() == 1):
             <span class="error"> <?php echo Helper::isEmpty('product')[2]; ?></span><br><br>
 
             <label for="category_id">Категорія:</label>
-            <select name="category_id">
+            <select name="category_id[]" multiple="multiple">
                 <?php
-                // Масив де ключі - id категорій, значення - імена категорій
-                $categories = $this->registry['categories'];
-                array_shift($categories);
+                // Масив де ключі - id категорій, значення - імена категорій                
+                //array_shift($categories);
                 // Вивід опцій випадаючого списку Категорія
-                foreach ($categories as $categoryId => $categoryName):
-                    ?>	
-                    <option value="<?= $categoryId; ?>">
-                        <?= $categoryName; ?>
-                    </option>
-                <?php endforeach; ?>
+                foreach ($categories as $categoryId => $categoryName): ?>	
+                    <option value="<?= $categoryId; ?>"><?= $categoryName; ?></option>
+    <?php endforeach; ?>
             </select>
-
             </br></br>
-
             Ціна: <input type="text" name="price" value="<?= ($product["price"] ?? '') ?>">
             <span class="error"><?php
                 echo Helper::isEmpty('product')[3];
@@ -121,7 +118,7 @@ if (Helper::isAdmin() == 1):
                 ?></span><br><br>
 
             Опис:<p><textarea rows="5" cols="56" name="description">
-                    <?= ($product["description"] ?? '') ?></textarea></p>
+    <?= ($product["description"] ?? '') ?></textarea></p>
             <span class="error"> <?php echo Helper::isEmpty('product')[5]; ?></span><br>
 
             <label for="product_image">Product Photo:</label>
@@ -129,5 +126,7 @@ if (Helper::isAdmin() == 1):
             <input class="button" type="submit" name="add" value="Додати">
         </div>
     </form>
-
 <?php endif; ?>
+
+
+

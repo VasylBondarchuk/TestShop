@@ -105,12 +105,12 @@ class Controller {
     }
 
     // Повертає назву id-колонки
-    public function getIdColumnName($name) {
+    public function getIdColumnName(string $name) {
         return $this->getModel($name)->getIdName();
     }
 
     // Отримати значення id з GET - запиту
-    public function getId($name): int {
+    public function getId(string $name): int {
         return (int) filter_input(INPUT_GET, $this->getIdColumnName($name));
     }
 }

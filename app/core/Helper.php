@@ -272,11 +272,11 @@ class Helper {
     //метод обробки данних форми
     public static function ClearInput($data) {
         //обрізка пробілів з країв 
-        $data = trim($data);
+        //$data = trim($data);
         //обрізка зворотніх слешів
-        $data = stripslashes($data);
+        //$data = stripslashes($data);
         //перетворення спецсимволів
-        $data = htmlspecialchars($data);
+        //$data = htmlspecialchars($data);
 
         return $data;
     }
@@ -341,14 +341,6 @@ class Helper {
             }
         }
         return array_values($params);
-    }
-
-    //метод отримання данних за номером
-    public static function getItem($id) {
-        $db = new DB();
-        $sql = "SELECT * FROM products WHERE id=?";
-        $results = $db->query($sql, array($id));
-        return $results[0];
     }
 
     //метод отримання id
