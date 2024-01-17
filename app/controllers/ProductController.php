@@ -18,12 +18,7 @@ class ProductController extends Controller {
         $this->setTitle("Товари");        
 
         $this->registry['products'] = $this->getModel('Product')
-            ->initProductCollection($this->getId('Category'))
-
-                //метод фільтрування 
-                ->filterByPrice()
-                /* метод сортування */
-                ->sort($this->getSortParams())
+            ->initProductCollection($this->getId('Category'))                
                 /* повертає обєкт класу Product зі значенням властивості $collection */
                 ->getCollection()
                 /* повертає значення властивості $collection класу Product */

@@ -3,8 +3,8 @@
 /**
  * Class Product
  */
-class Product extends Model {
-
+class Product extends Model {    
+    
     /**
      * Product constructor.
      */
@@ -20,23 +20,15 @@ class Product extends Model {
     }
 
     //МЕТОД ДОДАВАННЯ НОВОГО ТОВАРУ    
-    public function addProduct() {
-        //збільшуємо id нового товару на одницю
-        $productId = $this->MaxValue($this->id_column) + 1;
-        //параметри введеного товару
-        $this->params = array_merge([$productId], $this->FormData());
-        $this->addItem($this->getColumnsNames());
-        //якщо корректно введені всі поля - додати
-        if (isset($_POST['add']) && !Helper::isEmpty('product') &&
-                Helper::isNumericInput(['price', 'qty'])) {
-            $this->addItem($this->getColumnsNames());
-            Helper::$var['message'] = "ok";
-        }
-        $this->addProductToCategory($productId, $_POST['category_id']);
-        return $this;
+    public function addProduct()  {              
+        $this->params =  $this->FormData();
+        $columnNames = $this->getColumnsNames();
+        array_shift($columnNames);        
+        $this->addItem($columnNames);                
+        $this->addProductToCategory($this->getLastId(), $_POST['category_id']);        
     }   
     
-     public function editProduct(int $productId, array $categoryIds) { 
+     public function editProduct(int $productId, array $categoryIds): Product { 
         $data = $this->FormData();        
         if($_FILES['product_image']['name'] == ''){           
             $data[] = $this->getProductById($productId)['product_image'];            
@@ -47,13 +39,13 @@ class Product extends Model {
         return $this;
     }    
     
-    public function addProductToCategory(int $productId, array $categoryIds) {
+    public function addProductToCategory($productId, array $categoryIds) {      
         $db = new DB();
         $value = '';
         foreach ($categoryIds as $categoryId) {
             $value .= "($productId,$categoryId), ";
         }
-        $productIdCategoryIdValues = rtrim($value, ", ");
+        $productIdCategoryIdValues = rtrim($value, ", ");        
         $sql = "INSERT INTO `product_category` (`product_id`, `category_id`)
         VALUES  $productIdCategoryIdValues;";
         $db->query($sql);

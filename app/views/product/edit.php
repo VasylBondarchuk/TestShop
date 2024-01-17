@@ -39,8 +39,7 @@ $categoryName = $this->getModel('Category')->getCategoriesNames();
 $availableCategories = array_combine($categoryId, $categoryName);
 
 // Define the image upload directory
-$uploadDir = ROOT . "/img/products/";
-
+$uploadDir = PRODUCT_IMAGE_UPLOAD_DIR;
 $categoryIds = ($this->getModel('Product')->getProductCategories($this->getId('Product')));
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {    
@@ -54,9 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 //якщо адмін, то показувати форму
 if (Helper::isAdmin()): ?>
-    <center>
-        <h2>Редагування товару id = <?= $productDetails['sku'] ?></h2>
-    </center>
+    <center><h2>Редагування товару id = <?= $productDetails['sku'] ?></h2></center>
 
     <form method="POST" action="<?php $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
         <div class="container">
@@ -102,11 +99,9 @@ if (Helper::isAdmin()): ?>
             <input class="button" name="Edit" type="submit">
         </div>
     </form>
-
 <?php endif; ?>
 
 <?php
-
 if (move_uploaded_file($_FILES['product_image']['tmp_name'], $uploadFile)) {
         echo "Product information and photo uploaded successfully!";
         // You can now store the product information and file path in your database
@@ -119,7 +114,6 @@ if (isset($_POST['Edit'])) {
 // Кнопка натиснута і нема помилкової ситуаціїї - виводимо повідмлення про успіх
     echo("<div class='container'><span class='warning'><center><h3>{$this->registry['success']}</h3></center></span></div><br>");
 }
-
 
 // Вивід помилки
 echo("<div class='container'><span class='warning'><center><h3>{$this->registry['error']}</h3></center></span></div><br>");

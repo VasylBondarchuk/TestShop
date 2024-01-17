@@ -28,7 +28,7 @@
 <?php
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Define the upload directory
-    $uploadDir = ROOT . "/img/products/";
+    $uploadDir = PRODUCT_IMAGE_UPLOAD_DIR;
     // Create the uploads directory if it doesn"t exist
     if (!file_exists($uploadDir)) {
         mkdir($uploadDir, 0777, true);
@@ -66,14 +66,14 @@ if (Helper::isAdmin() == 1) {
     }
 
     //якщо кнопка додавання натиснута вивести помилку
-    if (isset($_POST['add']) && $this->registry['error'] != "") {
+    /*if (isset($_POST['add']) && $this->registry['error'] != "") {
         echo("<span class='warning'><center><h3>" . $this->registry['error'] . "</h3></center></span><br>");
-    }
+    }*/
 
     //якщо кнопка додавання натиснута і данні введено вірно
-    if (isset($_POST['add']) && $this->registry['error'] == "") {
-        $messageAdd = "Товар з id = $id успішно створено!";
-        Helper::redirect("/product/edit?messageAdd=$messageAdd&product_id = $id");
+    if (isset($_POST['add'])) {
+        //$messageAdd = "Товар з id = $id успішно створено!";
+        Helper::redirect("/product/edit?product_id = $id");
     }
 }
 //якщо не адмін
@@ -82,8 +82,7 @@ Helper::isNotAdmin("Ви не маєте права додавати товар�
 
 <?php
 //якщо адмін, то показувати форму
-if (Helper::isAdmin() == 1):
-    ?>
+if (Helper::isAdmin() == 1):?>
 
     <form method="POST" action="<?php $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
         <div class="container">
@@ -96,13 +95,10 @@ if (Helper::isAdmin() == 1):
 
             <label for="category_id">Категорія:</label>
             <select name="category_id[]" multiple="multiple">
-                <?php
-                // Масив де ключі - id категорій, значення - імена категорій                
-                //array_shift($categories);
-                // Вивід опцій випадаючого списку Категорія
+                <?php                
                 foreach ($categories as $categoryId => $categoryName): ?>	
                     <option value="<?= $categoryId; ?>"><?= $categoryName; ?></option>
-    <?php endforeach; ?>
+                <?php endforeach; ?>
             </select>
             </br></br>
             Ціна: <input type="text" name="price" value="<?= ($product["price"] ?? '') ?>">
@@ -117,8 +113,8 @@ if (Helper::isAdmin() == 1):
                 echo Helper::isNumeric()[1];
                 ?></span><br><br>
 
-            Опис:<p><textarea rows="5" cols="56" name="description">
-    <?= ($product["description"] ?? '') ?></textarea></p>
+            Опис:<p><textarea rows="5" name="description">
+            <?= ($product["description"] ?? '') ?></textarea></p>
             <span class="error"> <?php echo Helper::isEmpty('product')[5]; ?></span><br>
 
             <label for="product_image">Product Photo:</label>

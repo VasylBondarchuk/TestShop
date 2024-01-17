@@ -32,10 +32,10 @@ class DB
         }
         return self::$pdo;
     }
-    public function getLastId()
+    public function getLastId():int
     {
         
-        echo self::$pdo->lastInsertId();
+        return (int)self::$pdo->lastInsertId();
     }
 
     /**

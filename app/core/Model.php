@@ -33,11 +33,15 @@ class Model {
     }
 
     // АБСТРАКТНИЙ МЕТОД МЕТОД ДОДАВАННЯ ЗАПИСУ ДО ТАБЛИЦІ table_name БД
-    public function addItem($columns) {
-        $db = new DB();
-        //отримання рядку "(?,?,?,?......,?,?)"
+    public function addItem(array $columns) {
+        $db = new DB();        
         $questionMarks = trim(str_repeat('?,', count($columns)), ',');
-        $sql = "INSERT INTO {$this->table_name} VALUES ($questionMarks);";
+        $columnNames = '';
+        foreach ($columns as $column) {
+            $columnNames .= "$column, ";
+        }
+        $columnNames = rtrim($columnNames, ", ");
+        $sql = "INSERT INTO {$this->table_name} ($columnNames) VALUES ($questionMarks);";        
         return $db->query($sql, $this->params);
     }
 
@@ -50,7 +54,6 @@ class Model {
             $this->sql .= $sortParam . ' ' . $sortOrder . ',';
         }
         $this->sql = rtrim($this->sql, ',');
-
         return $this;
     }
 
@@ -337,4 +340,11 @@ class Model {
         // Повернути масив, що містить данні  
         return $minValue;
     }
+    
+    public function getLastId() {
+        $db = new DB();        
+        return $db->getLastId();
+    }
+    
+    
 }

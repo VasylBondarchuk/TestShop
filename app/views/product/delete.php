@@ -36,7 +36,10 @@
         </center>
     </span>
 
-    <?php $product = $this->getModel('Product')->getProductById($this->getId('Product')); ?>   
+    <?php $product = $this->getModel('Product')->getProductById($this->getId('Product'));
+   //var_dump($product);exit;
+    
+    ?>   
     <div class="product"></a>
     <p class="sku">Код: <?= $product['sku'] ?></p>
     <h4><?= $product['name'] ?></h4>
