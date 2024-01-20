@@ -88,6 +88,10 @@ class Product extends Model {
         return $this->getItem($productId);
     }
     
+    public function getProductBySku(string $productSku) {
+        return $this->getItem($productSku);
+    }
+    
     public function getProductCategories(int $productId) : array {
         $db = new DB();
         $sql = "SELECT `category_id` FROM `product_category` WHERE `product_id` = $productId;";
@@ -97,5 +101,10 @@ class Product extends Model {
             $categoryIds[] = $category['category_id'];
         }
         return $categoryIds;
+    }
+    
+     public function isProductInCategory(int $productId, int $categoryId) : bool {
+        $categoryIds = ($this->getProductCategories($productId));
+        return in_array($categoryId, $categoryIds);
     }
 }

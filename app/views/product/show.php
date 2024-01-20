@@ -21,7 +21,7 @@ $product = $this->getModel('Product')->getItem($productId);
     <div class="product">
         <table style="width:100%">
             <tr>
-            <td width="40%"><img src="<?= "/img/products/". $product['product_image'] ?>" alt="<?php echo $product['name'] ?>" width="400" height=""></td>
+            <td width="40%"><img src="<?= PRODUCT_IMAGE_PATH . $product['product_image'] ?>" alt="<?php echo $product['name'] ?>" width="500" height=""></td>
             <center><h1> <?= $product['name']; ?></h1></center>
             <td width="60%>                    
                 <p class="sku"> Код: <?= $product['sku'] ?></p>                    

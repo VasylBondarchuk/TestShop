@@ -82,16 +82,20 @@ Helper::isNotAdmin("Ви не маєте права додавати товар�
 
 <?php
 //якщо адмін, то показувати форму
-if (Helper::isAdmin() == 1):?>
+if (Helper::isAdmin()):?>
 
     <form method="POST" action="<?php $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
         <div class="container">
+            
+            <label for="sku"> Sku:</label>
+            <input type="text" name="sku" value="<?= ($product["sku"] ?? '') ?>">
+            <span class="error"> <?php echo Helper::isEmpty('product')[1]; ?></span>
+            <br><br>
 
-            Sku: <input type="text" name="sku" value="<?= ($product["sku"] ?? '') ?>">
-            <span class="error"> <?php echo Helper::isEmpty('product')[1]; ?></span><br><br>
-
-            Назва: <input type="text" name="name" value="<?= ($product["name"] ?? '') ?>">
-            <span class="error"> <?php echo Helper::isEmpty('product')[2]; ?></span><br><br>
+            <label for="name"> Назва:</label>
+            <input type="text" name="name" value="<?= ($product["name"] ?? '') ?>">
+            <span class="error"> <?php echo Helper::isEmpty('product')[2]; ?></span>
+            <br><br>
 
             <label for="category_id">Категорія:</label>
             <select name="category_id[]" multiple="multiple">
@@ -101,19 +105,25 @@ if (Helper::isAdmin() == 1):?>
                 <?php endforeach; ?>
             </select>
             </br></br>
-            Ціна: <input type="text" name="price" value="<?= ($product["price"] ?? '') ?>">
+            
+            <label for="category_id"> Price:</label>
+            <input type="text" name="price" value="<?= ($product["price"] ?? '') ?>">
             <span class="error"><?php
                 echo Helper::isEmpty('product')[3];
                 echo Helper::isNumeric()[0];
-                ?></span><br><br>
-
-            Кількість: <input type="text" name="qty" value="<?= ($product["qty"] ?? '') ?>" >
+                ?></span>
+            <br><br>
+            
+            <label for="qty"> Qty:</label>
+            <input type="text" name="qty" value="<?= ($product["qty"] ?? '') ?>" >
             <span class="error"> <?php
                 echo Helper::isEmpty('product')[4];
                 echo Helper::isNumeric()[1];
-                ?></span><br><br>
-
-            Опис:<p><textarea rows="5" name="description">
+                ?></span>
+            <br><br>
+                
+            <label for="description"> Description: </label>
+            <textarea rows="5" name="description">
             <?= ($product["description"] ?? '') ?></textarea></p>
             <span class="error"> <?php echo Helper::isEmpty('product')[5]; ?></span><br>
 

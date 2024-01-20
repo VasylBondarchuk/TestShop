@@ -11,8 +11,7 @@ class IndexController extends Controller
      */
     public function IndexAction()
     {
-        $this->setTitle("Test shop");
-        $this->setView();
-        $this->renderLayout();
+        // редирект на сторінку категорій
+        Helper::redirect('/category/list'); 
     }
 }

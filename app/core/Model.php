@@ -58,7 +58,7 @@ class Model {
     }
 
     //МЕТОД ФІЛЬТРУВАННЯ
-     public function filter($column, $min, $max) {        
+     public function filter(string $column, $min, $max) {        
       //формування частини sql-запиту "WHERE price BETWEEN"
       $this->sql .= " AND $column BETWEEN " . $min . " AND " . $max;
       return $this;
@@ -94,8 +94,7 @@ class Model {
             if (in_array($key, $columns)) {
                 $formData[] = $value;
             }
-        }
-        //echo $_FILES['product_image']['name'];exit;
+        }        
         if ($_FILES['product_image']['name'] != '') {
             $formData[] = $_FILES['product_image']['name'];
         }
@@ -322,8 +321,7 @@ class Model {
         } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
             $maxValue = '0';
-        }
-        // Повернути масив, що містить данні  
+        }        
         return $maxValue;
     }
 
@@ -336,8 +334,7 @@ class Model {
         } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
             $minValue = '0';
-        }
-        // Повернути масив, що містить данні  
+        }        
         return $minValue;
     }
     

@@ -26,34 +26,44 @@
         border: 2px solid green;
     }
 </style>
+<?php
+if (isset($_POST['Edit']) && isset($this->registry['success'])) {
+// Кнопка натиснута і нема помилкової ситуаціїї - виводимо повідмлення про успіх
+    echo("<div class='container'><span class='warning'><center><h3>{$this->registry['success']}</h3></center></span></div><br>");
+}
+
+if (isset($_POST['Edit']) && isset($this->registry['error'])) {
+// Кнопка натиснута і нема помилкової ситуаціїї - виводимо повідмлення про успіх
+    echo("<div class='container'><span class='warning'><center><h3>{$this->registry['error']}</h3></center></span></div><br>");
+}// Вивід помилки
+
+?>
 
 <?php
 $product = $this->getModel('Product');
 $category = $this->getModel('Category');
-
 $productId = $this->getId('Product');
-$product->getProductById($productId);
 $productDetails = $product->getProductById($productId);
-$categoryId = $this->getModel('Category')->getCategoriesIds();
-$categoryName = $this->getModel('Category')->getCategoriesNames();
-$availableCategories = array_combine($categoryId, $categoryName);
+$availableCategories = array_combine($category->getCategoriesIds(), $category->getCategoriesNames());
 
 // Define the image upload directory
 $uploadDir = PRODUCT_IMAGE_UPLOAD_DIR;
-$categoryIds = ($this->getModel('Product')->getProductCategories($this->getId('Product')));
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {    
-    // Create the uploads directory if it doesn"t exist
+if ($_SERVER["REQUEST_METHOD"] == "POST") { 
     if (!file_exists($uploadDir)) {
         mkdir($uploadDir, 0777, true);
     }    
     // Process the uploaded file
     $uploadFile = $uploadDir . basename($_FILES['product_image']['name']);
+    if (move_uploaded_file($_FILES['product_image']['tmp_name'], $uploadFile)){
+        echo "Product information and photo uploaded successfully!";        
+    } else {
+        echo "Error uploading product photo.";
+    }
 }
 
 //якщо адмін, то показувати форму
 if (Helper::isAdmin()): ?>
-    <center><h2>Редагування товару id = <?= $productDetails['sku'] ?></h2></center>
+    <center><h2>Редагування товару id = <?= $productId ?></h2></center>
 
     <form method="POST" action="<?php $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
         <div class="container">
@@ -71,7 +81,7 @@ if (Helper::isAdmin()): ?>
             <label for="category_id">Категорія:</label>
             <select name="category_id[]" multiple="multiple">
                 <?php foreach ($availableCategories as $categoryId => $categoryName): ?>	
-                <option value="<?= $categoryId; ?>"<?= in_array($categoryId, $categoryIds) ? "selected" :"";?>><?= $categoryName; ?></option>
+                <option value="<?= $categoryId; ?>" <?= $product->isProductInCategory($productId,$categoryId) ? "selected" :"";?>><?= $categoryName;?></option>
                 <?php endforeach; ?>
             </select>            
             </br></br>
@@ -90,8 +100,7 @@ if (Helper::isAdmin()): ?>
             <textarea rows="5" cols="55" name="description"><?= $productDetails["description"] ?></textarea>
             <span class="error"><?= Helper::isEmpty('product')[5]; ?></span>
             </br></br>
-            
-            <img src="<?= "/img/products/". $productDetails['product_image'] ?>" alt="<?= $productDetails['name'] ?>" width="400" height="">
+            <img src="<?= PRODUCT_IMAGE_PATH . $productDetails['product_image']; ?>" alt="<?= $productDetails['name'] ?>" width="400" height="">
             <label for="product_image">Product Photo:</label>
             </br></br>
             
@@ -100,21 +109,3 @@ if (Helper::isAdmin()): ?>
         </div>
     </form>
 <?php endif; ?>
-
-<?php
-if (move_uploaded_file($_FILES['product_image']['tmp_name'], $uploadFile)) {
-        echo "Product information and photo uploaded successfully!";
-        // You can now store the product information and file path in your database
-        // or perform any other necessary actions.
-    } else {
-        echo "Error uploading product photo.";
-    }
-
-if (isset($_POST['Edit'])) {
-// Кнопка натиснута і нема помилкової ситуаціїї - виводимо повідмлення про успіх
-    echo("<div class='container'><span class='warning'><center><h3>{$this->registry['success']}</h3></center></span></div><br>");
-}
-
-// Вивід помилки
-echo("<div class='container'><span class='warning'><center><h3>{$this->registry['error']}</h3></center></span></div><br>");
-?>

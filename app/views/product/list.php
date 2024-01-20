@@ -19,51 +19,51 @@ Helper::buttonListener($products);
 
 
 <form method="POST" action="<?php $_SERVER['PHP_SELF']; ?>">
-    <select name='sortfirst'>
+    <select name='sort_by_price'>
         <?php if (isset($_COOKIE['price'])): ?>
             <?php if ($_COOKIE['price'] == 'ASC'): ?>
-                <option <?php echo filter_input(INPUT_POST, 'sortfirst') == 'price_ASC' ? 'selected' : ''; ?>
+                <option <?php echo filter_input(INPUT_POST, 'sort_by_price') == 'price_ASC' ? 'selected' : ''; ?>
                     value="price_ASC">від дешевших до дорожчих
                 </option>
-                <option <?php echo filter_input(INPUT_POST, 'sortfirst') == 'price_DESC' ? 'selected' : ''; ?>
+                <option <?php echo filter_input(INPUT_POST, 'sort_by_price') == 'price_DESC' ? 'selected' : ''; ?>
                     value="price_DESC">від дорожчих до дешевших
                 </option>
             <?php endif; ?>
             <?php if ($_COOKIE['price'] == 'DESC'): ?>
-                <option <?php echo filter_input(INPUT_POST, 'sortfirst') == 'price_DESC' ? 'selected' : ''; ?>
+                <option <?php echo filter_input(INPUT_POST, 'sort_by_price') == 'price_DESC' ? 'selected' : ''; ?>
                     value="price_DESC">від дорожчих до дешевших</option>
-                <option <?php echo filter_input(INPUT_POST, 'sortfirst') == 'price_ASC' ? 'selected' : ''; ?>
+                <option <?php echo filter_input(INPUT_POST, 'sort_by_price') == 'price_ASC' ? 'selected' : ''; ?>
                     value="price_ASC">від дешевших до дорожчих</option>
                 <?php endif; ?>
             <?php else: ?>
-            <option <?php echo filter_input(INPUT_POST, 'sortfirst') == 'price_ASC' ? 'selected' : ''; ?>
+            <option <?php echo filter_input(INPUT_POST, 'sort_by_price') == 'price_ASC' ? 'selected' : ''; ?>
                 value="price_ASC">від дешевших до дорожчих
             </option>
-            <option <?php echo filter_input(INPUT_POST, 'sortfirst') == 'price_DESC' ? 'selected' : ''; ?>
+            <option <?php echo filter_input(INPUT_POST, 'sort_by_price') == 'price_DESC' ? 'selected' : ''; ?>
                 value="price_DESC">від дорожчих до дешевших
             </option>
         <?php endif; ?>
     </select>
 
-    <select name='sortsecond'>
+    <select name='sort_by_qty'>
         <?php if (isset($_COOKIE['qty'])): ?>
             <?php if ($_COOKIE['qty'] == 'ASC'): ?>
-                <option <?= filter_input(INPUT_POST, 'sortsecond') === 'qty_ASC' ? 'selected' : ''; ?>
+                <option <?= filter_input(INPUT_POST, 'sort_by_qty') === 'qty_ASC' ? 'selected' : ''; ?>
                     value="qty_ASC">по зростанню кількості</option>
-                <option <?= filter_input(INPUT_POST, 'sortsecond') === 'qty_DESC' ? 'selected' : ''; ?>
+                <option <?= filter_input(INPUT_POST, 'sort_by_qty') === 'qty_DESC' ? 'selected' : ''; ?>
                     value="qty_DESC">по спаданню кількості</option>
                 <?php endif; ?>
                 <?php if ($_COOKIE['qty'] == 'DESC'): ?>
-                <option <?= filter_input(INPUT_POST, 'sortsecond') === 'qty_DESC' ? 'selected' : ''; ?>
+                <option <?= filter_input(INPUT_POST, 'sort_by_qty') === 'qty_DESC' ? 'selected' : ''; ?>
                     value="qty_DESC">по спаданню кількості</option>
-                <option <?= filter_input(INPUT_POST, 'sortsecond') === 'qty_ASC' ? 'selected' : ''; ?>
+                <option <?= filter_input(INPUT_POST, 'sort_by_qty') === 'qty_ASC' ? 'selected' : ''; ?>
                     value="qty_ASC">по зростанню кількості</option>
                 <?php endif; ?>
             <?php else: ?>
-            <option <?= filter_input(INPUT_POST, 'sortsecond') === 'qty_ASC' ? 'selected' : ''; ?>
+            <option <?= filter_input(INPUT_POST, 'sort_by_qty') === 'qty_ASC' ? 'selected' : ''; ?>
                 value="qty_ASC">по зростанню кількості
             </option>
-            <option <?= filter_input(INPUT_POST, 'sortsecond') === 'qty_DESC' ? 'selected' : ''; ?>
+            <option <?= filter_input(INPUT_POST, 'sort_by_qty') === 'qty_DESC' ? 'selected' : ''; ?>
                 value="qty_DESC">по спаданню кількості
             </option>
         <?php endif; ?>
@@ -105,7 +105,7 @@ Helper::buttonListener($products);
     <div class="product">
         <table style="width:100%">
             <tr>
-            <td width="20%"><img src="<?= "/img/products/". $product['product_image'] ?>" alt="<?= $product['name'] ?>" width="200" height=""></td>            
+            <td width="20%"><img src="<?= PRODUCT_IMAGE_PATH . $product['product_image'] ?>" alt="<?= $product['name'] ?>" width="300" height=""></td>            
             <center><h1> <?= Helper::simpleLink('/product/show', $product['name'], array('product_id' => $product['product_id']))?></h1></center>
             <td width="80%>                    
                 <p class="sku"> Код: <?= $product['sku'] ?></p>                    

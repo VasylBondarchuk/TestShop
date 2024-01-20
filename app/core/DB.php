@@ -18,11 +18,11 @@ class DB
     {
         if (!self::$pdo) {
             $dsn = 'mysql:host='. MYSQL_HOST .';port='. MYSQL_PORT .';dbname='. DB_NAME . ';charset=utf8';
-            $options = array(
+            $options = [
                 PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'",
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_EMULATE_PREPARES => false
-            );
+                    ];
             try {
                 self::$pdo = new PDO($dsn, DB_USERNAME , DB_PASSWORD, $options);
             } catch (PDOException $e) {
@@ -32,10 +32,10 @@ class DB
         }
         return self::$pdo;
     }
-    public function getLastId():int
-    {
-        
-        return (int)self::$pdo->lastInsertId();
+    
+    public function getLastId() : int
+    {        
+        return self::$pdo->lastInsertId();
     }
 
     /**

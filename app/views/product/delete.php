@@ -37,8 +37,7 @@
     </span>
 
     <?php $product = $this->getModel('Product')->getProductById($this->getId('Product'));
-   //var_dump($product);exit;
-    
+       
     ?>   
     <div class="product"></a>
     <p class="sku">Код: <?= $product['sku'] ?></p>
@@ -61,7 +60,7 @@
     //здійснити редірект на сторінку продуктів
     if (isset($_POST['Delete'])) {
         $product->deleteProduct($this->getId('Product'));
-        Helper::redirect("/category/show");        
+        Helper::redirect("/category/list");        
     }
     ?>    
 

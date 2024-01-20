@@ -15,19 +15,17 @@ class ProductController extends Controller {
     // МЕТОД ВИВЕДЕННЯ ВСІХ ТОВАРІВ
     public function ListAction() {
         // Встановлюємо назву сторінки
-        $this->setTitle("Товари");        
+        $this->setTitle("Products");        
 
         $this->registry['products'] = $this->getModel('Product')
             ->initProductCollection($this->getId('Category'))                
-                /* повертає обєкт класу Product зі значенням властивості $collection */
                 ->getCollection()
-                /* повертає значення властивості $collection класу Product */
-                ->select();
-        // завантаження вигляду
-        $this->setView();
-        // завантаження шаблону
+                ->filterByPrice()
+        	->sort($this->getSortParams())
+                ->select();        
+        $this->setView();        
         $this->renderLayout();
-    }
+    } 
 
     // МЕТОД РЕДАГУВАННЯ ТОВАРУ
     public function EditAction() {        
@@ -36,6 +34,7 @@ class ProductController extends Controller {
         $model = $this->getModel('Product');
         if (isset($_POST['Edit'])) {
             $model->editProduct($this->getId('Product'), $selectedCategoryIds);
+            $this->registry['success'] = "The Product was edited";            
         }        
         $this->setView();        
         $this->renderLayout();
@@ -43,51 +42,26 @@ class ProductController extends Controller {
 
     // МЕТОД ПОКАЗУ ТОВАРУ
     public function ShowAction() {
-        // Встановлюємо назву сторінки
-        $this->setTitle("Показ товару");
-        // Повертає об'єкт класу Category extends Model
-        $categoryModel = $this->getModel('Category');
-        // Масив імен категорій
-        $category_names = $categoryModel->getCategoriesNames();
-        // Масив id категорій		
-        $category_id = $categoryModel->getCategoriesIds();
-        // Масив де ключі - id категорій, значення - імена категорій
-        $this->registry['categories'] = array_combine($category_id, $category_names);
-        // Введений sku 
-        $entered_sku = Helper::ClearInput($_POST['sku']);
-        // Змінна для виводу помилок 
-        $this->registry['error'] = $this->registry['success'] = '';
-        // Якщо не адмін
-        if (Helper::isAdmin() != 1) {
-            $this->registry['error'] = "Ви не маєте права редагувати товари!";
-            
-        }
-        // Повертає об'єкт класу Product extends Model
-        $model = $this->getModel('Product');
-        // Отримуємо масив данних товару, що редагується
-        $this->registry['product'] = $model->getItem($this->getId('Product'));
-        if ($_POST) {
-            $model->editItem($this->getId('Product'));
-        }
-        $this->registry['product'] = $model->getItem($this->getId('Product'));
-
-        //відображаємо вигляд
-        $this->setView();
-
-        //відображаємо шаблон
+        $productModel = $this->getModel('Product');
+        $productName = $productModel->getItem($this->getId('Product'))['name'] ?? '' ;        
+        $this->setTitle($productName);        
+        $this->registry['product'] = $productModel->getItem($this->getId('Product'));
+        $this->setView();        
         $this->renderLayout();
     }
 
     // МЕТОД ДОДАВАННЯ ТОВАРУ
     public function AddAction() {        
         $this->setTitle("Додавання товару");        
-        $model = $this->getModel('Product');        
+        $product = $this->getModel('Product');        
         $entered_sku = $_POST['sku'];
 
         // Якщо введений sku не унікальний 
-        if ($values = $model->getPostValues() && !($model->IsValueExists($entered_sku, "sku"))) {
+        if ($values = $product->getPostValues() && !($product->IsValueExists($entered_sku, "sku"))) {
             //Викликаємо метод класу Model додавання товару 
-            $model->addProduct();
+            $product->addProduct();
+            $productId = $product->getMaxValue('product_id');            
+            Helper::redirect("/product/edit?product_id=$productId"); 
         } else {
             $this->registry['error'] = "Товар з sku = $entered_sku вже існує.<br>Введіть інший sku та спробуйте знову";
         } 
@@ -99,23 +73,21 @@ class ProductController extends Controller {
     public function DeleteAction() {
         // Встановлюємо назву сторінки
         $this->setTitle("Видалення товару");
-
         // Повертає об'єкт класу Product extends Model
-        $model = $this->getModel('Product');
-
-        // Отримуємо масив данних товару, що редагується 	
-        $this->registry['product'] = $model->getItem($this->getId('Product'));
+        $model = $this->getModel('Product');        
 
         // Якщо отриманий з запиту id існує в БД - видаляємо
         if (in_array(
                         $this->getId('Product'),
                         $model->getColumnArray($this->getIdColumnName('Product')))) {
             // Викликаємо метод класу Model видалення товару
-            $model->deleteItem($this->getId('Product'));
+            if(isset($_POST['Delete'])){
+                $model->deleteItem($this->getId('Product'));
+                Helper::redirect("/category/list"); 
+            }
 
             //відображаємо вигляд
             $this->setView();
-
             //відображаємо шаблон
             $this->renderLayout();
         }
@@ -151,9 +123,9 @@ class ProductController extends Controller {
 
         $params = [];
 
-        $sortfirst = filter_input(INPUT_POST, 'sortfirst');
+        $sortByPrice = filter_input(INPUT_POST, 'sort_by_price');
 
-        if ($sortfirst === "price_DESC") {
+        if ($sortByPrice === "price_DESC") {
             $params['price'] = 'DESC';
             //запис cookie для ціни
             setcookie('price', 'DESC', time() + 3600, '/');
@@ -163,9 +135,9 @@ class ProductController extends Controller {
             setcookie('price', 'ASC', time() + 3600, '/');
         }
 
-        $sortsecond = filter_input(INPUT_POST, 'sortsecond');
+        $sortByQty = filter_input(INPUT_POST, 'sort_by_qty');
 
-        if ($sortsecond === "qty_DESC") {
+        if ($sortByQty === "qty_DESC") {
             $params['qty'] = 'DESC';
             //запис cookie для к-сті
             setcookie('qty', 'DESC', time() + 3600, '/');
@@ -176,10 +148,17 @@ class ProductController extends Controller {
         }
 
         //масив cookie 	
-        $cookies = ['price' => isset($_COOKIE['price']) ? $_COOKIE['price'] : $params['price'], 'qty' => isset($_COOKIE['qty']) ? $_COOKIE['qty'] : $params['qty']];
+        $cookies = ['price' => isset($_COOKIE['price'])
+            ? $_COOKIE['price']
+            : $params['price'],
+            'qty' => isset($_COOKIE['qty'])
+            ? $_COOKIE['qty']
+            : $params['qty']];
 
         //якщо сторінку оновили=сортуємо, якщо ні показуємо cookie 
-        return $pageRefreshed == 0 ? $cookies : $params;
+        return $pageRefreshed == 0
+                ? $cookies
+                : $params;
     }
 
     //МЕТОД ЕКСПОРТУ З XML	

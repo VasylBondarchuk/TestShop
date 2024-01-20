@@ -61,7 +61,7 @@ class CustomerController extends Controller
                     $_SESSION['first_name']=$customer['first_name'];
                     $_SESSION['last_name']=$customer['last_name'];
                     // редирект на сторінку категорій
-                    Helper::redirect('/category/show');
+                    Helper::redirect('/category/list');
                 }
             }
         }
