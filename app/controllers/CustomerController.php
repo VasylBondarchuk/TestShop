@@ -40,7 +40,7 @@ class CustomerController extends Controller
 
             if($_POST['password'] && $_POST['email'])
             {
-                $params =array ('email'=>$email,'password'=> $password);
+                $params = array ('email'=>$email,'password'=> $password);
                 $customer = $this->getModel('customer')->initCollection()
                     ->getCollection()->getItemByParam('email',$params['email']);
 
@@ -90,7 +90,7 @@ class CustomerController extends Controller
             setcookie(session_name(), "", time() - 3600, "/");
         }
         session_destroy();
-        Helper::redirect('/category/show');
+        Helper::redirect('/category/list');
     }
 
     // МЕТОД РЕДАГУВАННЯ КЛІЄНТА

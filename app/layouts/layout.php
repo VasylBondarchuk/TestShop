@@ -29,6 +29,9 @@
         <div id="header">
             <?php $this->renderPartialview('menu'); ?>
         </div>
+        <div class="message">
+            <?php $this->renderMessageView(); ?>
+        </div>
         <div class="container">
             <?php $this->renderView(); ?>
         </div>

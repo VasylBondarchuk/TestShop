@@ -5,9 +5,14 @@
  */
 class Product extends Model {    
     
-    /**
-     * Product constructor.
-     */
+    const PRODUCT_ID = 'product_id';
+    const SKU = 'sku';
+    const NAME = 'name';
+    const PRICE = 'price';
+    const QTY = 'qty';
+    const DESCRIPTION = 'description';
+    const PRODUCT_IMAGE = 'product_image';
+        
     function __construct() {
         $this->table_name = "product";
         $this->id_column = "product_id";
@@ -46,41 +51,45 @@ class Product extends Model {
             $value .= "($productId,$categoryId), ";
         }
         $productIdCategoryIdValues = rtrim($value, ", ");        
-        $sql = "INSERT INTO `product_category` (`product_id`, `category_id`)
-        VALUES  $productIdCategoryIdValues;";
+        $sql = "INSERT INTO product_category (" . self::PRODUCT_ID . ", category_id)
+        VALUES  $productIdCategoryIdValues";
         $db->query($sql);
     }
     
-        public function deleteProductFromCategory(int $productId) {
+    public function deleteProductFromCategory(int $productId) {
         $db = new DB();        
-        $sql = "DELETE FROM `product_category` WHERE `product_id` = $productId";
+        $sql = "DELETE FROM product_category WHERE " . self::PRODUCT_ID . " = $productId";
         $db->query($sql);
     }
 
     public function deleteProduct(int $productId) {
         $db = new DB();
-        $sql = "DELETE FROM product_category WHERE product_id = ?;";
+        $sql = "DELETE FROM product_category WHERE " . self::PRODUCT_ID . "= ?";
         $db->query($sql, [$productId]);
         $this->deleteItem($productId);
     }
 
     //МЕТОД ФІЛЬТРУВАННЯ
     public function filterByPrice(): Product {
-        $min = $this->getMinValue('price');
-        $minIput = Helper::getFilteringInput('minPrice') ?: $min;
+        $minPrice = $this->getMinValue(self::PRICE);
+        $minPriceIput = is_numeric(Helper::getFilteringInput('minPrice'))
+                ? Helper::getFilteringInput('minPrice')
+                : $minPrice;        
 
-        $max = $this->getMaxValue('price');
-        $maxIput = Helper::getFilteringInput('maxPrice') ?: $max;
+        $maxPrice = $this->getMaxValue(self::PRICE);
+        $maxPriceIput = is_numeric(Helper::getFilteringInput('maxPrice'))
+                ? Helper::getFilteringInput('maxPrice')
+                : $maxPrice;
 
-        if ($minIput > $maxIput) {
-            $minIput = $min;
-            $maxIput = $max;
+        if ($minPriceIput > $maxPriceIput) {
+            $minPriceIput = $minPrice;
+            $maxPriceIput = $maxPrice;
         }
 
-        if ($minIput > $max) {
-            $minIput = $max;
+        if ($minPriceIput > $maxPrice) {
+            $minPriceIput = $minPrice;
         }
-        $this->filter('price', $minIput, $maxIput);
+        $this->filter(self::PRICE, $minPriceIput, $maxPriceIput);
         return $this;
     }
 
@@ -94,7 +103,7 @@ class Product extends Model {
     
     public function getProductCategories(int $productId) : array {
         $db = new DB();
-        $sql = "SELECT `category_id` FROM `product_category` WHERE `product_id` = $productId;";
+        $sql = "SELECT category_id FROM product_category WHERE " . self::PRODUCT_ID . " = $productId";
         $result = $db->query($sql);
         $categoryIds = [];
         foreach($result as $category){

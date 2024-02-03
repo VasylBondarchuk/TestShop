@@ -60,7 +60,7 @@ class Model {
     //МЕТОД ФІЛЬТРУВАННЯ
      public function filter(string $column, $min, $max) {        
       //формування частини sql-запиту "WHERE price BETWEEN"
-      $this->sql .= " AND $column BETWEEN " . $min . " AND " . $max;
+      $this->sql .= " AND $column BETWEEN " . $min . " AND " . $max;      
       return $this;
       } 
 
@@ -127,16 +127,11 @@ class Model {
     }
 
     // Перевірка чи введенне значення є унікальним (не належить масиву існуючих значень, крім вже введеного)
-    public function IsValueExists($check, $column_name): bool {
+    public function isValueUnique($value, $columnName): bool {
         $db = new DB();
-        $sql = "SELECT {$column_name} from {$this->table_name};";
-        $results = $db->query($sql);
-        $column_values_array = [];
-        // створюємо і повертаємо масив зі значеннями колонки $column_name
-        foreach ($results as $result => $value) {
-            $column_values_array[] = $value[$column_name];
-        }
-        return in_array($check, $column_values_array);
+        $sql = "SELECT COUNT(*) as count FROM $this->table_name WHERE $columnName = $value";
+        $results = $db->query($sql);        
+        return array_shift($results)['count'] === 0;
     }
 
     public function getColumnsNames(): array {
@@ -170,32 +165,7 @@ class Model {
         $results = $db->query($sql);
         return floatval($results[0]["MIN($column)"]);
     }
-
-    //отримання верхнього значення введеного параметра
-    public function HigherPrice($param) {
-        //максимально можливе значення параметру
-        $max = $this->MaxValue($param);
-
-        if (isset($_POST[$param][1])) {//отримання верхнього значення сортування
-            if (!empty($_POST[$param][1])) {
-                $max = floatval($_POST[$param][1]) >= $max ? $max : floatval($_POST[$param][1]);
-            }
-        }
-        return 100;
-    }
-
-    //отримання нижнього значення введеного параметра
-    public function LowerPrice($param) {
-        //мінімально можливе значення параметру
-        $min = 0;
-        if (isset($_POST[$param][0])) {//отримання нижнього значення сортування
-            if (!empty($_POST[$param][0])) {
-                $min = floatval($_POST[$param][0]) >= $this->HigherPrice($param) ? $min : floatval($_POST[$param][0]);
-            }
-        }
-        return $min;
-    }
-
+    
     public function getCollection(): Model {
         $db = new DB();
         $this->sql .= ";";
@@ -233,15 +203,6 @@ class Model {
         }
         // Повернути масив, що містить данні  
         return array_shift($itemDetails);
-    }
-
-    // Метод отримання данних рядка таблиці table_name за id
-    public function getItemUniv($column, $value) {
-        $this->sql = "SELECT * FROM {$this->table_name} WHERE $column = ?;";
-        $db = new DB();
-        $results = $db->query($this->sql, array($value));
-        // Повернути масив, що містить данні  
-        return $this;
     }
 
     public function getPostValues() {
@@ -312,9 +273,9 @@ class Model {
         return TRUE;
     }
 
-    public function getMaxValue(string $column) {
+    public function getMaxValue(string $columnName) {
         try {
-            $sql = "SELECT MAX($column) AS max_value FROM $this->table_name";            
+            $sql = "SELECT MAX($columnName) AS max_value FROM $this->table_name";            
             $db = new DB();
             $result = $db->query($sql);
             $maxValue = array_shift($result)['max_value'];
@@ -325,12 +286,12 @@ class Model {
         return $maxValue;
     }
 
-    public function getMinValue(string $column) {
+    public function getMinValue(string $columnName) {
         try {
-            $sql = "SELECT MIN($column) AS minValue FROM $this->table_name";
+            $sql = "SELECT MIN($columnName) AS min_value FROM $this->table_name";
             $db = new DB();
             $result = $db->query($sql);
-            $minValue = array_shift($result)['minValue'];
+            $minValue = array_shift($result)['min_value'];
         } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
             $minValue = '0';
@@ -338,7 +299,7 @@ class Model {
         return $minValue;
     }
     
-    public function getLastId() {
+    public function getLastId(): int {
         $db = new DB();        
         return $db->getLastId();
     }

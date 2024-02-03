@@ -26,18 +26,6 @@
         border: 2px solid green;
     }
 </style>
-<?php
-if (isset($_POST['Edit']) && isset($this->registry['success'])) {
-// Кнопка натиснута і нема помилкової ситуаціїї - виводимо повідмлення про успіх
-    echo("<div class='container'><span class='warning'><center><h3>{$this->registry['success']}</h3></center></span></div><br>");
-}
-
-if (isset($_POST['Edit']) && isset($this->registry['error'])) {
-// Кнопка натиснута і нема помилкової ситуаціїї - виводимо повідмлення про успіх
-    echo("<div class='container'><span class='warning'><center><h3>{$this->registry['error']}</h3></center></span></div><br>");
-}// Вивід помилки
-
-?>
 
 <?php
 $product = $this->getModel('Product');

@@ -58,6 +58,14 @@ class Controller {
             include $view_path;
         }
     }
+    
+     // Метод відображення вигляду
+    public function renderMessageView() {        
+        $view_path = ROOT . '/app/views/message/message.php';
+        if (file_exists($view_path)) {
+            include $view_path;
+        }
+    }
 
     // Метод відображення шаблону
     public function renderLayout($layout = "layout") {
@@ -103,7 +111,7 @@ class Controller {
         $this->setModelName(get_class($model));
         return $model;
     }
-
+    
     // Повертає назву id-колонки
     public function getIdColumnName(string $name) {
         return $this->getModel($name)->getIdName();

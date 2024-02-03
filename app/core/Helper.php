@@ -111,7 +111,10 @@ class Helper {
     public static function redirect($path) {
         $server_host = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];
         $url = $server_host . route::getBP() . $path;
+        ob_start();
         header("Location: $url");
+        ob_end_flush();
+        exit();
     }
 
     public static function getCustomer() {
@@ -355,29 +358,11 @@ class Helper {
         }
     }
 
-    //отримання записів з бази за конкретним значенням певної колонки
-    public static function getItemByValue($column, $value, $table) {
-        $db = new DB();
-        $sql = "SELECT * FROM $table WHERE $column=?";
-        $params = array($value);
-        return empty($db->query($sql, $params)) ? array() :
-                $db->query($sql, $params);
-    }
-
     //перевірка чи відвідувач є адміном
-    public static function isAdmin() {
-        //масив адмінів
-        $admin_array = Helper::getItemByValue('admin_role', 1, 'customer');
-
-        //якщо відвідувач авторизувався, перевірити значеня колонки admin_role
-        if (!empty($_SESSION['id']) && !empty($admin_array)) {
-            foreach ($admin_array as $admin) {
-                if ($admin['customer_id'] == $_SESSION['id']) {
-                    return TRUE;
-                }
-            }
-            return FALSE;
-        }
+    public static function isAdmin() : bool {
+        return isset($_SESSION['id'])
+                ? self::getModel('Customer')->getCustomerAdminRole($_SESSION['id'])
+                : false; 
     }
 
     //метод створення кошика

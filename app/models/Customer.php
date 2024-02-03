@@ -16,47 +16,58 @@ class Customer extends Model
         return 'customer';
     }
 	
-	// МЕТОД ДОДАВАННЯ (РЕЄСТРАЦІЇ) НОВОГО КЛІЄНТА
+    // МЕТОД ДОДАВАННЯ (РЕЄСТРАЦІЇ) НОВОГО КЛІЄНТА
     public function addCustomer()
 	{
 		//імена колонок таблиці
 		$columns = $this->getColumnsNames();
-
-		//id нового користувача
-		$customer_id = $this->MaxValue($this->id_column) + 1;
-
 		//параметри форми
-		$params=array_merge([$customer_id],Helper::FormData($columns));
-
+		$rawParams = Helper::FormData($columns);
+                $params = $rawParams;
+                array_pop($params);
+                //print_r($params);exit;
 		//отримання шифрованого паролю md5
-		$password ='';
-
+		$password = '';
 		if(isset($_POST['password']))
 		{
-			if(!empty($_POST['password'])){$password = md5(Helper::CleanInput($_POST['password']));}
+                    if(!empty($_POST['password'])){
+                            $password = md5(Helper::CleanInput($_POST['password']));
+                            
+                    }
 		}
-
 		//перевірка корректності введень
-
 		$correctInput = 0;
 
 		//непорожні корректні введення
 		if ($this->isEmpty(Helper::FormData($columns)) &&
-			Helper::CorrectCustomerInput($columns[1],$columns[2],$columns[3],
-			$columns[4],$columns[5],'pass_confirm',$columns[6])){$correctInput = 1;}
+			Helper::CorrectCustomerInput(
+                                $columns[1],
+                                $columns[2],
+                                $columns[3],
+                                $columns[4],
+                                $columns[5],
+                                'pass_confirm',
+                                $columns[6]
+                                )
+                        )
+                    {
+                    $correctInput = 1; 
+                }
 		
 		//якщо введений email унікальний для бази	
-		if(empty($this->getItemByParam('email',$params[4])))
+		if(empty($this->getItemByParam('email', $params[4])))
 		{
 			//якщо корректно введені всі поля - редагувати
-			if (isset($_POST['addcustomer']) && $correctInput==1)
+			if (isset($_POST['addcustomer']) && $correctInput == 1)
 			{
-				//додаємо до БД							
-				$this->addItem($columns,array($customer_id,$params[1],
-				$params[2],$params[3],$params[4],$password,$params[6],0));
-				
+                           $columns2 = $columns;
+                            array_shift($columns2);
+                            print_r($columns2); 
+                            print_r(array($params[1], $params[2],$params[3],$params[4],$password, $params[6], 0));
+                            $this->addItem($columns2, array($params[1], $params[2],$params[3],$params[4],$password, $params[6], 0));
+			
 				//змінна успішного реєстрування 
-				Helper::$var['message']=1;
+				Helper::$var['message'] = 1;
 			}
 		}
 		//змінна неуспішного реєстрування із-за дублікату ел. пошти
@@ -71,5 +82,17 @@ class Customer extends Model
 	{
             $customers = $this->initCollection()->getCollection()->select();
             return $customers;
+	}
+        
+        // Масив id категорій
+	public function getCustomerById(int $customerId) : array
+	{
+            return $this->getItem($customerId);           
+	}
+        
+        // Масив id категорій
+	public function getCustomerAdminRole(int $customerId) : int 
+	{
+            return $this->getItem($customerId)['admin_role'];           
 	} 
 }

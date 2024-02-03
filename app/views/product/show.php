@@ -10,7 +10,7 @@
 
 
 <?php
-
+echo isset($this->registry['successMessage']) ? : "";
 $productId = (int)Helper::getParamFromUrl('product_id');
 // Метод виведення повідомлення про додавання товару до кошика
 $product = $this->getModel('Product')->getItem($productId);

@@ -1,5 +1,5 @@
 <?php
-//error_reporting(E_ALL);
+
 error_reporting(E_ERROR | E_PARSE);
 // Декларування константи ROOT - адреса директорії, де розміщено файл index.php (директрія проекту) 
 define("ROOT", getcwd());
@@ -7,3 +7,4 @@ define("ROOT", getcwd());
 define("DS", DIRECTORY_SEPARATOR);
 // підключення файлу bootstrap.php
 include ROOT . '/app/bootstrap.php';
+
