@@ -31,6 +31,12 @@ class Category extends Model
             return $categories;
 	}
         
+         // Масив категорій
+	public function getCategories() : array
+	{
+            return array_combine($this->getCategoriesIds(), $this->getCategoriesNames());
+        }
+        
          // Масив id категорій
 	public function getCategoryNameById(int $categoryId) : string
 	{

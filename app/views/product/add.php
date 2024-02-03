@@ -26,50 +26,16 @@
 </style>
 
 <?php
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Define the upload directory
-    $uploadDir = PRODUCT_IMAGE_UPLOAD_DIR;
-    // Create the uploads directory if it doesn"t exist
-    if (!file_exists($uploadDir)) {
-        mkdir($uploadDir, 0777, true);
-    }
-
-    // Process the uploaded file
-    $uploadFile = $uploadDir . basename($_FILES['product_image']['name']);   
-            
-    if (move_uploaded_file($_FILES['product_image']['tmp_name'], $uploadFile)) {
-        echo "Product information and photo uploaded successfully!";
-        // You can now store the product information and file path in your database
-        // or perform any other necessary actions.
-    } else {
-        echo "Error uploading product photo.";
-    }
-}
-
-//збереження введень користувача
 $form_data = Helper::FormDataInput(array('sku', 'name', 'price', 'qty', 'description', 'product_image'));
-?>
-
-<?php
-
-$categoryId = $this->getModel('Category')->getCategoriesIds();
-$categoryName = $this->getModel('Category')->getCategoriesNames();
-$categories = array_combine($categoryId, $categoryName);
-
-if (Helper::isAdmin()):?>
-
-<span class='warning'>
-    <center>
-        <h3>Ви збираєтеся створити новий товар. Якщо ви впевнені,
-            корректно введіть данні та натисніть кнопку 'Додати'.
-        </h3>
-    </center>
-</span>
-<br><br> 
-
-    <form method="POST" action="<?php $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
+if (Helper::isAdmin()):
+    ?>
+    <div class='product'>
+        Ви збираєтеся створити новий товар. Якщо ви впевнені,
+        корректно введіть данні та натисніть кнопку 'Додати'.        
+    </div>
+    <br><br>
+    <form method="POST" action="<?php FORMS_HANDLER_PATH . DS . 'add_product_form.php'; ?>" enctype="multipart/form-data">
         <div class="container">
-            
             <label for="sku"> Sku:</label>
             <input type="text" name="sku">
             <span class="error"> <?php echo Helper::isEmpty('product')[1]; ?></span>
@@ -82,13 +48,12 @@ if (Helper::isAdmin()):?>
 
             <label for="category_id">Категорія:</label>
             <select name="category_id[]" multiple="multiple">
-                <?php                
-                foreach ($categories as $categoryId => $categoryName): ?>	
+                <?php foreach ($this->getModel('Category')->getCategories() as $categoryId => $categoryName): ?>	
                     <option value="<?= $categoryId; ?>"><?= $categoryName; ?></option>
                 <?php endforeach; ?>
             </select>
             </br></br>
-            
+
             <label for="price"> Price:</label>
             <input type="text" name="price">
             <span class="error"><?php
@@ -96,7 +61,7 @@ if (Helper::isAdmin()):?>
                 echo Helper::isNumeric()[0];
                 ?></span>
             <br><br>
-            
+
             <label for="qty"> Qty:</label>
             <input type="text" name="qty">
             <span class="error"> <?php
@@ -104,7 +69,7 @@ if (Helper::isAdmin()):?>
                 echo Helper::isNumeric()[1];
                 ?></span>
             <br><br>
-                
+
             <label for="description"> Description: </label>
             <textarea rows="5" name="description"></textarea>
             <span class="error"> <?php echo Helper::isEmpty('product')[5]; ?></span><br>

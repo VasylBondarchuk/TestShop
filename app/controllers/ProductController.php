@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 // Enable error reporting
 error_reporting(E_ALL);
 // Display errors on the screen
@@ -52,14 +52,14 @@ class ProductController extends Controller {
     public function AddAction() {
         $this->setTitle("Додавання товару");
         if (!Helper::isAdmin()) {
-            $this->registry['errorMessage'] = "Ви не маєте права створювати товари";
+            $this->registry['errorMessage'].= " Ви не маєте права створювати товари";
         } else {
             $product = $this->getModel('Product');
             if ($product->getPostValues()) {
                 $enteredSku = $_POST['sku'];
                 if ($product->isValueUnique($enteredSku, 'sku')) {
                     $product->addProduct();
-                    $this->registry['successMessage'] = "Товар успішно створено";
+                    $_SESSION['successMessage'] = "Товар успішно створено";
                     $productId = $product->getMaxValue('product_id');
                     Helper::redirect("/product/show?product_id=$productId");
                 } else {

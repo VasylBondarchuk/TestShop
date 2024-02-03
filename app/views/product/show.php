@@ -1,20 +1,6 @@
-<style>
-    div #order {
-        background-color: white;
-        width: 97%;
-        border: 10px solid green;
-        padding: 20px;
-        margin: 20px;
-    }
-</style>
-
-
 <?php
-echo isset($this->registry['successMessage']) ? : "";
 $productId = (int)Helper::getParamFromUrl('product_id');
-// Метод виведення повідомлення про додавання товару до кошика
 $product = $this->getModel('Product')->getItem($productId);
-//print_r($product);exit;
 ?>
 
 <?php if($product) : ?>
@@ -46,7 +32,7 @@ $product = $this->getModel('Product')->getItem($productId);
                     $_SESSION['qty'][] = 1;
                 }
 
-                if (Helper::isAdmin() == 1) {
+                if (Helper::isAdmin()) {
                     echo '<span class="glyphicon glyphicon-pencil"></span>' . " ";
                     echo Helper::simpleLink('/product/edit', 'Редагувати', array('product_id' => $product['product_id'])) . " ";
                     echo '<span class="glyphicon glyphicon-trash"></span>' . " ";

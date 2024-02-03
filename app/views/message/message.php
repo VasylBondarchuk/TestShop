@@ -1,19 +1,22 @@
-<?php if (isset($this->registry['errorMessage'])) : ?>
+<?php
+if (isset($this->registry['errorMessage'])) : ?>
 
-    <div class="product">
-        <center>            
+    <div class ="product">                   
             <?= $this->registry['errorMessage'];?>
-        </center>
-    </div>    
+    </div>
+
 <?php endif; ?>
 
-<?php if (isset($this->registry['successMessage'])) : ?>
+<?php if (isset($_SESSION['successMessage'])) : ?>
 
     <div class="product">
         <center>            
-            <?= $this->registry['successMessage'];?>
+            <?php
+            echo $_SESSION['successMessage'];
+            unset($_SESSION['successMessage']);
+            ?>
         </center>
-    </div>    
+    </div>
 <?php endif; ?>
 
 

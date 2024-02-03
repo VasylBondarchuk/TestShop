@@ -29,31 +29,14 @@
 
 <?php
 $product = $this->getModel('Product');
-$category = $this->getModel('Category');
 $productId = $this->getId('Product');
 $productDetails = $product->getProductById($productId);
-$availableCategories = array_combine($category->getCategoriesIds(), $category->getCategoriesNames());
-
-// Define the image upload directory
-$uploadDir = PRODUCT_IMAGE_UPLOAD_DIR;
-if ($_SERVER["REQUEST_METHOD"] == "POST") { 
-    if (!file_exists($uploadDir)) {
-        mkdir($uploadDir, 0777, true);
-    }    
-    // Process the uploaded file
-    $uploadFile = $uploadDir . basename($_FILES['product_image']['name']);
-    if (move_uploaded_file($_FILES['product_image']['tmp_name'], $uploadFile)){
-        echo "Product information and photo uploaded successfully!";        
-    } else {
-        echo "Error uploading product photo.";
-    }
-}
 
 //якщо адмін, то показувати форму
 if (Helper::isAdmin()): ?>
     <center><h2>Редагування товару id = <?= $productId ?></h2></center>
 
-    <form method="POST" action="<?php $_SERVER['PHP_SELF']; ?>" enctype="multipart/form-data">
+    <form method="POST" action="<?php FORMS_HANDLER_PATH . DS . '/add_product_form.php'; ?>" enctype="multipart/form-data">
         <div class="container">
             
             <label for="sku"> Sku: </label>
@@ -61,37 +44,40 @@ if (Helper::isAdmin()): ?>
             <span class="error"> <?php Helper::FormIcorrectInputMessage('sku'); ?></span>
             </br></br>
             
-            <label for="name"> Назва: </label>
+            <label for="name"> Product Name: </label>
             <input type="text" name="name" value="<?= $productDetails['name'] ?>">
             <span class="error"> <?php Helper::FormIcorrectInputMessage('name'); ?></span>
             </br></br>
             
-            <label for="category_id">Категорія:</label>
+            <label for="category_id"> Category:</label>
             <select name="category_id[]" multiple="multiple">
-                <?php foreach ($availableCategories as $categoryId => $categoryName): ?>	
-                <option value="<?= $categoryId; ?>" <?= $product->isProductInCategory($productId,$categoryId) ? "selected" :"";?>><?= $categoryName;?></option>
+                <?php foreach ($this->getModel('Category')->getCategories() as $categoryId => $categoryName): ?>	
+                <option value="<?= $categoryId; ?>"
+                    <?= $product->isProductInCategory($productId,$categoryId) ? 'selected' : '';?>><?= $categoryName;?>
+                </option>
                 <?php endforeach; ?>
             </select>            
             </br></br>
             
-            <label for="price">Ціна:</label>            
+            <label for="price">Price:</label>            
             <input type="text" name="price" value="<?= $productDetails["price"] ?>">
             <span class="error"><?php Helper::FormIcorrectInputMessage("price"); ?></span>
             </br></br>
             
-            <label for="qty">Кількість:</label>
+            <label for="qty">Qty:</label>
             <input type="text" name="qty" value="<?= $productDetails["qty"] ?>">
             <span class="error"><?php Helper::FormIcorrectInputMessage("qty"); ?></span>
             </br></br>
             
-            <label for="qty">Опис:</label>            
+            <label for="qty">Description:</label>            
             <textarea rows="5" cols="55" name="description"><?= $productDetails["description"] ?></textarea>
             <span class="error"><?= Helper::isEmpty('product')[5]; ?></span>
             </br></br>
+            
             <img src="<?= PRODUCT_IMAGE_PATH . $productDetails['product_image']; ?>" alt="<?= $productDetails['name'] ?>" width="400" height="">
-            <label for="product_image">Product Photo:</label>
             </br></br>
             
+            <label for="product_image">Product Photo:</label> 
             <input type="file" name="product_image" id="product_image" accept="image/*"><br>   
             <input class="button" name="Edit" type="submit">
         </div>

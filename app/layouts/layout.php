@@ -1,8 +1,8 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <link rel="stylesheet" type="text/css" href="<?php echo route::getBP(); ?>/css/style.css" >
-        <title><?php echo $this->getTitle(); ?></title>
+        <link rel="stylesheet" type="text/css" href="<?= route::getBP(); ?>/css/style.css" >
+        <title><?= $this->getTitle(); ?></title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
@@ -29,10 +29,9 @@
         <div id="header">
             <?php $this->renderPartialview('menu'); ?>
         </div>
-        <div class="message">
-            <?php $this->renderMessageView(); ?>
-        </div>
+        
         <div class="container">
+            <?php $this->renderMessageView(); ?>
             <?php $this->renderView(); ?>
         </div>
 

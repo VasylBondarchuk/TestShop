@@ -1,23 +1,15 @@
-<style>
-    div #order {
-        background-color: white;
-        width: 97%;
-        border: 10px solid green;
-        padding: 20px;
-        margin: 20px;
-    }
-</style>
-
 <?php
 // Метод виведення повідомлення про додавання товару до кошика
 $products = $this->registry['products'];
+if(!$products){
+    echo "There are no products in this category";
+}
 $minPrice = $this->registry['products'] ? min(array_column($this->registry['products'], 'price')) : 0;
 $maxPrice = $this->registry['products'] ? max(array_column($this->registry['products'], 'price')) : 0;
-
 Helper::buttonListener($products);
 ?>
 
-
+<?php if($products) : ?>
 <form method="POST" action="<?php $_SERVER['PHP_SELF']; ?>">
     <select name='sort_by_price'>
         <?php if (isset($_COOKIE['price'])): ?>
@@ -74,9 +66,9 @@ Helper::buttonListener($products);
     <input class="w3-button w3-black" type="submit" name="sort" value="Застосувати">
 
 </form>
+<?php endif; ?>
 
-
-<?php if (Helper::isAdmin() == 1) : ?>
+<?php if (Helper::isAdmin()) : ?>
 
     <div class="product">
         <p>
