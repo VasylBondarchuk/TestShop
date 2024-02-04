@@ -5,16 +5,15 @@
  */
 class Customer extends Model
 {
+    const LOGIN_PATH = '/customer/login';
+    const LOGOUT_PATH = '/customer/logout';
+    const REGISTER_PATH = '/customer/register';
+    
     function __construct()
     {
         $this->table_name = "customer";
         $this->id_column = "customer_id";
-    }
-
-    public function getName()
-    {
-        return 'customer';
-    }
+    }    
 	
     // МЕТОД ДОДАВАННЯ (РЕЄСТРАЦІЇ) НОВОГО КЛІЄНТА
     public function addCustomer()
@@ -82,6 +81,13 @@ class Customer extends Model
 	{
             $customers = $this->initCollection()->getCollection()->select();
             return $customers;
+	}        
+        
+	public function getLogedInCustomerId() 
+	{            
+            return (int)isset($_SESSION['customer_id'])
+                    ?  $_SESSION['customer_id']
+                    : '';
 	}
         
         // Масив id категорій
@@ -94,5 +100,36 @@ class Customer extends Model
 	public function getCustomerAdminRole(int $customerId) : int 
 	{
             return $this->getItem($customerId)['admin_role'];           
-	} 
+	}
+        
+        // Масив id категорій
+	public function isLogedIn() : bool
+	{
+            return isset($_SESSION['customer_id']);           
+	}        
+        
+        // Масив id категорій
+	public function getLoginPath() : string
+	{
+           return route::getBP() . self::LOGIN_PATH;          
+	}
+        
+        // Масив id категорій
+	public function getLogoutPath() : string
+	{
+           return route::getBP() . self::LOGOUT_PATH;          
+	}
+        
+        // Масив id категорій
+	public function getRegisterPath() : string
+	{
+           return route::getBP() . self::REGISTER_PATH;          
+	}
+        
+        // Масив id категорій
+	public function getCustomerFullName(int $customerId) : string
+	{
+           return $this->getCustomerById($customerId)['first_name'] . ' '
+                   . $this->getCustomerById($customerId)['last_name'];          
+	}
 }

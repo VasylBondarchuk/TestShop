@@ -50,16 +50,16 @@ class CustomerController extends Controller
             if(!empty($customer))
             {
                 //якщо ел.пошта та пароль співпадають
-                //if(($email==$customer['email']) && ($password==$customer['password']))
-                if(TRUE)
+                if(($email==$customer['email']) && ($password==$customer['password']))
+                
                 {
                     // змінна логування = успіх
                     $this->registry['user_login'] = TRUE;
                     //отримання id
-                    $_SESSION['id'] = $customer['customer_id'];
+                    $_SESSION['customer_id'] = $customer['customer_id'];
                     //отримання повного імені користувача
-                    $_SESSION['first_name']=$customer['first_name'];
-                    $_SESSION['last_name']=$customer['last_name'];
+                    $_SESSION['first_name'] = $customer['first_name'];
+                    $_SESSION['last_name']  = $customer['last_name'];
                     // редирект на сторінку категорій
                     Helper::redirect('/category/list');
                 }
