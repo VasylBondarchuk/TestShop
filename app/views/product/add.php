@@ -27,8 +27,7 @@
 
 <?php
 $form_data = Helper::FormDataInput(array('sku', 'name', 'price', 'qty', 'description', 'product_image'));
-if (Helper::isAdmin()):
-    ?>
+if ($this->getModel('Customer')->isAdmin()): ?>
     <div class='product'>
         Ви збираєтеся створити новий товар. Якщо ви впевнені,
         корректно введіть данні та натисніть кнопку 'Додати'.        
@@ -75,7 +74,8 @@ if (Helper::isAdmin()):
             <span class="error"> <?php echo Helper::isEmpty('product')[5]; ?></span><br>
 
             <label for="product_image">Product Photo:</label>
-            <input type="file" name="product_image" id="product_image" accept="image/*" required><br>            
+            <input type="file" name="product_image" id="product_image" accept="image/*" required><br>
+            
             <input class="button" type="submit" name="add" value="Додати товар">
         </div>
     </form>

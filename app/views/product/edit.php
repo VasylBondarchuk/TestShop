@@ -33,7 +33,7 @@ $productId = $this->getId('Product');
 $productDetails = $product->getProductById($productId);
 
 //якщо адмін, то показувати форму
-if (Helper::isAdmin()): ?>
+if ($this->getModel('Customer')->isAdmin()): ?>
     <center><h2>Редагування товару id = <?= $productId ?></h2></center>
 
     <form method="POST" action="<?php FORMS_HANDLER_PATH . DS . '/add_product_form.php'; ?>" enctype="multipart/form-data">

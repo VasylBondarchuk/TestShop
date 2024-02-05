@@ -53,42 +53,29 @@ h3{
 <?php endif; ?>
 
 <?php
-Helper::сartStart();
 
-//загальна кількість всіх замовлених товарів
-$total_qty = Helper::cartTotalQty();
-//загальна сумма всіх замовлених товарів
-$total_amount = Helper::cartTotalAmount();
-//передача в сесію
-$_SESSION['total_qty'] = $total_qty;
-
-foreach($_SESSION['cart'] as $num => $product):
-	//загальна кількість конкретного замовленого товару
-	$item_total_qty=Helper::itemTotalQty($num,$product['qty']);
-	//загальна сумма конкретного замовленого товару
-	$item_total_amount=Helper::itemTotalAmount($num,$product['qty'],$product['price']);
-?>
-
+$cart = $this->getModel('Cart');
+$cartItems = $cart->getCartItems();
+foreach($cart->getUniqueCartItems($cartItems) as $itemNum => $product):?>
 <tr>
-	<td><?= (++$num) ?></td>
+	<td><?= ($itemNum + 1) ?></td>
 	<td><?= $product['name'] ?></td>
 	<td><?= $product['sku']?></td>
 	<td><?= $product['price'];?>грн</td>
-	<td><?= $item_total_qty?> шт.</td>
-    <td><?= $item_total_amount;?> грн</td>
+	<td><?= $cart->itemTotalQty($product['product_id']) ?> шт.</td>
+        <td><?= $cart->itemTotalAmount($product['product_id'], $product['price']);?> грн </td>
 	<td>
-	<form method="POST" action="<?php $_SERVER['PHP_SELF']; ?>">
-	<input name="<?= $num ?>" type="submit" onClick="history.go(0)" value="Видалити" class="btndelete" />
-	</form>
+            <form method="POST" action="<?php $_SERVER['PHP_SELF']; ?>">
+            <input name="<?= $itemNum ?>" type="submit" onClick="history.go(0)" value="Видалити" class="btndelete" />
+            </form>
 	</td>
-</tr>       
-		 
+</tr>	 
 <?php endforeach; ?>
 
 <tr>
-<td colspan="4" align="right">Підсумок:</td>
-<td align="left"><strong><?= $total_qty." шт."; ?></strong></td>
-<td align="left" colspan="3"><strong><?= number_format($total_amount, 2); ?></strong></td>
+    <td colspan="4" align="right">Підсумок:</td>
+    <td align="left"><strong><?= $cart->cartTotalQty() ." шт."; ?></strong></td>
+    <td align="left" colspan="3"><strong><?= number_format($cart->cartTotalAmount(), 2); ?></strong></td>
 </tr>
 </table>
 <br>
@@ -105,7 +92,7 @@ foreach($_SESSION['cart'] as $num => $product):
  відправити данні в базу та очистити сесію*/
  
 if(!empty($_POST['order']) && !empty($_SESSION['id'])){
-	Helper::orderDetails();
+	$cart->orderDetails();
 	$_SESSION['cart']=[];
 	$_SESSION['qty']=[];
 	$_SESSION['total_qty']=[];

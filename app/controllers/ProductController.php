@@ -1,10 +1,8 @@
 <?php
-session_start();
-// Enable error reporting
-error_reporting(E_ALL);
+/*error_reporting(E_ALL);
 // Display errors on the screen
 ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+ini_set('display_startup_errors', 1);*/
 
 class ProductController extends Controller {
 
@@ -51,7 +49,7 @@ class ProductController extends Controller {
     // МЕТОД ДОДАВАННЯ ТОВАРУ
     public function AddAction() {
         $this->setTitle("Додавання товару");
-        if (!Helper::isAdmin()) {
+        if (!$this->getModel('Customer')->isAdmin()) {
             $this->registry['errorMessage'].= " Ви не маєте права створювати товари";
         } else {
             $product = $this->getModel('Product');

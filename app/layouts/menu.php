@@ -3,7 +3,7 @@
         <ul class="nav navbar-nav">
             <?php
             
-            $customer = $this->getModel('Customer');
+            $customer = $this->getModel('Customer');            
             $logedIn = $customer->isLogedIn();            
             
             $registrationOrCustomerFullName= $logedIn
@@ -25,7 +25,7 @@
             $cart = $this->getModel('Cart');            
             $cartLink = '<a href='. $cart->getCartPath() .'>';
             $cartLabel = $cart->getCartLabel();            
-            $cartItemsTotalQty = ' (' . Helper::cartTotalQty() . ')';            
+            $cartItemsTotalQty = ' (' . $cart->cartTotalQty() . ')';            
             
             foreach($this->getModel('Menu')->getMenu() as $menuItem):?>
                 <li>

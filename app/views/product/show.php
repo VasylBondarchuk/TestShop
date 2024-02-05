@@ -32,7 +32,7 @@ $product = $this->getModel('Product')->getItem($productId);
                     $_SESSION['qty'][] = 1;
                 }
 
-                if (Helper::isAdmin()) {
+                if ($this->getModel('Customer')->isAdmin()) {
                     echo '<span class="glyphicon glyphicon-pencil"></span>' . " ";
                     echo Helper::simpleLink('/product/edit', 'Редагувати', array('product_id' => $product['product_id'])) . " ";
                     echo '<span class="glyphicon glyphicon-trash"></span>' . " ";

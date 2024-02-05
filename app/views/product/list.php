@@ -7,6 +7,8 @@ if(!$products){
 $minPrice = $this->registry['products'] ? min(array_column($this->registry['products'], 'price')) : 0;
 $maxPrice = $this->registry['products'] ? max(array_column($this->registry['products'], 'price')) : 0;
 Helper::buttonListener($products);
+$customer = $this->getModel('Customer');
+$cart = $this->getModel('Cart');
 ?>
 
 <?php if($products) : ?>
@@ -68,7 +70,7 @@ Helper::buttonListener($products);
 </form>
 <?php endif; ?>
 
-<?php if (Helper::isAdmin()) : ?>
+<?php if ($customer->isAdmin()) : ?>
 
     <div class="product">
         <p>
@@ -112,21 +114,26 @@ Helper::buttonListener($products);
                 </p>
                 <p> Опис: <?= htmlspecialchars_decode($product['description']) ?></p>
                 <form method="POST" >
-                    <input type="number" name="quantity" min="1" max="<?= $product['qty']; ?>" value="1"/>
+                    <input type="number" name="qty" min="1" max="<?= $product['qty']; ?>" value="1"/>
                     <button <?php if ($product['qty'] == 0) echo("disabled"); ?> class="w3-button w3-black">Купити</button>
                     <input type="hidden" name="<?= $product['product_id'] ?>" value="<?= $product['name'] ?>"/>
                 </form>
                 <?php
                 if (!empty($_POST[$product['product_id']])) {
-                    $_SESSION['cart'][] = $product;
-                    $_SESSION['qty'][] = 1;
+                    $cart->addToCart([
+                        'product_id' => $product['product_id'],
+                        'sku' => $product['sku'],
+                        'name' => $product['name'],
+                        'price' => $product['price'],
+                        'qty' => $_POST['qty']]);   
+                       
                 }
 
-                if (Helper::isAdmin() == 1) {
+                if ($customer->isAdmin()) {
                     echo '<span class="glyphicon glyphicon-pencil"></span>' . " ";
-                    echo Helper::simpleLink('/product/edit', 'Редагувати', array('product_id' => $product['product_id'])) . ' ';
+                    echo Helper::simpleLink('/product/edit', 'Редагувати', ['product_id' => $product['product_id']]) . ' ';
                     echo '<span class="glyphicon glyphicon-trash"></span>' . " ";
-                    echo Helper::simpleLink('/product/delete', 'Видалити', array('product_id' => $product['product_id']));
+                    echo Helper::simpleLink('/product/delete', 'Видалити', ['product_id' => $product['product_id']]);
                 }
                 ?>
             </td>

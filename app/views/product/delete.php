@@ -3,7 +3,7 @@
         color: #FF0000;
     }
     .container {
-        width: 500px;
+        width: 800px;
         clear: both;
     }
     .container input {
@@ -20,7 +20,12 @@
     }
 </style>
 
-<?php if (Helper::isAdmin() == 1): ?>
+<?php
+$productId = (int)Helper::getParamFromUrl('product_id');
+$product = $this->getModel('Product')->getItem($productId);
+?>
+
+<?php if ($this->getModel('Customer')->isAdmin()): ?>
     <center>
         <h2>
             Видалення товару з id = <?= $this->getId('Product');?>
@@ -36,24 +41,27 @@
         </center>
     </span>
 
-    <?php $product = $this->getModel('Product')->getProductById($this->getId('Product'));
-       
-    ?>   
-    <div class="product"></a>
-    <p class="sku">Код: <?= $product['sku'] ?></p>
-    <h4><?= $product['name'] ?></h4>
-    <p> Ціна: <span class="price"><?= $product['price'] ?></span> грн </p>
-    <p> Кількість: <?= $product['qty'] ?></p>
-    <p>
-        <?php
-        if (!$product['qty'] > 0) {
-            echo 'Нема в наявності';
-        }
-        ?>
-    </p>
-    <p>
-        Опис: <?= htmlspecialchars_decode($product['description']) ?>
-    </p> 
+    <?php if($product) : ?>
+    <div class="product">
+        <table style="width:100%">
+            <tr>
+            <td width="40%"><img src="<?= PRODUCT_IMAGE_PATH . $product['product_image'] ?>" alt="<?php echo $product['name'] ?>" width="300" height=""></td>
+            <center><h1> <?= $product['name']; ?></h1></center>
+            <td width="60%>                    
+                <p class="sku"> Код: <?= $product['sku'] ?></p>                    
+                <p> Ціна: <span class="price"><?= $product['price'] ?></span> грн</p>
+                <p> <?php
+                    if ($product['qty'] != 0) {
+                        echo("Кількість:" . $product['qty'] . "");
+                    } else {
+                        echo('Нема в наявності');
+                    }
+                    ?>
+                </p>
+                <p> Опис: <?= htmlspecialchars_decode($product['description']) ?></p>                            
+            </td>
+            </tr>
+        </table>
     </div>
 
     <?php
@@ -79,7 +87,11 @@
 <?php endif; ?>
 
 <?php
-if (Helper::isAdmin() == 0) {
-    Helper::isNotAdmin("Ви не маєте права видаляти товари!");
-}
+$productId = (int)Helper::getParamFromUrl('product_id');
+$product = $this->getModel('Product')->getItem($productId);
 ?>
+
+
+<?php else : ?>
+<center><h2> There is no product with such id</h2></center>
+<?php endif ?>

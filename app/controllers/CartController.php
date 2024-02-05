@@ -19,4 +19,5 @@ class CartController extends Controller {
         $this->setView();
         $this->renderLayout();
     }
+    
 }
