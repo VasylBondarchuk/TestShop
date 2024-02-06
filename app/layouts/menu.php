@@ -23,8 +23,7 @@
             $registrationLink = $logedIn ? '<a/>' : '<a href=' . $customer->getRegisterPath() .'>';
 
             $cart = $this->getModel('Cart');            
-            $cartLink = '<a href='. $cart->getCartPath() .'>';
-            $cartLabel = $cart->getCartLabel();            
+            $cartLink = '<a href='. $cart->getCartPath() .'>';                
             $cartItemsTotalQty = ' (' . $cart->cartTotalQty() . ')';            
             
             foreach($this->getModel('Menu')->getMenu() as $menuItem):?>
@@ -34,8 +33,13 @@
             <?php endforeach; ?>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-            <li><?= $cartLink;?><span class="glyphicon glyphicon-shopping-cart"></span> <?= $cartLabel . $cartItemsTotalQty; ?></a></li>
-            <li><?= $registrationLink;?><span class="glyphicon glyphicon-user"></span> <?= $registrationOrCustomerFullName; ?></a></li>
+                    <li><?= $cartLink;?><span class="glyphicon glyphicon-shopping-cart"></span>
+                        <?= $cart->getCartLabel() . $cartItemsTotalQty; ?></a></li>
+            <li>
+                    <?= $registrationLink;?>
+                <span class="glyphicon glyphicon-user"></span> <?= $registrationOrCustomerFullName; ?>
+                </a>
+            </li>
             <li>
                 <a href="<?= $loginLogOutPath;?>/">
                     <span class="glyphicon glyphicon-log-<?= $in_out;?>"></span>

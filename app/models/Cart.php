@@ -25,55 +25,47 @@ class Cart extends Model {
         return 'Cart';
     }
 
-    //метод створення кошика
-    public function addToCart(array $itemToAdd) {
-        if (!isset($_SESSION['cart'])) {
-            $_SESSION['cart'] = [];
-        }
-        // Add the item to the cart
-        $_SESSION['cart'][] = $itemToAdd;
-    }
-
-    //метод видалення товару
-    public function delCartItem() {
-        //видалення позиції
-        for ($i = 0; $i < count($_SESSION['cart']); $i++) {
-            if (isset($_POST[$i])) {
-                unset($_SESSION['cart'][$i]);
-                unset($_SESSION['qty'][$i]);
-            }
-            $_SESSION['cart'] = array_values($_SESSION['cart']);
-            $_SESSION['qty'] = array_values($_SESSION['qty']);
-        }
-    }
-
-    //метод очищення кошика
-    public function emptyCart() {
-        //якщо натиснуто кнопку очищення - закрити сесії
-        if (isset($_POST['empty'])) {
-            $_SESSION['cart'] = [];            
-        }
-    }
-
     public function getCartItems() {
         return $_SESSION['cart'] ?? [];
     }
 
-    public function getUniqueCartItems() {
-        $uniqueCartItems = [];
-
-        foreach (self::getCartItems() as $product) {
-            $productId = $product['product_id'];
-
-            // Check if the product_id is not already in the uniqueElements array
-            if (!isset($uniqueCartItems[$productId])) {
-                $uniqueCartItems[$productId] = $product;
-            } else {
-                // If the product_id already exists, update quantity or perform other logic
-                $uniqueCartItems[$productId]['qty'] += $product['qty'];
+    public function addToCart(array $itemToAdd) {
+        // Initialize the cart if it doesn't exist
+        if (!isset($_SESSION['cart'])) {
+            $_SESSION['cart'] = [];
+        }
+        // Check if the product already exists in the cart
+        foreach ($_SESSION['cart'] as &$item) {
+            if ($item['product_id'] === $itemToAdd['product_id']) {
+                // Product already exists, update the quantity
+                $item['qty'] += $itemToAdd['qty'];
+                return;
             }
         }
-        return array_values($uniqueCartItems);
+        // If the product doesn't exist, add it to the cart
+        $_SESSION['cart'][] = $itemToAdd;
+    }
+
+    public function delCartItem(int $itemKey) {
+        // Check if the cart exists and is not empty
+        if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
+            // Loop through each item in the cart
+            foreach ($_SESSION['cart'] as $key => $item) {
+                // Check if the item key matches the provided item key
+                if ($key === $itemKey) {
+                    // Remove the item from the cart
+                    unset($_SESSION['cart'][$key]);
+                    // Break out of the loop since the item has been deleted
+                    break;
+                }
+            }
+        }
+    }
+
+    public function emptyCart() {
+        if (isset($_SESSION['cart'])) {
+            $_SESSION['cart'] = [];
+        }
     }
 
     //загальна кількість конкретного замовленого товару
@@ -86,14 +78,13 @@ class Cart extends Model {
         }
         return $cartItemTotalQty;
     }
-
     //загальна сумма конкретного замовленого товару
-    public function itemTotalAmount(int $productId, $item_price ) { 
+    public function itemTotalAmount(int $productId, $item_price) {
         return self::itemTotalQty($productId) * $item_price;
     }
 
     //загальна кількість всіх замовлених товарів
-    public function cartTotalQty() : int {
+    public function cartTotalQty(): int {
         $totalQty = 0;
         foreach (self::getCartItems() as $cartItem) {
             $totalQty += $cartItem['qty'];
