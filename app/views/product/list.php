@@ -4,9 +4,10 @@ $products = $this->registry['products'];
 if(!$products){
     echo "There are no products in this category";
 }
+
 $minPrice = $this->registry['products'] ? min(array_column($this->registry['products'], 'price')) : 0;
 $maxPrice = $this->registry['products'] ? max(array_column($this->registry['products'], 'price')) : 0;
-Helper::buttonListener($products);
+
 $customer = $this->getModel('Customer');
 $cart = $this->getModel('Cart');
 ?>
@@ -117,6 +118,7 @@ $cart = $this->getModel('Cart');
                     <input type="number" name="qty" min="1" max="<?= $product['qty']; ?>" value="1"/>
                     <button <?php if ($product['qty'] == 0) echo("disabled"); ?> class="w3-button w3-black">Купити</button>
                     <input type="hidden" name="<?= $product['product_id'] ?>" value="<?= $product['name'] ?>"/>
+                    
                 </form>
                 <?php
                 if (!empty($_POST[$product['product_id']])) {
@@ -125,8 +127,7 @@ $cart = $this->getModel('Cart');
                         'sku' => $product['sku'],
                         'name' => $product['name'],
                         'price' => $product['price'],
-                        'qty' => $_POST['qty']]);   
-                       
+                        'qty' => $_POST['qty']]);
                 }
 
                 if ($customer->isAdmin()) {

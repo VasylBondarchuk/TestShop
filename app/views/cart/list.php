@@ -40,18 +40,6 @@
 </center>
 <br>
 
-<?php if ((!empty($_POST['order']) && empty($_SESSION['id']))): ?>
-    <center>
-        <h3> Оформити замовлення можуть лише зареєстровані відвідувачі</h3>
-        <h3>
-            <a href = "<?= $_SERVER['SCRIPT_NAME'] . '/customer/login/'; ?>">Авторизуйтеся</a>
-            або
-            <a href = "<?= $_SERVER['SCRIPT_NAME'] . '/customer/register/'; ?>">зареєструйтеся на сайті.</a>
-        </h3>
-    </center>
-    </br>
-<?php endif; ?>
-
 <?php
 $cart = $this->getModel('Cart');
 
@@ -63,7 +51,6 @@ if (isset($_POST['delete_item'])) {
     $cartItemIndex = $_POST['delete_item'];
     $cart->delCartItem($cartItemIndex); 
 }
-
 
 foreach ($cart->getCartItems() as $cartItemIndex => $product):
     ?>
@@ -89,6 +76,18 @@ foreach ($cart->getCartItems() as $cartItemIndex => $product):
 </tr>
 </table>
 <br>
+
+<?php if ((!empty($_POST['order']) && empty($_SESSION['id']))): ?>
+    <center>
+        <h3> Оформити замовлення можуть лише зареєстровані відвідувачі</h3>
+        <h3>
+            <a href = "<?= $_SERVER['SCRIPT_NAME'] . '/customer/login/'; ?>">Авторизуйтеся</a>
+            або
+            <a href = "<?= $_SERVER['SCRIPT_NAME'] . '/customer/register/'; ?>">зареєструйтеся на сайті.</a>
+        </h3>
+    </center>
+    </br>
+<?php endif; ?>
 
 <?php if (!empty($_SESSION['cart'])): ?>
     <form method="POST" action="<?php $_SERVER['PHP_SELF']; ?>">

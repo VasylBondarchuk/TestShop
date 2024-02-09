@@ -1,6 +1,7 @@
 <?php
 $productId = (int)Helper::getParamFromUrl('product_id');
 $product = $this->getModel('Product')->getItem($productId);
+$cart = $this->getModel('Cart');
 ?>
 
 <?php if($product) : ?>
@@ -22,14 +23,20 @@ $product = $this->getModel('Product')->getItem($productId);
                 </p>
                 <p> Опис: <?= htmlspecialchars_decode($product['description']) ?></p>
                 <form method="POST" >
-                    <input type="number" name="quantity" min="1" max="<?= $product['qty']; ?>" value="1"/>
+                    <input type="number" name="qty" min="1" max="<?= $product['qty']; ?>" value="1"/>
                     <button <?php if ($product['qty'] == 0) echo("disabled"); ?> class="w3-button w3-black">Купити</button>
                     <input type="hidden" name="<?= $product['product_id'] ?>" value="<?= $product['name'] ?>"/>
                 </form>
                 <?php
+                
                 if (!empty($_POST[$product['product_id']])) {
-                    $_SESSION['cart'][] = $product;
-                    $_SESSION['qty'][] = 1;
+                    $cart->addToCart([
+                        'product_id' => $product['product_id'],
+                        'sku' => $product['sku'],
+                        'name' => $product['name'],
+                        'price' => $product['price'],
+                        'qty' => $_POST['qty']]);   
+                       
                 }
 
                 if ($this->getModel('Customer')->isAdmin()) {

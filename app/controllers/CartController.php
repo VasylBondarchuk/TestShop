@@ -10,11 +10,7 @@ class CartController extends Controller {
     }
 
     public function ListAction() {
-        $this->setTitle("Додавання до кошику");
-
-        $this->registry['cart'] = $this->getModel('Cart')
-                        ->initCollection()
-                        ->getCollection()->select();
+        $this->setTitle("Додавання до кошику");        
 
         $this->setView();
         $this->renderLayout();
