@@ -463,4 +463,36 @@ class Helper {
                 return TRUE;
         }
     }
+    
+    // Method to handle file uploads
+    public static function handleFileUpload(): array {
+        $filteredData = [];
+
+        if (isset($_FILES['product_image'])) {
+            $fileName = $_FILES['product_image']['name'];
+            // Store file name or handle file storage here
+            $filteredData['product_image'] = $fileName;
+        }
+        return $filteredData;
+    }
+
+    // Method to retrieve form data
+    public static function getFormData(array $columns): array {
+        $filteredData = [];
+
+        foreach ($_POST as $key => $value) {
+            // Check if the form field corresponds to a database column
+            if (in_array($key, $columns)) {
+                // Handle file uploads separately
+                if ($key === 'product_image') {
+                    $filteredData += self::handleFileUpload();
+                } else {
+                    // For other fields, store form data directly
+                    $filteredData[$key] = $value;
+                }
+            }
+        }
+
+        return $filteredData;
+    }
 }

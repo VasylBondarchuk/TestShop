@@ -62,10 +62,7 @@ class Product extends Model {
         $db->query($sql);
     }
 
-    public function deleteProduct(int $productId) {
-        $db = new DB();
-        $sql = "DELETE FROM product_category WHERE " . self::PRODUCT_ID . "= ?";
-        $db->query($sql, [$productId]);
+    public function deleteProduct(int $productId) {        
         $this->deleteItem($productId);
     }
 

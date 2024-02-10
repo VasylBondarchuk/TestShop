@@ -7,4 +7,3 @@ define("ROOT", getcwd());
 define("DS", DIRECTORY_SEPARATOR);
 // підключення файлу bootstrap.php
 include ROOT . '/app/bootstrap.php';
-

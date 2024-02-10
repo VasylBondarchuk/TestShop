@@ -72,21 +72,18 @@ $cart = $this->getModel('Cart');
 <?php endif; ?>
 
 <?php if ($customer->isAdmin()) : ?>
-
     <div class="product">
         <p>
             <span class="glyphicon glyphicon-plus"></span>
             <?= Helper::simpleLink('/product/add', 'Додати товар');?>
         </p>
     </div>
-
     <div class="product">
         <p>
             <span class="glyphicon glyphicon-export"></span>
             <?= Helper::simpleLink('/product/unload', 'Експорт');?>
         </p>
     </div>
-
     <div class="product">
         <p>
             <span class="glyphicon glyphicon-import"></span>
@@ -101,7 +98,11 @@ $cart = $this->getModel('Cart');
         <table style="width:100%">
             <tr>
             <td width="20%"><img src="<?= PRODUCT_IMAGE_PATH . $product['product_image'] ?>" alt="<?= $product['name'] ?>" width="300" height=""></td>            
-            <center><h1> <?= Helper::simpleLink('/product/show', $product['name'], array('product_id' => $product['product_id']))?></h1></center>
+            <center>
+                <h1>
+                    <?= Helper::simpleLink('/product/show', $product['name'], array('product_id' => $product['product_id']))?>
+                </h1>
+            </center>
             <td width="80%>                    
                 <p class="sku"> Код: <?= $product['sku'] ?></p>                    
                 <p> Ціна: <span class="price"><?= $product['price'] ?></span> грн</p>
@@ -116,7 +117,7 @@ $cart = $this->getModel('Cart');
                 <p> Опис: <?= htmlspecialchars_decode($product['description']) ?></p>
                 <form method="POST" >
                     <input type="number" name="qty" min="1" max="<?= $product['qty']; ?>" value="1"/>
-                    <button <?php if ($product['qty'] == 0) echo("disabled"); ?> class="w3-button w3-black">Купити</button>
+                    <button <?= $product['qty'] == 0 ? 'disabled' : ''; ?> class="w3-button w3-black">Купити</button>
                     <input type="hidden" name="<?= $product['product_id'] ?>" value="<?= $product['name'] ?>"/>
                     
                 </form>
@@ -127,7 +128,10 @@ $cart = $this->getModel('Cart');
                         'sku' => $product['sku'],
                         'name' => $product['name'],
                         'price' => $product['price'],
-                        'qty' => $_POST['qty']]);
+                        'qty' => $_POST['qty'],
+                        'product_image' => $product['product_image'],
+                        ]
+                            );
                 }
 
                 if ($customer->isAdmin()) {

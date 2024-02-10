@@ -114,7 +114,7 @@ class Controller {
     
     // Повертає назву id-колонки
     public function getIdColumnName(string $name) {
-        return $this->getModel($name)->getIdName();
+        return $this->getModel($name)->getIdColumn();
     }
 
     // Отримати значення id з GET - запиту

@@ -43,7 +43,7 @@ class Cart extends Model {
         return $this->cartTitle;
     }
     
-     // Get cart column
+     // Get cart column labels
     public function getCartColumnLabels(): array {
         return $this->cartColumnLabels;
     }

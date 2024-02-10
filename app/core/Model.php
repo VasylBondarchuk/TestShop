@@ -302,7 +302,6 @@ class Model {
     public function getLastId(): int {
         $db = new DB();        
         return $db->getLastId();
-    }
-    
+    }   
     
 }
