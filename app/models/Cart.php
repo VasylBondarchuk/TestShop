@@ -7,14 +7,47 @@ class Cart extends Model {
 
     const CART_PATH = '/cart/list';
 
-    private $cartItems = [];
+    private array $cartItems = [];
+    
+    private string $cartLabel = '';
+    
+    private string $cartTitle = '';
+    
+    private array $cartColumnLabels = [];   
+    
 
     function __construct() {
         if (!isset($_SESSION['cart'])) {
             $_SESSION['cart'] = [];
         }
         $this->cartItems = $_SESSION['cart'];
+        $this->cartLabel = 'Cart';
+        $this->cartTitle = 'Your Cart';
+        $this->cartColumnLabels = [
+            'Product image',
+            'Product name',
+            'SKU',
+            'Price',
+            'Qty',
+            'Total'
+            ];        
     }
+    
+    // Get cart label
+    public function getCartLabel(): string {
+        return $this->cartLabel;
+    }
+    
+     // Get cart title
+    public function getCartTitle(): string {
+        return $this->cartTitle;
+    }
+    
+     // Get cart column
+    public function getCartColumnLabels(): array {
+        return $this->cartColumnLabels;
+    }
+
 
     // Get cart items
     public function getCartItems(): array {
@@ -100,9 +133,5 @@ class Cart extends Model {
     public function getCartPath(): string {
         return route::getBP() . self::CART_PATH;
     }
-
-    // Get cart label
-    public function getCartLabel(): string {
-        return 'Cart';
-    }
+    
 }
