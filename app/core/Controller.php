@@ -103,22 +103,18 @@ class Controller {
         }
     }
 
-    // Метод створення моделі об'єкту класа $name
-    public function getModel($name) {
-        //створення об'єкту класа $name 
-        $model = new $name();
-        // виклик методу встановлення назви сторінки 
-        $this->setModelName(get_class($model));
-        return $model;
-    }
+    public function getModel(string $name, ...$constructorParameters) {
+    // Create an object of the class $name with the given constructor parameters
+    $model = new $name(...$constructorParameters);
+    
+    // Call the method to set the model name
+    $this->setModelName(get_class($model));
+    
+    return $model;
+}
     
     // Повертає назву id-колонки
     public function getIdColumnName(string $name) {
         return $this->getModel($name)->getIdColumn();
-    }
-
-    // Отримати значення id з GET - запиту
-    public function getId(string $name): int {
-        return (int) filter_input(INPUT_GET, $this->getIdColumnName($name));
-    }
+    }    
 }

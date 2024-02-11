@@ -14,7 +14,7 @@ class ProductController extends Controller {
     public function ListAction() {
         $this->setTitle("Products");
         $this->registry['products'] = $this->getModel('Product')
-                ->initProductCollection($this->getId('Category'))
+                ->initProductCollection($this->getCategoryId())
                 ->filterByPrice()
                 ->sort($this->getSortParams())
                 ->getCollection()
@@ -29,7 +29,7 @@ class ProductController extends Controller {
         $selectedCategoryIds = $_POST['category_id'];
         $model = $this->getModel('Product');
         if (isset($_POST['Edit'])) {
-            $model->editProduct($this->getId('Product'), $selectedCategoryIds);
+            $model->editProduct($this->getProductId(), $selectedCategoryIds);
             $this->registry['successMessage'] = "The Product was edited";
         }
         $this->setView();
@@ -39,9 +39,9 @@ class ProductController extends Controller {
     // МЕТОД ПОКАЗУ ТОВАРУ
     public function ShowAction() {
         $productModel = $this->getModel('Product');
-        $productName = $productModel->getItem($this->getId('Product'))['name'] ?? '';
+        $productName = $productModel->getItem($this->getProductId())['name'] ?? '';
         $this->setTitle($productName);
-        $this->registry['product'] = $productModel->getItem($this->getId('Product'));
+        $this->registry['product'] = $productModel->getItem($this->getProductId());
         $this->setView();
         $this->renderLayout();
     }
@@ -253,9 +253,18 @@ class ProductController extends Controller {
 			через некорректні значення ціни або (та) к-сті";
             } else
                 $this->registry['import_message'] = "Файлу import.xml в папці public не знайдено! ";
-        }
+        }        
+        
 
         $this->setView();
         $this->renderLayout();
+    }
+    
+    public function getProductId() : ?int {
+        return (int)Helper::getQueryParam('product_id');
+    }
+    
+    public function getCategoryId() : ?int {
+        return (int)Helper::getQueryParam('category_id');
     }
 }

@@ -9,4 +9,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $this->registry['errorMessage'].= " Виникла проблема з завантаженням зображення.";
     }
 }
-?>
+

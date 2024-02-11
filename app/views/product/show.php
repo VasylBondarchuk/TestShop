@@ -1,14 +1,12 @@
 <?php
-$productId = (int)Helper::getParamFromUrl('product_id');
-$product = $this->getModel('Product')->getItem($productId);
-$cart = $this->getModel('Cart');
-?>
-
-<?php if($product) : ?>
+$product = $this->getModel('Product')->getItem($this->getProductId());
+if ($product) : ?>
     <div class="product">
         <table style="width:100%">
             <tr>
-            <td width="40%"><img src="<?= PRODUCT_IMAGE_PATH . $product['product_image'] ?>" alt="<?php echo $product['name'] ?>" width="500" height=""></td>
+                <td width="40%">
+                    <img src="<?= PRODUCT_IMAGE_PATH . $product['product_image'] ?>" alt="<?php echo $product['name'] ?>" width="500" height="">
+                </td>
             <center><h1> <?= $product['name']; ?></h1></center>
             <td width="60%>                    
                 <p class="sku"> Код: <?= $product['sku'] ?></p>                    
@@ -28,22 +26,25 @@ $cart = $this->getModel('Cart');
                     <input type="hidden" name="<?= $product['product_id'] ?>" value="<?= $product['name'] ?>"/>
                 </form>
                 <?php
-                
                 if (!empty($_POST[$product['product_id']])) {
-                    $cart->addToCart([
-                        'product_id' => $product['product_id'],
-                        'sku' => $product['sku'],
-                        'name' => $product['name'],
-                        'price' => $product['price'],
-                        'qty' => $_POST['qty']]);   
-                       
+                    $cartManger = $this->getModel('CartManager');
+                    $cartItem = $this->getModel(
+                            'CartItem',
+                            $product['product_id'],
+                            $product['sku'],
+                            $product['name'],
+                            $product['price'],
+                            $_POST['qty'],
+                            $product['product_image']
+                    );
+                    $cartManger->addItem($cartItem);
                 }
 
                 if ($this->getModel('Customer')->isAdmin()) {
                     echo '<span class="glyphicon glyphicon-pencil"></span>' . " ";
-                    echo Helper::simpleLink('/product/edit', 'Редагувати', array('product_id' => $product['product_id'])) . " ";
+                    echo Helper::urlBuilder('/product/edit', 'Редагувати', array('product_id' => $product['product_id'])) . " ";
                     echo '<span class="glyphicon glyphicon-trash"></span>' . " ";
-                    echo Helper::simpleLink('/product/delete', 'Видалити', array('product_id' => $product['product_id']));
+                    echo Helper::urlBuilder('/product/delete', 'Видалити', array('product_id' => $product['product_id']));
                 }
                 ?>
             </td>
@@ -51,7 +52,7 @@ $cart = $this->getModel('Cart');
         </table>
     </div>
 <?php else : ?>
-<center><h2> There is no product with such id</h2></center>
+    <center><h2> There is no product with such id</h2></center>
 <?php endif ?>
 
 

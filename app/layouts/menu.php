@@ -22,19 +22,20 @@
             
             $registrationLink = $logedIn ? '<a/>' : '<a href=' . $customer->getRegisterPath() .'>';
 
-            $cart = $this->getModel('Cart');            
-            $cartLink = '<a href='. $cart->getCartPath() .'>';                
-            $cartItemsTotalQty = ' (' . $cart->cartTotalQty() . ')';            
+            $cartViewer = $this->getModel('CartViewer');            
+            $cartManager = $this->getModel('CartManager');            
+            $cartLink = '<a href='. $cartViewer->getPath() .'>';                
+            $cartItemsTotalQty = ' (' . $cartManager->getTotalQty() . ')';            
             
             foreach($this->getModel('Menu')->getMenu() as $menuItem):?>
                 <li>
-                    <?= Helper::simpleLink($menuItem['path'], $menuItem['name']); ?>
+                    <?= Helper::urlBuilder($menuItem['path'], $menuItem['name']); ?>
                 </li>
             <?php endforeach; ?>
         </ul>
         <ul class="nav navbar-nav navbar-right">
                     <li><?= $cartLink;?><span class="glyphicon glyphicon-shopping-cart"></span>
-                        <?= $cart->getCartLabel() . $cartItemsTotalQty; ?></a></li>
+                        <?= $cartViewer->getLabel() . $cartItemsTotalQty; ?></a></li>
             <li>
                     <?= $registrationLink;?>
                 <span class="glyphicon glyphicon-user"></span> <?= $registrationOrCustomerFullName; ?>

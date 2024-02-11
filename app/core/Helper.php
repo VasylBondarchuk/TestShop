@@ -86,25 +86,33 @@ class Helper {
         }
     }
 
-    public static function simpleLink($path, $name, $params = []): string {
+    public static function urlBuilder($url, $linkText, $params = []): string {
+        // Ensure $url starts with a slash
+        $url = '/' . ltrim($url, '/');
+
+        // Append query parameters, if any
         if (!empty($params)) {
-            $firts_key = array_keys($params)[0];
-            foreach ($params as $key => $value) {
-                $path .= ($key === $firts_key ? '?' : '&');
-                $path .= "$key=$value";
-            }
+            $query = http_build_query($params);
+            $url .= '?' . $query;
         }
-        return '<a href="' . route::getBP() . $path . '">' . $name . '</a>';
+
+        // Construct the anchor tag
+        return '<a href="' . route::getBP() . $url . '">' . htmlspecialchars($linkText) . '</a>';
     }
 
-    // Метод перенаправлення
-    public static function redirect($path) {
+    public static function redirect(string $path): void {
+        // Validate path
+        if (!is_string($path) || empty($path)) {
+            throw new InvalidArgumentException("Invalid redirect path");
+        }
+
+        // Construct full URL
         $server_host = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];
         $url = $server_host . route::getBP() . $path;
-        ob_start();
+
+        // Perform redirect
         header("Location: $url");
-        ob_end_flush();
-        exit();
+        exit(); // Ensure no further code execution
     }
 
     public static function getCustomer() {
@@ -248,30 +256,35 @@ class Helper {
                 }
             }
         }
-    }
+    }    
 
-    //метод отримання назв колонок
-    public static function getColumnsNames($table_name) {
-        $columns = [];
-        $db = new DB();
-        $sql = "show columns from  $table_name;";
-        $results = $db->query($sql);
-        foreach ($results as $result) {
-            array_push($columns, $result['Field']);
+    /**
+     * Method to sanitize form inputs.
+     * Handles arrays recursively.
+     *
+     * @param mixed $inputData The input data to be sanitized.
+     * @return mixed Sanitized input data.
+     */
+    public static function sanitizeInput(string|array $inputData) {
+        // Initialize the variable to hold sanitized data
+        $sanitizedInput = '';
+
+        // If the input is an array, sanitize each element recursively
+        if (is_array($inputData)) {
+            $sanitizedInput = [];
+            foreach ($inputData as $key => $value) {
+                $sanitizedInput[$key] = self::sanitizeInput($value);
+            }
+        } else {
+            // Trim whitespace from the beginning and end of the input
+            $trimmedInputData = trim($inputData);
+            // Remove backslashes
+            $stripSlashesData = stripslashes($trimmedInputData);
+            // Convert special characters to HTML entities to prevent XSS attacks
+            $sanitizedInput = htmlspecialchars($stripSlashesData);
         }
-        return $columns;
-    }
 
-    //метод обробки данних форми
-    public static function ClearInput($data) {
-        //обрізка пробілів з країв 
-        //$data = trim($data);
-        //обрізка зворотніх слешів
-        //$data = stripslashes($data);
-        //перетворення спецсимволів
-        //$data = htmlspecialchars($data);
-
-        return $data;
+        return $sanitizedInput;
     }
 
     //отримання значень форми
@@ -290,38 +303,23 @@ class Helper {
         return $form_data;
     }
 
-    //метод виведення попереджень при порожніх введенях 
-    public static function isEmpty($table_name) {
-        //массив назв колонок
-        $columns = Helper::getColumnsNames($table_name);
-        //массив помилок Array ( [0] => '' [1] => '' [2] => '' ... )
-        $errors = array_fill(0, count($columns), '');
-        //масив колонка => помилка
-        $params = array_combine($columns, $errors);
-        foreach ($params as $column => &$error) {
-            if (isset($_POST[$column]) && empty($_POST[$column])) {
-                $error = "Введіть данні!";
-            }
-        }
-        return array_values($params);
+    /**
+     * Get and sanitize a value from $_POST.
+     *
+     * @param string $field The field name.
+     * @return mixed The sanitized value from $_POST or null if not found.
+     */
+    public static function getPostValue(string $field) {
+        return filter_input(INPUT_POST, $field, FILTER_SANITIZE_SPECIAL_CHARS);
     }
 
-    //метод визначення непорожніх введень форми  
-    public static function NotEmptyEnter(): bool {
-        // масив данних введенних у форму
-        $form_values = (array_slice(array_values($_POST), 0, count($_POST) - 1));
+    public static function isEmpty(string $field): bool {
+        return empty(self::getPostValue($field));
+    }    
 
-        // якщо хоч одне значення у формі не було введено = FALSE
-        /* foreach ($form_values as $form_value)
-          {
-          if(!$form_value)return FALSE;
-          } */
-        return TRUE;
+    public static function emptyFieldMessage(string $fieldName): string {
+        return "The field '{$fieldName}' is required.";
     }
-
-    /* метод виведення попереджень при порожніх введенях 
-      для окремоого поля */
-
     public static function isSeparateEmpty($field): array {
 
         //масив помилок
@@ -336,12 +334,20 @@ class Helper {
         return array_values($params);
     }
 
-    //метод отримання id
-    public static function getParamFromUrl(string $paramNane) {
-        return filter_input(INPUT_GET, $paramNane);
+    /**
+     * Get parameter value from the URL query string.
+     *
+     * @param string $paramName The name of the parameter to retrieve.
+     * @return mixed|null The value of the parameter if found, or null if not found.
+     */
+    public static function getQueryParam(string $paramName) {
+        // Get the value of the parameter from the URL query string
+        $paramValue = filter_input(INPUT_GET, $paramName);
+
+        // Return the parameter value if found, otherwise return null
+        return $paramValue !== false ? $paramValue : null;
     }
 
-    
     //метод, який реагує на натискання кнопок купити
     public static function buttonListener($products) {
         $names = [];
@@ -463,7 +469,7 @@ class Helper {
                 return TRUE;
         }
     }
-    
+
     // Method to handle file uploads
     public static function handleFileUpload(): array {
         $filteredData = [];

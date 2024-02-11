@@ -7,7 +7,7 @@
         foreach ($categories as $category) : ?>	
         <th>
         <center>
-    <?=Helper::simpleLink('/product/list', $category['category_name'], array('category_id' => $category['category_id'])); ?>
+    <?=Helper::urlBuilder('/product/list', $category['category_name'], array('category_id' => $category['category_id'])); ?>
         </center>
     </th> 
     <?php endforeach; ?>    
