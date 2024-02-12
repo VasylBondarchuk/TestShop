@@ -59,7 +59,7 @@ class Controller {
         }
     }
     
-     // Метод відображення вигляду
+    // Метод відображення вигляду
     public function renderMessageView() {        
         $view_path = ROOT . '/app/views/message/message.php';
         if (file_exists($view_path)) {

@@ -61,9 +61,9 @@ if (empty($products)) {
                             <input type="hidden" name="<?= $product['product_id'] ?>" value="<?= $product['name'] ?>"/>
                         </form>
 
-                        <?php                        
+                        <?php
                         if (!empty($_POST[$product['product_id']])) {
-                            $cartManger = $this->getModel('CartManager');
+                            $cartManager= $this->getModel('CartManager');
                             $cartItem = $this->getModel(
                                     'CartItem',
                                     $product['product_id'],
@@ -72,19 +72,18 @@ if (empty($products)) {
                                     $product['price'],
                                     $_POST['qty'],
                                     $product['product_image']
-                                    );
-                            $cartManger->addItem($cartItem);
+                            );                            
                         }
                         ?>
 
                         <!--Admin actions-->
-                        <?php if ($isAdmin):
-                            ?>
+        <?php if ($isAdmin):
+            ?>
                             <span class="glyphicon glyphicon-pencil"></span>
                             <?= Helper::urlBuilder('/product/edit', 'Edit', ['product_id' => $product['product_id']]) ?>
                             <span class="glyphicon glyphicon-trash"></span>
                             <?= Helper::urlBuilder('/product/delete', 'Delete', ['product_id' => $product['product_id']]) ?>
-        <?php endif; ?>
+                        <?php endif; ?>
                     </td>
                 </tr>
             </table>

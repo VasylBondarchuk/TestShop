@@ -22,18 +22,19 @@ class CartManager {
         return empty($this->cartItems);
     }
 
-    public function addItem(CartItem $cartItemToBeAdded): void {
+    public function addItem(CartItem $cartItemToBeAdded): bool {
         foreach ($this->cartItems as &$cartItem) {
-            // If the product ID wasn found in the cart, increase qty
+            // If the product ID was found in the cart, increase qty
             if ($cartItem->getProductId() === $cartItemToBeAdded->getProductId()) {
                 $cartItem->setQuantity($cartItem->getQuantity() + $cartItemToBeAdded->getQuantity());
                 $this->updateSessionCart();
-                return;
+                return true; // Item added successfully
             }
         }
         // If the product ID wasn't found in the cart, add the item to the cart
         $this->cartItems[] = $cartItemToBeAdded;
         $this->updateSessionCart();
+        return true; // Item added successfully
     }
 
     public function deleteItem(int $key): void {

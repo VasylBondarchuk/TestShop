@@ -28,19 +28,8 @@ class Helper {
         }
         return TRUE;
     }
-
-    //метод перевірки правильності email
-    public static function isCorrectEmail($input) {
-        if (isset($_POST[$input])) {
-            if (!empty($_POST[$input])) {
-                if (!filter_var($_POST[$input], FILTER_VALIDATE_EMAIL)) {
-                    return FALSE;
-                }
-            }
-        }
-        return TRUE;
-    }
-
+   
+    
     //метод перевірки правильності введення паролю та підтвердження
     public static function isCorrectPassword($password) {
         if (isset($_POST[$password])) {
@@ -52,6 +41,7 @@ class Helper {
         }
         return FALSE;
     }
+    
 
     //метод перевірки правильності підтвердження паролю
     public static function isConfirmOk($password, $confirm) {
@@ -200,35 +190,7 @@ class Helper {
             }
         }
         return array_values($params);
-    }
-
-    //метод виведення попереджень при введені телефону
-    public static function isCorrectPhoneInput() {
-        //масив помилок
-        $params = array('telephone' => '');
-
-        foreach ($params as $column => &$error) {
-            if (isset($_POST[$column]) && !empty($_POST[$column]) &&
-                    !preg_match("/^[0-9]*$/", $_POST['telephone'])) {
-                $error = "Некорректне введення. Введення має містити лише цифри";
-            }
-        }
-        return array_values($params);
-    }
-
-    //вивід помилок при введенні email
-    public static function isCorrectEmailInput() {
-        //масив помилок
-        $params = array('email' => '');
-        foreach ($params as $column => &$error) {
-            if (!empty($_POST[$column])) {
-                if (!filter_var($_POST[$column], FILTER_VALIDATE_EMAIL)) {
-                    $error = "Некорректне введення";
-                }
-            }
-        }
-        return array_values($params);
-    }
+    }   
 
     //вивід помилок при введенні паролів
     public static function isCorrectPasswordInput() {
@@ -320,20 +282,7 @@ class Helper {
     public static function emptyFieldMessage(string $fieldName): string {
         return "The field '{$fieldName}' is required.";
     }
-    public static function isSeparateEmpty($field): array {
-
-        //масив помилок
-        $params = array($field => '');
-        foreach ($params as $column => &$error) {
-            if (isset($_POST[$column])) {
-                if (empty($_POST[$column])) {
-                    $error = "Введіть данні!";
-                }
-            }
-        }
-        return array_values($params);
-    }
-
+    
     /**
      * Get parameter value from the URL query string.
      *
@@ -346,22 +295,7 @@ class Helper {
 
         // Return the parameter value if found, otherwise return null
         return $paramValue !== false ? $paramValue : null;
-    }
-
-    //метод, який реагує на натискання кнопок купити
-    public static function buttonListener($products) {
-        $names = [];
-        for ($i = 0; $i < count($products); $i++) {
-            $names[] = $products[$i]['product_id'];
-        }
-        foreach ($names as $name) {
-            if (!empty($_POST[$name])) {
-                echo ("<div id ='order'><h3>Товар <strong>" .
-                (array_values($_POST)[1]) .
-                "</strong> додано до Вашого кошика! </h3></div>");
-            }
-        }
-    }
+    }    
 
     // Перевірка непорожності введення, якщо порожнє повертає TRUE 
     public static function Empty($input) {
