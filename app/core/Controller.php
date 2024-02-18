@@ -74,12 +74,16 @@ class Controller {
         }
     }
 
-    // Метод 
-    public function getHomePageURL() {
+    /**
+     * Retrieves the base URL of the home page.
+     * 
+     * @return string The base URL of the home page.
+     */
+    public function getHomePageBaseUrl(): string {
         $protocol = 'http';
         if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
             $protocol = 'https';
-        } 
+        }
         $serverName = filter_input(INPUT_SERVER, 'SERVER_NAME', FILTER_SANITIZE_URL);
         return $serverName ? "$protocol://" . $serverName : '';
     }

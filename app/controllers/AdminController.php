@@ -28,8 +28,7 @@ class AdminController extends Controller
             {
                 $params =array ('email'=>$email,'password'=> $password);            
                 $customer = $this->getModel('customer')->initCollection()
-                ->getCollection()->getItemByParam('email',$params['email']);
-                print_r($_POST);                    
+                ->getCollection()->getItemByParam('email',$params['email']);                                  
             }
             
             //якщо є хоча б один користувач з такою ел. адресою

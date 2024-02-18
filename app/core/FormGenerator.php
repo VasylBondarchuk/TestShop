@@ -41,19 +41,6 @@ class FormGenerator {
         }
         $html .= '</br></br>';
         return $html;
-    }
-
-    /**
-     * Generate form fields based on an array of field details.
-     *
-     * @param array $fields An array of field details arrays.
-     * @return string The HTML markup for the form fields.
-     */
-    public static function generateFields(array $fields): string {
-        $html = '';
-        foreach ($fields as $field) {
-            $html .= self::generateField($field);
-        }
-        return $html;
-    }
+    }    
 }
+

@@ -26,57 +26,23 @@
 </style>
 
 <?php
-$form_data = Helper::FormDataInput(array('sku', 'name', 'price', 'qty', 'description', 'product_image'));
+require_once FORMS_HANDLER_PATH . DS . 'add_product_form_fields.php';
+require_once FORMS_HANDLER_PATH . DS . 'add_product_form.php';
+
+$form_data = Helper::getFormData(['sku', 'name', 'price', 'qty', 'description', 'product_image']);
 if ($this->getModel('Customer')->isAdmin()): ?>
     <div class='product'>
         Ви збираєтеся створити новий товар. Якщо ви впевнені,
         корректно введіть данні та натисніть кнопку 'Додати'.        
     </div>
     <br><br>
-    <form method="POST" action="<?php FORMS_HANDLER_PATH . DS . 'add_product_form.php'; ?>" enctype="multipart/form-data">
+    <form method="POST" action="<?php FORMS_HANDLER_PATH . DS . '/add_product_form.php'; ?>" enctype="multipart/form-data">
         <div class="container">
-            <label for="sku"> Sku:</label>
-            <input type="text" name="sku">
-            <span class="error"> <?php echo Helper::isEmpty('product')[1]; ?></span>
-            <br><br>
-
-            <label for="name"> Назва:</label>
-            <input type="text" name="name" >
-            <span class="error"> <?php echo Helper::isEmpty('product')[2]; ?></span>
-            <br><br>
-
-            <label for="category_id">Категорія:</label>
-            <select name="category_id[]" multiple="multiple">
-                <?php foreach ($this->getModel('Category')->getCategories() as $categoryId => $categoryName): ?>	
-                    <option value="<?= $categoryId; ?>"><?= $categoryName; ?></option>
-                <?php endforeach; ?>
-            </select>
-            </br></br>
-
-            <label for="price"> Price:</label>
-            <input type="text" name="price">
-            <span class="error"><?php
-                echo Helper::isEmpty('product')[3];
-                echo Helper::isNumeric()[0];
-                ?></span>
-            <br><br>
-
-            <label for="qty"> Qty:</label>
-            <input type="text" name="qty">
-            <span class="error"> <?php
-                echo Helper::isEmpty('product')[4];
-                echo Helper::isNumeric()[1];
-                ?></span>
-            <br><br>
-
-            <label for="description"> Description: </label>
-            <textarea rows="5" name="description"></textarea>
-            <span class="error"> <?php echo Helper::isEmpty('product')[5]; ?></span><br>
-
+            <?= FormGenerator::generateFields($addProductFormFields); ?>                
             <label for="product_image">Product Photo:</label>
-            <input type="file" name="product_image" id="product_image" accept="image/*" required><br>
-            
-            <input class="button" type="submit" name="add" value="Додати товар">
+
+            <input type="file" name="product_image" id="product_image" accept="image/*"><br>   
+            <input class="button" name="Edit" type="submit">
         </div>
     </form>
 <?php endif; ?>

@@ -1,6 +1,6 @@
 <div class="message">
         <center>            
-            <?php MessageManager::displayMessages(); ?>
+            <?php $this->displayMessages(); ?>
         </center>
 </div>
 

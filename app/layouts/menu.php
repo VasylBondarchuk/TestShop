@@ -27,9 +27,9 @@
             $cartLink = '<a href='. $cartViewer->getPath() .'>';                
             $cartItemsTotalQty = ' (' . $cartManager->getTotalQty() . ')';            
             
-            foreach($this->getModel('Menu')->getMenu() as $menuItem):?>
+            foreach($this->getModel('Menu')->getCollection() as $menuItem):?>
                 <li>
-                    <?= Helper::urlBuilder($menuItem['path'], $menuItem['name']); ?>
+                    <?= Helper::urlBuilder($menuItem->getPath(), $menuItem->getName()); ?>
                 </li>
             <?php endforeach; ?>
         </ul>

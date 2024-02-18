@@ -1,6 +1,5 @@
 <?php
 $customers = $this->getModel('Customer')->getCustomersDetails();
-print_r($customers);
 
 foreach ($customers as $customer) :
     ?>

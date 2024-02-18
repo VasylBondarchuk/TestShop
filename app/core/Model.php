@@ -9,7 +9,7 @@ ini_set('display_startup_errors', 1);
 /**
  * Class Model
  */
-class Model {
+abstract class Model {
 
     // ім'я таблиці БД
     protected string $table_name;
@@ -32,16 +32,24 @@ class Model {
         return $idColumn;
     }
 
+    /**
+     * Retrieve a collection of objects.
+     * This method must be implemented by child classes.
+     * 
+     * @return array Collection of objects.
+     */
+    abstract public function getCollection(): array;
+
     // АБСТРАКТНИЙ МЕТОД МЕТОД ДОДАВАННЯ ЗАПИСУ ДО ТАБЛИЦІ table_name БД
     public function addItem(array $columns) {
-        $db = new DB();        
-        $questionMarks = trim(str_repeat('?,', count($columns)), ',');
+        $db = new DB();
+        $placeHolders = trim(str_repeat('?,', count($columns)), ',');
         $columnNames = '';
         foreach ($columns as $column) {
             $columnNames .= "$column, ";
         }
         $columnNames = rtrim($columnNames, ", ");
-        $sql = "INSERT INTO {$this->table_name} ($columnNames) VALUES ($questionMarks);";        
+        $sql = "INSERT INTO {$this->table_name} ($columnNames) VALUES ($placeHolders);";
         return $db->query($sql, $this->params);
     }
 
@@ -57,12 +65,71 @@ class Model {
         return $this;
     }
 
+    /**
+     * Sorts a collection of objects by a specified property.
+     *
+     * @param array  $collection The collection of objects to be sorted.
+     * @param string $property   The property by which to sort the objects.
+     * @param string $order      The order of sorting ('asc' for ascending, 'desc' for descending).
+     *
+     * @return array The sorted collection.
+     */
+    public function sortCollectionByProperty(array $collection, string $property, ?string $order = 'asc'): array {
+        // Define the comparison function based on the property and order
+        $comparisonFunction = function ($a, $b) use ($property, $order) {
+            if ($order === 'asc') {
+                return $a->{$property} <=> $b->{$property};
+            } elseif ($order === 'desc') {
+                return $b->{$property} <=> $a->{$property};
+            }
+        };
+
+        // Sort the collection using the comparison function
+        usort($collection, $comparisonFunction);
+
+        return $collection;
+    }
+
+    public function sortCollectionByProperties(array $collection, array $sortingParams): array {
+        // Sort the collection by each property in the specified order        
+        foreach ($sortingParams as $property => $order) {
+            $collection = $this->sortCollectionByProperty($collection, $property, $order);
+        }
+        return $collection;
+    }
+
+    /**
+     * Filter a collection of objects by a specified property within a given range.
+     * 
+     * @param array $collection The collection of objects to filter
+     * @param string $property The name of the property to filter by
+     * @param mixed $minValue The minimum value of the range
+     * @param mixed $maxValue The maximum value of the range
+     * @return array The filtered collection of objects
+     */
+    public function filterCollectionByPropertyInRange(array $collection, string $property, $minValue, $maxValue): array {
+        // Initialize an empty array to store filtered objects
+        $filteredCollection = [];
+
+        // Iterate over the collection
+        foreach ($collection as $item) {
+            // Check if the property exists and its value is within the specified range
+            $propertyValue = $item->{$property}();
+            if (property_exists($item, $property) && $propertyValue >= $minValue && $propertyValue <= $maxValue) {
+                // If so, add the object to the filtered collection
+                $filteredCollection[] = $item;
+            }
+        }
+
+        return $filteredCollection;
+    }
+
     //МЕТОД ФІЛЬТРУВАННЯ
-     public function filter(string $column, $min, $max) {        
-      //формування частини sql-запиту "WHERE price BETWEEN"
-      $this->sql .= " AND $column BETWEEN " . $min . " AND " . $max;      
-      return $this;
-      } 
+    public function filter(string $column, $min, $max) {
+        //формування частини sql-запиту "WHERE price BETWEEN"
+        $this->sql .= " AND $column BETWEEN " . $min . " AND " . $max;
+        return $this;
+    }
 
     // АБСТРАКТНИЙ МЕТОД МЕТОД РЕДАГУВАННЯ ЗАПИСУ ТАБЛИЦІ table_name БД
     public function editItem(int $id, array $data): Model {
@@ -74,38 +141,17 @@ class Model {
             $q[] = "$column = ?";
         }
         $qMarks = implode(',', $q);
-        $sql = "UPDATE {$this->table_name} SET $qMarks WHERE {$this->id_column}=?;";        
-        $params = array_merge($data, [$id]);        
+        $sql = "UPDATE {$this->table_name} SET $qMarks WHERE {$this->id_column}=?;";
+        $params = array_merge($data, [$id]);
         $db->query($sql, $params);
         return $this;
     }
 
-    //отримання значень форми
-    public function FormData(): array {
-        // імена колонок
-        $columns = $this->getColumnsNames();
-        
-        // масив для отримання данних з форми
-        $formData = [];
-
-        // ітерація по масиву отриманих з форми данних
-        foreach ($_POST as $key => $value) {
-            // записуємо тільки ті, для яких є редагована колонка в БД
-            if (in_array($key, $columns)) {
-                $formData[] = $value;
-            }
-        }        
-        if ($_FILES['product_image']['name'] != '') {
-            $formData[] = $_FILES['product_image']['name'];
-        }
-        return $formData;
-    }
-
     // АБСТРАКТНИЙ МЕТОД ВИДАЛЕННЯ ЗАПИСУ З ТАБЛИЦІ table_name БД
-    public function deleteItem(int $id): Model {        
-            $db = new DB();
-            $sql = "DELETE FROM {$this->table_name} WHERE {$this->id_column} = ?;";
-            $db->query($sql, [$id]);        
+    public function deleteItem(int $id): Model {
+        $db = new DB();
+        $sql = "DELETE FROM {$this->table_name} WHERE {$this->id_column} = ?;";
+        $db->query($sql, [$id]);
         return $this;
     }
 
@@ -126,12 +172,11 @@ class Model {
         return $column_values_array;
     }
 
-    // Перевірка чи введенне значення є унікальним (не належить масиву існуючих значень, крім вже введеного)
-    public function isValueUnique($value, $columnName): bool {
+    public function isValueUnique(string $value, string $columnName): bool {
         $db = new DB();
-        $sql = "SELECT COUNT(*) as count FROM $this->table_name WHERE $columnName = $value";
-        $results = $db->query($sql);        
-        return array_shift($results)['count'] === 0;
+        $sql = "SELECT COUNT(*) as count FROM $this->table_name WHERE $columnName = ?";
+        $result = $db->query($sql, [$value]);
+        return $result[0]['count'] === 0;
     }
 
     public function getColumnsNames(): array {
@@ -165,22 +210,6 @@ class Model {
         $results = $db->query($sql);
         return floatval($results[0]["MIN($column)"]);
     }
-    
-    public function getCollection(): Model {
-        $db = new DB();
-        $this->sql .= ";";
-        $this->collection = $db->query($this->sql, $this->params);
-        return $this;
-    }
-
-    //метод перевірки порожніх введеннь
-    public function isEmpty(array $params) {
-        foreach ($params as $element) {
-            if ($element == '')
-                return FALSE;
-        }
-        return TRUE;
-    }
 
     public function select() {
         return $this->collection;
@@ -203,18 +232,6 @@ class Model {
         }
         // Повернути масив, що містить данні  
         return array_shift($itemDetails);
-    }
-
-    public function getPostValues() {
-        $values = [];
-        $columns = $this->getColumnsNames();
-        foreach ($columns as $column) {
-            $column_value = filter_input(INPUT_POST, $column);
-            if ($column_value && $column !== $this->id_column) {
-                $values[$column] = $column_value;
-            }
-        }
-        return $values;
     }
 
     // Метод отримання імені колонки з id
@@ -275,14 +292,14 @@ class Model {
 
     public function getMaxValue(string $columnName) {
         try {
-            $sql = "SELECT MAX($columnName) AS max_value FROM $this->table_name";            
+            $sql = "SELECT MAX($columnName) AS max_value FROM $this->table_name";
             $db = new DB();
             $result = $db->query($sql);
             $maxValue = array_shift($result)['max_value'];
         } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
             $maxValue = '0';
-        }        
+        }
         return $maxValue;
     }
 
@@ -295,13 +312,19 @@ class Model {
         } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
             $minValue = '0';
-        }        
+        }
         return $minValue;
     }
-    
+
     public function getLastId(): int {
-        $db = new DB();        
+        $db = new DB();
         return $db->getLastId();
-    }   
-    
+    }
+
+    public function isValueExists(string $value, string $columnName): bool {
+        $db = new DB();
+        $sql = "SELECT COUNT(*) as count FROM {$this->table_name} WHERE $columnName = ?";
+        $results = $db->query($sql, [$value]);
+        return intval($results[0]['count']) > 0;
+    }
 }

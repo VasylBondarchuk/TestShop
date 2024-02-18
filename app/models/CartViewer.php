@@ -3,7 +3,7 @@
 /**
  * Class CartViewer
  */
-class CartViewer extends Model {
+class CartViewer {
 
     const CART_PATH = '/cart/list';   
     

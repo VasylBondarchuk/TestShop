@@ -2,12 +2,11 @@
     
     <?php
     // Категорії
-    $categories = $this->getModel('Category')->getCategoriesDetails();
-    array_shift($categories);    
+    $categories = $this->getModel('Category')->getCollection();       
         foreach ($categories as $category) : ?>	
         <th>
         <center>
-    <?=Helper::urlBuilder('/product/list', $category['category_name'], array('category_id' => $category['category_id'])); ?>
+    <?=Helper::urlBuilder('/category/show', $category->getCategoryName(), array('category_id' => $category->getCategoryId())); ?>
         </center>
     </th> 
     <?php endforeach; ?>    
@@ -16,7 +15,7 @@
         <td width="20%">                            
             <br>
     <center>
-        <img src="<?= CATEGORY_IMAGE_PATH . $category['category_name'] . ".jpg" ?>" alt="<?= $category['category_name'] ?>" width="200" height="">
+        <img src="<?= CATEGORY_IMAGE_PATH . $category->getCategoryName() . ".jpg" ?>" alt="<?= $category->getCategoryName() ?>" width="200" height="">
     </center>
     </td>
 <?php endforeach; ?>

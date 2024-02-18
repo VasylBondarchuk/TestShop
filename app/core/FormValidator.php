@@ -8,15 +8,15 @@ class FormValidator {
      * @param string $inputEmail The input to validate.
      * @return bool True if the input is a valid email address, false otherwise.
      */
-    public static function isValidEmail(string $inputEmail) : bool {  
-    
-    if (empty($inputEmail)) {
-        // Empty email is considered invalid
-        return false;
-    }        
-    $email = Helper::sanitizeInput($inputEmail); 
-    // Use filter_var with FILTER_VALIDATE_EMAIL flag to check email format
-    return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+    public static function isValidEmail(string $inputEmail): bool {
+
+        if (empty($inputEmail)) {
+            // Empty email is considered invalid
+            return false;
+        }
+        $email = Helper::sanitizeInput($inputEmail);
+        // Use filter_var with FILTER_VALIDATE_EMAIL flag to check email format
+        return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
     }
 
     /**
@@ -26,12 +26,12 @@ class FormValidator {
      * @return string|null Returns an error message if the input is invalid, null otherwise.
      */
     public static function validatePhoneNumber(string $inputPhoneNumber): ?string {
-       
+
         if (empty($inputPhoneNumber)) {
-        // Empty email is considered invalid
-        return false;
-        }     
-        
+            // Empty email is considered invalid
+            return false;
+        }
+
         $phoneNumber = Helper::sanitizeInput($inputPhoneNumber);
 
         // Check if the input is empty
@@ -48,9 +48,17 @@ class FormValidator {
         // If the input passes all validation checks, return null (indicating no error)
         return null;
     }
+
+    public static function isValidPersonName($name) {
+        // Regular expression pattern to match valid person names
+        $pattern = "/^[a-zA-Z' -]+$/";
+
+        // Check if the input matches the pattern
+        if (preg_match($pattern, $name)) {
+            return true; // Valid name
+        } else {
+            return false; // Invalid name
+        }
 // Add more validation methods as needed
-}
-
-
-
-
+    }
+    

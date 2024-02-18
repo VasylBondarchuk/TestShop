@@ -13,11 +13,7 @@ class CustomerController extends Controller
     // метод для перегляду клієнтів
     public function ListAction()
     {        
-        $this->setTitle("Клієнти");
-        $this->registry['customers'] = $this->getModel('Customer')
-            ->initCollection()
-            ->getCollection()
-            ->select();
+        $this->setTitle("Клієнти");        
         $this->setView();
         $this->renderLayout();
     }
