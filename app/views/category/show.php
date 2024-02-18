@@ -60,7 +60,10 @@ require_once FORMS_HANDLER_PATH . DS . 'sorting_filtering_product_form_fields.ph
                         <input type="hidden" name="<?= $product->getProductId() ?>" value="<?= $product->getName() ?>"/>
                     </form>
     <?php
-    $this->addToCart($product);
+    //echo($_POST[$product->getProductId()]);
+    if (isset($_POST[$product->getProductId()])) {
+        $this->addToCart($product);
+    }
     include '/var/www/html/app/views/admin/admin_product_actions.php';
     ?>
 

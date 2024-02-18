@@ -1,8 +1,9 @@
 <?php
-/*error_reporting(E_ALL);
-// Display errors on the screen
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);*/
+
+/* error_reporting(E_ALL);
+  // Display errors on the screen
+  ini_set('display_errors', 1);
+  ini_set('display_startup_errors', 1); */
 
 class ProductController extends Controller {
 
@@ -37,34 +38,33 @@ class ProductController extends Controller {
     }
 
     // МЕТОД ПОКАЗУ ТОВАРУ
-    public function ShowAction() {        
+    public function ShowAction() {
         $productModel = $this->getModel('Product');
         $product = $productModel->getProductById($this->getProductId());
         $productName = $product ? $product->getName() : '';
-        $this->setTitle($productName);        
+        $this->setTitle($productName);
         $this->setView();
         $this->renderLayout();
     }
 
-public function AddAction() {
-    $this->setTitle("Додавання товару");
-    if (!$this->getModel('Customer')->isAdmin()) {
-        $this->registry['errorMessage'].= " Ви не маєте права створювати товари";
-    } else {
-        $product = $this->getModel('Product');
-        if(isset($_POST['Add'])) {
-            $enteredSku = Helper::getPostValue('sku');
-            if ($product->isValueUnique($enteredSku, self::SKU)) {
-                $product->addProduct();
-                $productId = $product->getLastId(); // Get the last inserted product ID
-                Helper::redirect("/product/edit?product_id=$productId");
+    public function AddAction() {
+        $this->setTitle("Додавання товару");
+        if (!$this->getModel('Customer')->isAdmin()) {
+            $this->registry['errorMessage'] .= " Ви не маєте права створювати товари";
+        } else {
+            $product = $this->getModel('Product');
+            if (isset($_POST['Add'])) {
+                $enteredSku = Helper::getPostValue('sku');
+                if ($product->isValueUnique($enteredSku, self::SKU)) {
+                    $product->addProduct();
+                    $productId = $product->getLastId(); // Get the last inserted product ID
+                    Helper::redirect("/product/edit?product_id=$productId");
+                }
             }
         }
+        $this->setView();
+        $this->renderLayout();
     }
-    $this->setView();
-    $this->renderLayout();
-}
-
 
     // МЕТОД ВИДАЛЕННЯ ТОВАРУ
     public function DeleteAction() {
@@ -73,27 +73,26 @@ public function AddAction() {
         // Повертає об'єкт класу Product extends Model
         $product = $this->getModel('Product');
         $productId = $this->getProductId();
-        
+
         //  echo $product->isValueExists($productId,$product->getIdColumn());exit;
         // Якщо отриманий з запиту id існує в БД - видаляємо 
-            // Викликаємо метод класу Model видалення товару            
-                if ($product->isValueExists($productId, $product->getIdColumn())) {
-                    //$product->deleteItem($productId);                        
-                }
-                // Start output buffering                
-                //Helper::redirect("/category/list");            
-            //відображаємо вигляд
-            $this->setView();
-            //відображаємо шаблон
-            $this->renderLayout();
-        
+        // Викликаємо метод класу Model видалення товару            
+        if ($product->isValueExists($productId, $product->getIdColumn())) {
+            //$product->deleteItem($productId);                        
+        }
+        // Start output buffering                
+        //Helper::redirect("/category/list");            
+        //відображаємо вигляд
+        $this->setView();
+        //відображаємо шаблон
+        $this->renderLayout();
 
         // Якщо отриманий з запиту id неіснує в БД    
-        /*else {
-            //відображаємо шаблон
-            $this->renderPartialview('layout');
-            echo("Нема такого товару");
-        }*/
+        /* else {
+          //відображаємо шаблон
+          $this->renderPartialview('layout');
+          echo("Нема такого товару");
+          } */
     }
 
     //МЕТОД ЕКСПОРТУ З XML	
@@ -201,34 +200,19 @@ public function AddAction() {
 			через некорректні значення ціни або (та) к-сті";
             } else
                 $this->registry['import_message'] = "Файлу import.xml в папці public не знайдено! ";
-        }        
-        
+        }
+
 
         $this->setView();
         $this->renderLayout();
     }
-    
-    private function getProductId() : ?int {
-        return (int)Helper::getQueryParam('product_id');
+
+    private function getProductId(): ?int {
+        return (int) Helper::getQueryParam('product_id');
+    }
+
+    public function getCategoryId(): ?int {
+        return (int) Helper::getQueryParam('category_id');
     }
     
-    public function getCategoryId() : ?int {
-        return (int)Helper::getQueryParam('category_id');
-    }
-    
-    public function addToCart(Product $product) : void {        
-        if (!empty($_POST[$product->getProductId()])) {
-                    $cartManger = $this->getModel('CartManager');
-                    $cartItem = $this->getModel(
-                            'CartItem',
-                            $product->getProductId(),
-                            $product->getSku(),
-                            $product->getName(),
-                            $product->getPrice(),
-                            Helper::getPostValue('qty'),
-                            $product->getProductImage()
-                    );
-                    $cartManger->addItem($cartItem);
-                }
-    }
 }

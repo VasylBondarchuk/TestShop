@@ -120,5 +120,19 @@ class Controller {
     // Повертає назву id-колонки
     public function getIdColumnName(string $name) {
         return $this->getModel($name)->getIdColumn();
-    }    
+    }
+
+    public function addToCart(Product $product): void {            
+        $cartManger = $this->getModel('CartManager');
+        $cartItem = $this->getModel(
+                'CartItem',
+                $product->getProductId(),
+                $product->getSku(),
+                $product->getName(),
+                $product->getPrice(),
+                Helper::getPostValue('qty'),
+                $product->getProductImage()
+        );
+        $cartManger->addItem($cartItem);
+    }
 }
