@@ -124,13 +124,13 @@ class Category extends Model {
     // Масив id категорій
     public function getCategoriesIds(): array {
         $db = new DB();
-        $categoriesData = $db->query("SELECT category_name FROM $this->table_name");
+        $categoriesData = $db->query("SELECT category_id FROM $this->table_name");
 
         return array_column($categoriesData, 'category_id');
     }
 
     // Масив категорій
-    public function getCategories(): array {
+    public function getCategories(): array {        
         return array_combine($this->getCategoriesIds(), $this->getCategoriesNames());
     }    
 

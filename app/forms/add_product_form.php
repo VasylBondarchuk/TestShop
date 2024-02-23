@@ -6,7 +6,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }   
     $uploadFile = $uploadDir . basename($_FILES['product_image']['name']);
     if (!move_uploaded_file($_FILES['product_image']['tmp_name'], $uploadFile)) {
-        $this->registry['errorMessage'].= " Виникла проблема з завантаженням зображення.";
+        echo " Виникла проблема з завантаженням зображення.";
     }
 }
 

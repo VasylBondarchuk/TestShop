@@ -124,28 +124,38 @@ abstract class Model {
         return $filteredCollection;
     }
 
-    //МЕТОД ФІЛЬТРУВАННЯ
-    public function filter(string $column, $min, $max) {
-        //формування частини sql-запиту "WHERE price BETWEEN"
-        $this->sql .= " AND $column BETWEEN " . $min . " AND " . $max;
-        return $this;
+    public function editItem(int $id, array $data): Model {
+    // Prepare the SQL query
+    $db = new DB();
+    $editableColumns = $this->getColumnsNames();
+    $editableColumns = array_slice($editableColumns, 1); // Exclude the ID column
+    $setClause = '';
+    $params = [];
+
+    foreach ($editableColumns as $column) {
+        if (isset($data[$column])) {
+            $setClause .= "$column = ?, ";
+            $params[] = $data[$column];
+        }
     }
 
-    // АБСТРАКТНИЙ МЕТОД МЕТОД РЕДАГУВАННЯ ЗАПИСУ ТАБЛИЦІ table_name БД
-    public function editItem(int $id, array $data): Model {
-        $db = new DB();
-        $q = [];
-        $editableColumns = $this->getColumnsNames();
-        array_shift($editableColumns);
-        foreach ($editableColumns as &$column) {
-            $q[] = "$column = ?";
-        }
-        $qMarks = implode(',', $q);
-        $sql = "UPDATE {$this->table_name} SET $qMarks WHERE {$this->id_column}=?;";
-        $params = array_merge($data, [$id]);
+    //print_r($params);exit;
+    // Remove the trailing comma and space
+    $setClause = rtrim($setClause, ', ');
+
+    // Ensure there is at least one column to update
+    if (!empty($setClause)) {
+        $sql = "UPDATE {$this->table_name} SET $setClause WHERE {$this->id_column} = ?";
+        $params[] = $id;
+
+        // Execute the query
         $db->query($sql, $params);
-        return $this;
     }
+
+    // Return the updated model instance
+    return $this;
+}
+
 
     // АБСТРАКТНИЙ МЕТОД ВИДАЛЕННЯ ЗАПИСУ З ТАБЛИЦІ table_name БД
     public function deleteItem(int $id): Model {

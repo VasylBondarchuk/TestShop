@@ -119,11 +119,27 @@ class Product extends Model {
 
         // Filter the products to retain only those assigned to the specified category
         $productsInCategory = array_filter($products, function ($product) use ($categoryId) {
-            return $product->isProductInCategory($product->getProductId(),$categoryId);
+            return $product->isProductInCategory($product->getProductId(), $categoryId);
         });
 
         return $productsInCategory;
-    }    
+    }
+
+    public function addToCategory(int $productId, int $categoryId): void {
+        // You need to implement the logic to add the product to the specified category here
+
+        $db = new DB();
+        $sql = "INSERT INTO product_category (product_id, category_id) VALUES (?, ?)";
+        $db->query($sql, [$productId, $categoryId]);
+    }
+
+    public function removeFromAllCategories(int $productId): void {
+        // You need to implement the logic to remove the product from all categories here
+
+        $db = new DB();
+        $sql = "DELETE FROM product_category WHERE product_id = ?";
+        $db->query($sql, [$productId]);
+    }
 
     //МЕТОД ДОДАВАННЯ НОВОГО ТОВАРУ    
     public function addProduct() {
@@ -134,30 +150,93 @@ class Product extends Model {
         $this->addProductToCategory($this->getLastId(), $_POST['category_id']);
     }
 
-    public function editProduct(int $productId, array $categoryIds): Product {
-        $data = Helper::getFormData($this->getColumnsNames());
-        $this->editItem($productId, $data);
-        $this->deleteProductFromCategory($productId);
-        $this->addProductToCategory($productId, $categoryIds);
-        return $this;
-    }
+// Separate method to handle file upload and update data array
+    private function handleProductImage(int $productId, array &$data): void {
+        // Get filtered data from file upload
+        $filteredData = Helper::handleFileUpload();
 
-    public function addProductToCategory($productId, array $categoryIds) {
-        $db = new DB();
-        $value = '';
-        foreach ($categoryIds as $categoryId) {
-            $value .= "($productId,$categoryId), ";
+        // Check if a new image file has been uploaded
+        if (!empty($filteredData['product_image'])) {
+            // If a file was uploaded, update the data array with the filename
+            $data['product_image'] = $filteredData['product_image'];
+        } else {
+            // If no new file was uploaded, retain the existing product image in the data array
+            $existingProduct = $this->getProductById($productId);
+            if ($existingProduct) {
+                $data['product_image'] = $existingProduct->getProductImage();
+            }
         }
-        $productIdCategoryIdValues = rtrim($value, ", ");
-        $sql = "INSERT INTO product_category (" . self::PRODUCT_ID . ", category_id)
-        VALUES  $productIdCategoryIdValues";
-        $db->query($sql);
     }
 
-    public function deleteProductFromCategory(int $productId) {
-        $db = new DB();
-        $sql = "DELETE FROM product_category WHERE " . self::PRODUCT_ID . " = $productId";
-        $db->query($sql);
+// Separate method to retrieve all form data including photo data
+    private function getEditFormData(int $productId): array {
+        $data = Helper::getFormData($this->getColumnsNames());
+
+        // Handle product image
+        $this->handleProductImage($productId, $data);
+
+        return $data;
+    }
+
+public function editProduct(int $productId, array $categoryIds): Product {
+    // Get all form data including photo data
+    $data = $this->getEditFormData($productId);
+
+    // Check if the SKU is unique for this product
+    $newSku = $data['sku'] ?? ''; // Get the new SKU from the form data
+    if (!$this->isSkuUniqueForProduct($newSku, $productId)) {
+        throw new Exception('SKU must be unique.');
+    }
+
+    // Perform the rest of the product editing logic
+    $this->editItem($productId, $data);
+
+    // Update product-category associations
+    $this->updateProductCategories($productId, $categoryIds);
+
+    return $this;
+}
+
+
+private function isSkuUniqueForProduct(string $sku, int $productId): bool {
+    $db = new DB();
+    $sql = "SELECT COUNT(*) AS count FROM $this->table_name WHERE sku = ? AND $this->id_column != ?";
+    $params = [$sku, $productId];
+    $result = $db->query($sql, $params);
+    
+    // Check if any product other than the specified one has the same SKU
+    return $result['count'] == 0;
+}
+
+    public function updateProductCategories(int $productId, array $categoryIds): void {
+        // Get the product instance
+        $product = $this->getProductById($productId);
+
+        // Remove the product from all categories first
+        $product->removeFromAllCategories($productId);
+
+        // Assign the product to the specified categories
+        foreach ($categoryIds as $categoryId) {
+            $product->addToCategory($productId, $categoryId);
+        }
+    }
+
+    public function assignProductToCategories(int $productId, array $categoryIds): void {
+        // Get the product instance
+        $product = $this->getProductById($productId);
+
+        // Assign the product to the specified categories
+        foreach ($categoryIds as $categoryId) {
+            $product->addToCategory($categoryId);
+        }
+    }
+
+    public function unassignProductFromAllCategories(int $productId): void {
+        // Get the product instance
+        $product = $this->getProductById($productId);
+
+        // Remove the product from all categories
+        $product->removeFromAllCategories();
     }
 
     public function deleteProduct(int $productId) {
@@ -253,7 +332,7 @@ class Product extends Model {
         }
 
         return in_array($categoryId, $categoryIds);
-    }    
+    }
 
     public function findCollectionMinMaxPropertyValue(array $collection, string $property, string $flag = 'min') {
         // If no items found, return null
@@ -297,6 +376,5 @@ class Product extends Model {
      */
     public function sortProductsByPrice(array $products, ?string $order = 'asc'): array {
         return $this->sortCollectionByProperty($products, 'price', $order);
-    }   
-     
+    }
 }

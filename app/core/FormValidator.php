@@ -61,4 +61,5 @@ class FormValidator {
         }
 // Add more validation methods as needed
     }
+}
     

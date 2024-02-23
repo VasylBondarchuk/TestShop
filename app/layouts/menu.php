@@ -3,12 +3,12 @@
         <ul class="nav navbar-nav">
             <?php
             
-            $customer = $this->getModel('Customer');            
-            $logedIn = $customer->isLogedIn();            
-            
+            $customerModel = $this->getModel('Customer');            
+            $logedIn = $customerModel->isLogedIn();                      
+            $customer = $logedIn ? $customerModel->getCustomerById($customerModel->getLoggedInCustomerId()) : null;
             $registrationOrCustomerFullName= $logedIn
-                    ? $customer->getCustomerFullName($customer->getLogedInCustomerId())
-                    : 'Реєстрація';
+                    ? $customer->getCustomerFullName()
+                    : 'Registration';
 
             //вивід написів Увійти та Вийти
             $loginLogOutLabel = $logedIn  ?  ' Вийти ' : ' Увійти '; 
@@ -17,10 +17,10 @@
             $in_out = $logedIn ? 'out' : 'in';
             
             $loginLogOutPath = $logedIn
-                    ? $customer->getLogoutPath()
-                    : $customer->getLoginPath();
+                    ? $customerModel->getLogoutPath()
+                    : $customerModel->getLoginPath();
             
-            $registrationLink = $logedIn ? '<a/>' : '<a href=' . $customer->getRegisterPath() .'>';
+            $registrationLink = $logedIn ? '<a/>' : '<a href=' . $customerModel->getRegisterPath() .'>';
 
             $cartViewer = $this->getModel('CartViewer');            
             $cartManager = $this->getModel('CartManager');            

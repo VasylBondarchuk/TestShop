@@ -2,16 +2,35 @@
 
 class Helper {
 
-    //метод перевірки правильності введення паролю та підтвердження
-    public static function isCorrectPassword($password) {
-        if (isset($_POST[$password])) {
-            if ((strlen($_POST[$password]) >= 8) &&
-                    preg_match("#[0-9]+#", $_POST[$password]) &&
-                    preg_match("#[a-zA-Z]+#", $_POST[$password])) {
-                return TRUE;
-            }
+    /**
+     * Check if a password meets the specified requirements.
+     *
+     * @param string $password The password to check.
+     * @return bool True if the password meets the requirements, false otherwise.
+     */
+    public function isCorrectPassword($password) {
+        // Check if password length is between 8 and 64 characters
+        if (strlen($password) < 8 || strlen($password) > 64) {
+            return false;
         }
-        return FALSE;
+
+        // Check for at least one uppercase letter, one lowercase letter, one digit, and one special character
+        if (!preg_match('/[A-Z]/', $password) || !preg_match('/[a-z]/', $password) || !preg_match('/\d/', $password) || !preg_match('/[!@#$%^&*()\-_=+{};:,<.>]/', $password)) {
+            return false;
+        }
+
+        // Check for common patterns to avoid (e.g., sequential characters, repeated characters)
+        if (preg_match('/(.)\1{2,}/', $password) || preg_match('/abc|bcd|cde|xyz/', $password)) {
+            return false;
+        }
+
+        // Check if password contains the user's email or parts of it (optional)
+        $email = $this->getEmail(); // Assuming you have a method to get the user's email
+        if (strpos($password, $email) !== false) {
+            return false;
+        }
+
+        return true;
     }
 
     //метод перевірки правильності підтвердження паролю
@@ -36,20 +55,6 @@ class Helper {
             return FALSE;
         }
         return TRUE;
-    }
-
-    public static function validateCustomerInput($name1, $name2, $telephone, $email, $password, $confirm, $city) {
-        if (!self::isCorrectPhone($telephone) ||
-                !self::isCorrectEmail($email) || !self::isCorrectPassword($password) || !self::isUkrainian($city) ||
-                !$this->confirmPassword($password, $confirm)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private static function confirmPassword($password, $confirm) {
-        return $password === $confirm;
     }
 
     public static function urlBuilder($url, $linkText, $params = []): string {
@@ -100,32 +105,31 @@ class Helper {
     }
 
     public static function sanitizeInput(string|array|null $inputData): mixed {
-    // Check if input data is null
-    if ($inputData === null) {
-        return null;
-    }
-
-    // Initialize the variable to hold sanitized data
-    $sanitizedInput = '';
-
-    // If the input is an array, sanitize each element recursively
-    if (is_array($inputData)) {
-        $sanitizedInput = [];
-        foreach ($inputData as $key => $value) {
-            $sanitizedInput[$key] = self::sanitizeInput($value);
+        // Check if input data is null
+        if ($inputData === null) {
+            return null;
         }
-    } else {
-        // Trim whitespace from the beginning and end of the input
-        $trimmedInputData = trim($inputData);
-        // Remove backslashes
-        $stripSlashesData = stripslashes($trimmedInputData);
-        // Convert special characters to HTML entities to prevent XSS attacks
-        $sanitizedInput = htmlspecialchars($stripSlashesData);
+
+        // Initialize the variable to hold sanitized data
+        $sanitizedInput = '';
+
+        // If the input is an array, sanitize each element recursively
+        if (is_array($inputData)) {
+            $sanitizedInput = [];
+            foreach ($inputData as $key => $value) {
+                $sanitizedInput[$key] = self::sanitizeInput($value);
+            }
+        } else {
+            // Trim whitespace from the beginning and end of the input
+            $trimmedInputData = trim($inputData);
+            // Remove backslashes
+            $stripSlashesData = stripslashes($trimmedInputData);
+            // Convert special characters to HTML entities to prevent XSS attacks
+            $sanitizedInput = htmlspecialchars($stripSlashesData);
+        }
+
+        return $sanitizedInput;
     }
-
-    return $sanitizedInput;
-}
-
 
     /**
      * Get and sanitize a value from $_POST.
@@ -135,12 +139,11 @@ class Helper {
      */
     public static function getPostValue(string $field) {
         $rawValue = filter_input(INPUT_POST, $field, FILTER_SANITIZE_SPECIAL_CHARS);
-        // Sanitize the raw value using the sanitizeInput method
         return self::sanitizeInput($rawValue);
     }
 
-    public static function isEmpty(string $field): bool {
-        return empty(self::getPostValue($field));
+    public static function isEmpty(string $fieldName): bool {
+        return empty(self::getPostValue($fieldName));
     }
 
     public static function emptyFieldMessage(string $fieldName): string {
@@ -258,27 +261,25 @@ class Helper {
 
         return $filteredData;
     }
-    
-public static function getSortParams(string $field): array {
-    // Initialize sorting parameters array
-    $sortParams = [];
 
-    // Retrieve sorting parameter from POST data
-    $sortParam = filter_input(INPUT_GET, $field);    
-    // Check if sorting parameter is set
-    if ($sortParam) {
-        // Split the sorting parameter into direction and property
-        $sortParts = explode('_', $sortParam);
+    public static function getSortParams(string $field): array {
+        // Initialize sorting parameters array
+        $sortParams = [];
 
-        // Extract sorting direction and property
-        $sortOrder = $sortParts[0]; // "asc" or "desc"
-        $sortField = $sortParts[1]; // "price" or "qty"
+        // Retrieve sorting parameter from POST data
+        $sortParam = filter_input(INPUT_GET, $field);
+        // Check if sorting parameter is set
+        if ($sortParam) {
+            // Split the sorting parameter into direction and property
+            $sortParts = explode('_', $sortParam);
 
-        // Add sorting parameter to the array
-        $sortParams[$sortField] = $sortOrder;
+            // Extract sorting direction and property
+            $sortOrder = $sortParts[0]; // "asc" or "desc"
+            $sortField = $sortParts[1]; // "price" or "qty"
+            // Add sorting parameter to the array
+            $sortParams[$sortField] = $sortOrder;
+        }
+
+        return $sortParams;
     }
-
-    return $sortParams;
 }
-}
-

@@ -1,42 +1,78 @@
-<style>	
-.error {color: #FF0000;}
-.warning {color: DodgerBlue;}
-.cont {width: 300px;clear: both;text-align:left;}
-.cont input {width: 100%;clear: both;}
-.button {
-	font-size: 25px;
-	border: none;
-	padding: 15px 32px;
-	background-color: DodgerBlue; 
-	color: white; 
-	border: 2px solid DodgerBlue;
-}
-</style>
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизація на сайті</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
+        .container {
+            width: 300px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .input-group input[type="text"],
+        .input-group input[type="password"] {
+            width: calc(100% - 10px);
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .error {
+            color: red;
+        }
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
 
-<center><h2>Авторизація на сайті</h2></center>
-
-<?php
-
-//якщо при непорожніх введеннях авторизація невдала
-/*if(isset($_POST['login']) && Helper::NotEmptyEnter())
-{
-	echo("<span class='warning'><center><h3>Невірний email або(та) пароль!</h3></center></span><br>");
-}*/
-?>
-
-<form method="POST" action="<?php $_SERVER['PHP_SELF']; ?>">
-<center>	
-<div class="cont">
-email:
-<input type="text" name="email" value="<?php echo ($_POST['email'] ?? '') ;?>"><span class="error">
-<?php if(isset($_POST['email']) && !$_POST['email'])echo $this->registry['empty_email'];?></span><br><br>
-Пароль:
-<input type="password" name="password" value="<?php echo($_POST['password'] ?? '');?>">
-<span class="error">
-<?php if(isset($_POST['password']) && ! $_POST['password'])echo $this->registry['empty_password'];?></span>
-<br><br>
-<input class="button" type="submit" name="login" value="Увійти">
-
+<div class="container">
+    <h2>Авторизація на сайті</h2>
+    <form method="POST" action="<?= $_SERVER['REQUEST_URI']; ?>">
+        <div class="input-group">
+            <label for="email">Email:</label>
+            <input type="text" name="email" id="email" value="<?php echo ($_POST['email'] ?? ''); ?>">            
+        </div>
+        <div class="input-group">
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" value="<?php echo ($_POST['password'] ?? ''); ?>">            
+        </div>
+        <div class="input-group">
+            <input class="button" type="submit" name="login" value="Log in">
+        </div>
+    </form>
 </div>
-</center>
-</form>
+
+</body>
+</html>
+
