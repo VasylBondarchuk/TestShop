@@ -2,61 +2,6 @@
 
 class Helper {
 
-    /**
-     * Check if a password meets the specified requirements.
-     *
-     * @param string $password The password to check.
-     * @return bool True if the password meets the requirements, false otherwise.
-     */
-    public function isCorrectPassword($password) {
-        // Check if password length is between 8 and 64 characters
-        if (strlen($password) < 8 || strlen($password) > 64) {
-            return false;
-        }
-
-        // Check for at least one uppercase letter, one lowercase letter, one digit, and one special character
-        if (!preg_match('/[A-Z]/', $password) || !preg_match('/[a-z]/', $password) || !preg_match('/\d/', $password) || !preg_match('/[!@#$%^&*()\-_=+{};:,<.>]/', $password)) {
-            return false;
-        }
-
-        // Check for common patterns to avoid (e.g., sequential characters, repeated characters)
-        if (preg_match('/(.)\1{2,}/', $password) || preg_match('/abc|bcd|cde|xyz/', $password)) {
-            return false;
-        }
-
-        // Check if password contains the user's email or parts of it (optional)
-        $email = $this->getEmail(); // Assuming you have a method to get the user's email
-        if (strpos($password, $email) !== false) {
-            return false;
-        }
-
-        return true;
-    }
-
-    //метод перевірки правильності підтвердження паролю
-    public static function isConfirmOk($password, $confirm) {
-        return (self::CleanInput($_POST[$password]) ==
-                self::CleanInput($_POST[$confirm]));
-    }
-
-    //метод перевірки нецифрових введеннь
-    public static function isNumericInput(array $params) {
-        foreach ($params as $element) {
-            if (isset($element) && (!is_numeric($element) || ($element < 0))) {
-                return FALSE;
-            }
-        }
-        return TRUE;
-    }
-
-    //метод перевірки нецифрових введеннь
-    public static function Numeric($input) {
-        if (isset($_POST[$input]) && !empty($_POST[$input]) && (!is_numeric($_POST[$input]) || ($_POST[$input] < 0))) {
-            return FALSE;
-        }
-        return TRUE;
-    }
-
     public static function urlBuilder($url, $linkText, $params = []): string {
         // Ensure $url starts with a slash
         $url = '/' . ltrim($url, '/');
@@ -84,24 +29,6 @@ class Helper {
         // Perform redirect
         header("Location: $url");
         exit(); // Ensure no further code execution
-    }
-
-    //вивід помилок при введенні паролів
-    public static function isCorrectPasswordInput() {
-        //масив помилок
-        $params = array('password' => '', 'pass_confirm' => '');
-        foreach ($params as $column => &$error) {
-            if (!empty($_POST[$column])) {
-                if (strlen($_POST[$column]) < 8) {
-                    $error = "Пароль має містити мінімум 8 символів!";
-                } elseif (!preg_match("#[0-9]+#", $_POST[$column])) {
-                    $error = "Пароль має містити хочаб одну цифру!";
-                } elseif (!preg_match("#[a-zA-Z]+#", $_POST[$column])) {
-                    $error = "Пароль має містити лише англійські літери(мінімум одну)!";
-                }
-            }
-        }
-        return array_values($params);
     }
 
     public static function sanitizeInput(string|array|null $inputData): mixed {
@@ -184,7 +111,7 @@ class Helper {
             default:
                 echo "";
         }
-    }
+    }    
 
     public static function validateInput($input, $value) {
         switch ($input) {
@@ -281,5 +208,20 @@ class Helper {
         }
 
         return $sortParams;
+    }
+
+    /**
+     * Helper method to display an error message if the form field is empty and the form is submitted.
+     *
+     * @param string $fieldName The name of the form field.
+     * @param string $errorMessage The error message to display.
+     * @return string The error message if the field is empty and the form is submitted, otherwise an empty string.
+     */
+    public static function displayErrorMessageIfEmpty(string $fieldName) {
+        // Check if the form is submitted and the field is empty
+        if (isset($_POST[$fieldName]) && Helper::isEmpty($fieldName)) {
+            echo Helper::emptyFieldMessage($fieldName);
+        }
+        echo ''; // Return empty string if conditions are not met
     }
 }

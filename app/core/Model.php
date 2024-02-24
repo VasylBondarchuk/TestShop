@@ -40,17 +40,44 @@ abstract class Model {
      */
     abstract public function getCollection(): array;
 
-    // АБСТРАКТНИЙ МЕТОД МЕТОД ДОДАВАННЯ ЗАПИСУ ДО ТАБЛИЦІ table_name БД
-    public function addItem(array $columns) {
+    public function addItem(array $columns, array $data) {
         $db = new DB();
         $placeHolders = trim(str_repeat('?,', count($columns)), ',');
-        $columnNames = '';
-        foreach ($columns as $column) {
-            $columnNames .= "$column, ";
+        $columnNames = implode(', ', $columns);
+        $sql = "INSERT INTO {$this->table_name} ($columnNames) VALUES ($placeHolders)";
+        $flattenedData = array_values($data);
+        $db->query($sql, $flattenedData);
+    }
+
+    public function editItem(int $id, array $data): Model {
+        // Prepare the SQL query
+        $db = new DB();
+        $editableColumns = $this->getColumnsNames();
+        $editableColumns = array_slice($editableColumns, 1); // Exclude the ID column
+        $setClause = '';
+        $params = [];
+
+        foreach ($editableColumns as $column) {
+            if (isset($data[$column])) {
+                $setClause .= "$column = ?, ";
+                $params[] = $data[$column];
+            }
         }
-        $columnNames = rtrim($columnNames, ", ");
-        $sql = "INSERT INTO {$this->table_name} ($columnNames) VALUES ($placeHolders);";
-        return $db->query($sql, $this->params);
+
+        // Remove the trailing comma and space
+        $setClause = rtrim($setClause, ', ');
+
+        // Ensure there is at least one column to update
+        if (!empty($setClause)) {
+            $sql = "UPDATE {$this->table_name} SET $setClause WHERE {$this->id_column} = ?";
+            $params[] = $id;
+
+            // Execute the query
+            $db->query($sql, $params);
+        }
+
+        // Return the updated model instance
+        return $this;
     }
 
     //МЕТОД СОРТУВАННЯ
@@ -124,39 +151,6 @@ abstract class Model {
         return $filteredCollection;
     }
 
-    public function editItem(int $id, array $data): Model {
-    // Prepare the SQL query
-    $db = new DB();
-    $editableColumns = $this->getColumnsNames();
-    $editableColumns = array_slice($editableColumns, 1); // Exclude the ID column
-    $setClause = '';
-    $params = [];
-
-    foreach ($editableColumns as $column) {
-        if (isset($data[$column])) {
-            $setClause .= "$column = ?, ";
-            $params[] = $data[$column];
-        }
-    }
-
-    //print_r($params);exit;
-    // Remove the trailing comma and space
-    $setClause = rtrim($setClause, ', ');
-
-    // Ensure there is at least one column to update
-    if (!empty($setClause)) {
-        $sql = "UPDATE {$this->table_name} SET $setClause WHERE {$this->id_column} = ?";
-        $params[] = $id;
-
-        // Execute the query
-        $db->query($sql, $params);
-    }
-
-    // Return the updated model instance
-    return $this;
-}
-
-
     // АБСТРАКТНИЙ МЕТОД ВИДАЛЕННЯ ЗАПИСУ З ТАБЛИЦІ table_name БД
     public function deleteItem(int $id): Model {
         $db = new DB();
@@ -168,19 +162,7 @@ abstract class Model {
     public function initCollection(): Model {
         $this->sql = "SELECT * FROM " . $this->table_name;
         return $this;
-    }
-
-    // Отримання масиву значень колонки $column_name таблиці $table_name БД
-    public function getColumnArray($column_name): array {
-        $db = new DB();
-        $sql = "SELECT {$column_name} FROM {$this->table_name};";
-        $results = $db->query($sql);
-        // створюємо і повертаємо масив зі значеннями колонки $column_name
-        foreach ($results as $result => $value) {
-            $column_values_array[] = $value[$column_name];
-        }
-        return $column_values_array;
-    }
+    }   
 
     public function isValueUnique(string $value, string $columnName): bool {
         $db = new DB();
@@ -194,6 +176,16 @@ abstract class Model {
         $sql = "DESCRIBE $this->table_name";
         $results = $db->query($sql);
         return array_column($results, 'Field');
+    }
+
+    public function getFormFieldsFromDbColumns(array $postData): array {
+        // Get the column names from the database table
+        $dbColumns = $this->getColumnsNames();
+
+        // Filter the keys of the $_POST array to only include those present in the database table
+        $formFields = array_intersect($dbColumns, array_keys($postData));
+
+        return $formFields;
     }
 
     // отримання запису з бази за конкретним значенням певної колонки таблиці table_name БД

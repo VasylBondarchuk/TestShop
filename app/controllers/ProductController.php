@@ -59,16 +59,19 @@ class ProductController extends Controller {
 
     public function AddAction() {
         $this->setTitle("Додавання товару");
-        if (!$this->getModel('Customer')->isAdmin()) {
-            $this->registry['errorMessage'] .= " Ви не маєте права створювати товари";
-        } else {
-            $product = $this->getModel('Product');
-            if (isset($_POST['Add'])) {
-                $enteredSku = Helper::getPostValue('sku');
-                if ($product->isValueUnique($enteredSku, self::SKU)) {
-                    $product->addProduct();
-                    $productId = $product->getLastId(); // Get the last inserted product ID
-                    Helper::redirect("/product/edit?product_id=$productId");
+        $model = $this->getModel('Customer');        
+        if ($model->isLogedIn()) {
+            $customer = $model->getCustomerById($model->getLoggedInCustomerId());
+            print_r($customer);
+            if ($customer->getAdminRole() == 1) {
+                $product = $this->getModel('Product');
+                if (isset($_POST['Add'])) {
+                    $enteredSku = Helper::getPostValue('sku');
+                    if ($product->isValueUnique($enteredSku, self::SKU)) {
+                        $product->addProduct();
+                        $productId = $product->getLastId(); // Get the last inserted product ID
+                        Helper::redirect("/product/edit?product_id=$productId");
+                    }
                 }
             }
         }

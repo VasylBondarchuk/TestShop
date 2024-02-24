@@ -12,4 +12,5 @@ const PRODUCT_IMAGE_UPLOAD_DIR = ROOT . "/img/product/";
 const PRODUCT_IMAGE_PATH = "/img/product/";
 const CATEGORY_IMAGE_UPLOAD_DIR = ROOT . "/img/category/";
 const CATEGORY_IMAGE_PATH = "/img/category/";
-const FORMS_HANDLER_PATH = ROOT . "/app/forms/";
+const FORMS_HANDLER_PATH = ROOT . "/app/forms";
+const INDEX_PAGE_PATH = "/category/list/";

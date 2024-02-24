@@ -19,7 +19,6 @@ class Customer extends Model {
     private string $city;
     private int $adminRole = 0; // Initialize adminRole with a default value
 
-
     function __construct() {
         $this->table_name = "customer";
         $this->id_column = "customer_id";
@@ -86,7 +85,7 @@ class Customer extends Model {
         $this->adminRole = $adminRole;
     }
 
-    public function getAdminRole(): int {
+    public function getAdminRole(): int {        
         return $this->adminRole;
     }
 
@@ -116,96 +115,74 @@ class Customer extends Model {
         return $customers;
     }
 
-    // МЕТОД ДОДАВАННЯ (РЕЄСТРАЦІЇ) НОВОГО КЛІЄНТА
-    public function addCustomer() {
-        //імена колонок таблиці
-        $columns = $this->getColumnsNames();
-        //параметри форми
-        $rawParams = Helper::getFormData($columns);
-        $params = $rawParams;
-        array_pop($params);
-        //отримання шифрованого паролю md5
-        $password = '';
-        if (isset($_POST['password'])) {
-            if (!empty($_POST['password'])) {
-                $password = md5(Helper::CleanInput($_POST['password']));
-            }
-        }
-        //перевірка корректності введень
-        $correctInput = 0;
-
-        //непорожні корректні введення
-        if ($this->isEmpty(Helper::FormData($columns)) &&
-                Helper::CorrectCustomerInput(
-                        $columns[1],
-                        $columns[2],
-                        $columns[3],
-                        $columns[4],
-                        $columns[5],
-                        'pass_confirm',
-                        $columns[6]
-                )
-        ) {
-            $correctInput = 1;
+    /**
+     * Register a new customer.
+     *
+     * @param array $formData The form data submitted during registration.
+     * @return array|bool An array of errors if validation fails, or true if the registration was successful.
+     */
+    public function registerCustomer(array $formData) {
+        // Validate the form data
+        $validationErrors = FormValidator::validateRegistrationForm($formData);
+        if (!empty($validationErrors)) {            
+            return $validationErrors;
         }
 
-        //якщо введений email унікальний для бази	
-        if (empty($this->getItemByParam('email', $params[4]))) {
-            //якщо корректно введені всі поля - редагувати
-            if (isset($_POST['addcustomer']) && $correctInput == 1) {
-                $columns2 = $columns;
-                array_shift($columns2);
-                $this->addItem($columns2, array($params[1], $params[2], $params[3], $params[4], $password, $params[6], 0));
+        // Hash the password before saving it to the database
+        $hashedPassword = password_hash($formData['password'], PASSWORD_DEFAULT);
 
-                //змінна успішного реєстрування 
-                Helper::$var['message'] = 1;
-            }
-        }
-        //змінна неуспішного реєстрування із-за дублікату ел. пошти
-        else {
-            Helper::$var['message'] = 0;
-        }
-        return $this;
+        // Set up the data to be added to the database
+        $data = [
+            'first_name' => $formData['first_name'],
+            'last_name' => $formData['last_name'],
+            'telephone' => $formData['telephone'],
+            'email' => $formData['email'],
+            'city' => $formData['city'],
+            'password' => $hashedPassword,
+        ];
+
+        $columns = $this->getFormFieldsFromDbColumns($data);
+
+        // Save the customer to the database using the addItem method
+        return $this->addItem($columns, $data);
     }
 
-    public function getLoggedInCustomerId() {
+    public function getLoggedInCustomerId(): ?int {
         if (isset($_SESSION['customer_id']) && !empty($_SESSION['customer_id'])) {
             return (int) $_SESSION['customer_id'];
         } else {
             return null; // Return null if the customer is not logged in
         }
     }
-    
+
     public function isLogedIn(): bool {
         return isset($_SESSION['customer_id']);
     }
-    
+
     public function getLoginPath(): string {
         return route::getBP() . self::LOGIN_PATH;
     }
-    
+
     public function getLogoutPath(): string {
         return route::getBP() . self::LOGOUT_PATH;
     }
-    
+
     public function getRegisterPath(): string {
         return route::getBP() . self::REGISTER_PATH;
     }
-   
+
     public function getCustomerFullName(): string {
         return $this->getFirstName() . ' ' . $this->getLastName();
     }
 
-public function isAdmin(): bool {
-    // Check if the customer is logged in and has an admin role
-    if ($this->isLogedIn() && $this->getAdminRole() === self::ADMIN_ROLE_ID) {
-        return true;
-    } else {
-        return false;
+    public function isAdmin(): bool {
+        // Check if the customer is logged in and has an admin role
+        if ($this->isLogedIn() && $this->getAdminRole() === self::ADMIN_ROLE_ID) {
+            return true;
+        } else {
+            return false;
+        }
     }
-}
-
-
 
     /**
      * Retrieve a customer object by email.
@@ -228,7 +205,39 @@ public function isAdmin(): bool {
 
         // If customer data is found, create a Customer object and return it
         if (!empty($customerData)) {
-            $customerRow = array_shift($customerData);            
+            $customerRow = array_shift($customerData);
+            $customer = new Customer();
+            $customer->setCustomerId($customerRow['customer_id']);
+            $customer->setLastName($customerRow['last_name']);
+            $customer->setFirstName($customerRow['first_name']);
+            $customer->setTelephone($customerRow['telephone']);
+            $customer->setEmail($customerRow['email']);
+            $customer->setPassword($customerRow['password']);
+            $customer->setCity($customerRow['city']);
+            $customer->setAdminRole($customerRow['admin_role']);
+
+            return $customer;
+        } else {
+            return null; // Customer not found
+        }
+    }
+
+    /**
+     * Retrieve a customer object by ID.
+     *
+     * @param int $customerId The ID of the customer to retrieve.
+     * @return Customer|null The customer object if found, or null if not found.
+     */
+    public function getCustomerById(int $customerId): ?Customer {
+        // Perform a database query to retrieve the customer by ID
+        $db = new DB();
+        $sql = "SELECT * FROM $this->table_name WHERE customer_id = :customer_id LIMIT 1";
+        $parameters = [':customer_id' => $customerId];
+        $customerData = $db->query($sql, $parameters);
+
+        // If customer data is found, create a Customer object and return it
+        if (!empty($customerData)) {
+            $customerRow = array_shift($customerData);
             $customer = new Customer();
             $customer->setCustomerId($customerRow['customer_id']);
             $customer->setLastName($customerRow['last_name']);
@@ -245,36 +254,9 @@ public function isAdmin(): bool {
         }
     }
     
-    /**
- * Retrieve a customer object by ID.
- *
- * @param int $customerId The ID of the customer to retrieve.
- * @return Customer|null The customer object if found, or null if not found.
- */
-public function getCustomerById(int $customerId): ?Customer {
-    // Perform a database query to retrieve the customer by ID
-    $db = new DB();
-    $sql = "SELECT * FROM $this->table_name WHERE customer_id = :customer_id LIMIT 1";
-    $parameters = [':customer_id' => $customerId];
-    $customerData = $db->query($sql, $parameters);
-
-    // If customer data is found, create a Customer object and return it
-    if (!empty($customerData)) {
-        $customerRow = array_shift($customerData);            
-        $customer = new Customer();
-        $customer->setCustomerId($customerRow['customer_id']);
-        $customer->setLastName($customerRow['last_name']);
-        $customer->setFirstName($customerRow['first_name']);
-        $customer->setTelephone($customerRow['telephone']);
-        $customer->setEmail($customerRow['email']);
-        $customer->setPassword($customerRow['password']);
-        $customer->setCity($customerRow['city']);
-        $customer->setAdminRole($customerRow['admin_role']);
-
-        return $customer;
-    } else {
-        return null; // Customer not found
+    public function loginCustomer(){
+        $_SESSION['customer_id'] = $this->getCustomerId(); // Assuming you have the ID of the newly registered customer
+        $_SESSION['first_name'] = $this->getFirstName();
+        $_SESSION['last_name'] = $this->getFirstName();
     }
-}
-
 }

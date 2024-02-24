@@ -16,51 +16,42 @@ class CustomerController extends Controller {
         $this->renderLayout();
     }
 
-public function LoginAction() {
-    $this->setTitle("Вхід");
-    //print_r($_POST['login']);exit;    
-    if(isset($_POST['login'])){
-        //print_r($_POST['login']);exit;
-        $email = filter_input(INPUT_POST, 'email');
-        $password = md5(filter_input(INPUT_POST, 'password'));        
-        // Check if email and password are provided
-        if (!$email || !$password) {            
-            $this->setView();
-            $this->renderLayout();
-            return;
-        }        
-        $customerModel = $this->getModel('customer');
-        $customer = $customerModel->getCustomerByEmail($email);
-        
-        // Check if customer exists
-        if ($customer) {
-            // Verify password
-            if($password === $customer->getPassword()) {                           
-                // Set session variables
-                $_SESSION['customer_id'] = $customer->getCustomerId();
-                $_SESSION['first_name'] = $customer->getFirstName();
-                $_SESSION['last_name'] = $customer->getLastName();                
+    public function LoginAction() {
+        $this->setTitle("Вхід");
+
+        // Check if form is submitted
+        if (isset($_POST['login'])) {
+            $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+            $password = filter_input(INPUT_POST, 'password');
+
+            // Check if email and password are provided and valid
+            if (!$email || !$password) {
+                $this->setView();
+                $this->renderLayout();
+                return;
+            }
+
+            $customerModel = $this->getModel('customer');
+            $customer = $customerModel->getCustomerByEmail($email);
+
+            // Check if customer exists and password is verified
+            if ($customer && password_verify($password, $customer->getPassword())) {
+                $customer->loginCustomer();
                 // Redirect to categories page
                 Helper::redirect('/category/list');
-                return; 
+                return;
             }
         }
-    }    
-    // Render the login form if login was unsuccessful
-    $this->setView();
-    $this->renderLayout();
-}
 
-    //метод для регістрації нового клієнта
-    public function RegisterAction() {
-        $model = $this->getModel('Customer');
-        $this->setTitle("Додавання клієнта");
+        // Render the login form if login was unsuccessful
         $this->setView();
         $this->renderLayout();
-        if (isset($_POST)) {
-            $model->addCustomer();
-        }
-        
+    }
+
+    public function RegisterAction() {
+        $this->setTitle("Registration");
+        $this->setView();
+        $this->renderLayout();
     }
 
     public function LogoutAction() {
