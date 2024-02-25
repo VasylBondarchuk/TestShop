@@ -61,8 +61,7 @@ class ProductController extends Controller {
         $this->setTitle("Додавання товару");
         $model = $this->getModel('Customer');        
         if ($model->isLogedIn()) {
-            $customer = $model->getCustomerById($model->getLoggedInCustomerId());
-            print_r($customer);
+            $customer = $model->getCustomerById($model->getLoggedInCustomerId());            
             if ($customer->getAdminRole() == 1) {
                 $product = $this->getModel('Product');
                 if (isset($_POST['Add'])) {

@@ -15,7 +15,7 @@ class Customer extends Model {
     private string $firstName;
     private string $telephone;
     private string $email;
-    private ?string $password;
+    private string $password;
     private string $city;
     private int $adminRole = 0; // Initialize adminRole with a default value
 

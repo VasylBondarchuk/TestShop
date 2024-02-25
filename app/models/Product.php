@@ -11,7 +11,7 @@ class Product extends Model {
     const PRICE = 'price';
     const QTY = 'qty';
     const DESCRIPTION = 'description';
-    const PRODUCT_IMAGE = 'product_image';
+    const PRODUCT_IMAGE = 'product_image';    
 
     protected int $productId;
     protected string $sku;
@@ -80,7 +80,7 @@ class Product extends Model {
 
     public function getProductImage(): string {
         return $this->productImage;
-    }
+    }    
 
     /**
      * Retrieve a collection of products.
@@ -103,7 +103,6 @@ class Product extends Model {
             $product->setProductImage($productData[self::PRODUCT_IMAGE]);
             $products[] = $product;
         }
-
         return $products;
     }
 
@@ -178,35 +177,34 @@ class Product extends Model {
         return $data;
     }
 
-public function editProduct(int $productId, array $categoryIds): Product {
-    // Get all form data including photo data
-    $data = $this->getEditFormData($productId);
+    public function editProduct(int $productId, array $categoryIds): Product {
+        // Get all form data including photo data
+        $data = $this->getEditFormData($productId);
 
-    // Check if the SKU is unique for this product
-    $newSku = $data['sku'] ?? ''; // Get the new SKU from the form data
-    if (!$this->isSkuUniqueForProduct($newSku, $productId)) {
-        throw new Exception('SKU must be unique.');
+        // Check if the SKU is unique for this product
+        $newSku = $data['sku'] ?? ''; // Get the new SKU from the form data
+        if (!$this->isSkuUniqueForProduct($newSku, $productId)) {
+            throw new Exception('SKU must be unique.');
+        }
+
+        // Perform the rest of the product editing logic
+        $this->editItem($productId, $data);
+
+        // Update product-category associations
+        $this->updateProductCategories($productId, $categoryIds);
+
+        return $this;
     }
 
-    // Perform the rest of the product editing logic
-    $this->editItem($productId, $data);
+    private function isSkuUniqueForProduct(string $sku, int $productId): bool {
+        $db = new DB();
+        $sql = "SELECT COUNT(*) AS count FROM $this->table_name WHERE sku = ? AND $this->id_column != ?";
+        $params = [$sku, $productId];
+        $result = $db->query($sql, $params);
 
-    // Update product-category associations
-    $this->updateProductCategories($productId, $categoryIds);
-
-    return $this;
-}
-
-
-private function isSkuUniqueForProduct(string $sku, int $productId): bool {
-    $db = new DB();
-    $sql = "SELECT COUNT(*) AS count FROM $this->table_name WHERE sku = ? AND $this->id_column != ?";
-    $params = [$sku, $productId];
-    $result = $db->query($sql, $params);
-    
-    // Check if any product other than the specified one has the same SKU
-    return $result['count'] == 0;
-}
+        // Check if any product other than the specified one has the same SKU
+        return $result['count'] == 0;
+    }
 
     public function updateProductCategories(int $productId, array $categoryIds): void {
         // Get the product instance
@@ -288,13 +286,14 @@ private function isSkuUniqueForProduct(string $sku, int $productId): bool {
 
         if ($productData) {
             $product = new Product();
-            $product->setProductId($productData[self::PRODUCT_ID]);
-            $product->setSku($productData[self::SKU]);
-            $product->setName($productData[self::NAME]);
-            $product->setPrice($productData[self::PRICE]);
-            $product->setQty($productData[self::QTY]);
-            $product->setDescription($productData[self::DESCRIPTION]);
-            $product->setProductImage($productData[self::PRODUCT_IMAGE]);
+            foreach ($this->getColumnsNames() as $columnName) {
+                // Remove underscores and capitalize words
+                $formattedColumnName = str_replace('_', '', ucwords($columnName, '_'));
+                $setterMethod = 'set' . $formattedColumnName;
+                if (method_exists($product, $setterMethod)) {
+                    $product->$setterMethod($productData[$columnName]);
+                }
+            }
             return $product;
         } else {
             return null;
