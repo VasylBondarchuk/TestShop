@@ -149,20 +149,20 @@ class Product extends Model {
         $this->addProductToCategory($this->getLastId(), $_POST['category_id']);
     }
 
-// Separate method to handle file upload and update data array
+    // Separate method to handle file upload and update data array
     private function handleProductImage(int $productId, array &$data): void {
         // Get filtered data from file upload
         $filteredData = Helper::handleFileUpload();
 
         // Check if a new image file has been uploaded
-        if (!empty($filteredData['product_image'])) {
+        if (!empty($filteredData[self::PRODUCT_IMAGE])) {
             // If a file was uploaded, update the data array with the filename
-            $data['product_image'] = $filteredData['product_image'];
+            $data[self::PRODUCT_IMAGE] = $filteredData[self::PRODUCT_IMAGE];
         } else {
             // If no new file was uploaded, retain the existing product image in the data array
             $existingProduct = $this->getProductById($productId);
             if ($existingProduct) {
-                $data['product_image'] = $existingProduct->getProductImage();
+                $data[self::PRODUCT_IMAGE] = $existingProduct->getProductImage();
             }
         }
     }

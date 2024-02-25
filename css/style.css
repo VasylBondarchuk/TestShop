@@ -233,6 +233,71 @@ select:focus {
     background-color: #0056b3;
 }
 
+.login-form body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+    margin: 0;
+    padding: 0;
+}
+
+.login-form .container {
+    width: 300px;
+    margin: 50px auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.login-form h2 {
+    text-align: center;
+    color: #333;
+}
+
+.login-form .input-group {
+    margin-bottom: 20px;
+}
+
+.login-form .input-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.login-form .input-group input[type="text"],
+.login-form .input-group input[type="password"] {
+    width: calc(100% - 10px);
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.login-form .error {
+    color: red; /* Error messages in red color */
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.login-form .button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+}
+
+.login-form .button:hover {
+    background-color: #45a049;
+}
+
+.error {
+        color: #FF0000;
+    }
+
 
 
 

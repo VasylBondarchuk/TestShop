@@ -85,7 +85,7 @@ class Customer extends Model {
         $this->adminRole = $adminRole;
     }
 
-    public function getAdminRole(): int {        
+    public function getAdminRole(): int {
         return $this->adminRole;
     }
 
@@ -124,7 +124,7 @@ class Customer extends Model {
     public function registerCustomer(array $formData) {
         // Validate the form data
         $validationErrors = FormValidator::validateRegistrationForm($formData);
-        if (!empty($validationErrors)) {            
+        if (!empty($validationErrors)) {
             return $validationErrors;
         }
 
@@ -253,10 +253,84 @@ class Customer extends Model {
             return null; // Customer not found
         }
     }
-    
-    public function loginCustomer(){
+
+    public function loginCustomer() {
         $_SESSION['customer_id'] = $this->getCustomerId(); // Assuming you have the ID of the newly registered customer
         $_SESSION['first_name'] = $this->getFirstName();
         $_SESSION['last_name'] = $this->getFirstName();
+    }
+
+    /**
+     * Verify if the entered email belongs to a registered customer.
+     *
+     * @param string $email The email of the customer.
+     * @return bool True if the email belongs to a registered customer, false otherwise.
+     */
+    public function verifyCustomerEmail(string $email): bool {
+        $customer = $this->getCustomerByEmail($email);
+        return $customer !== null;
+    }
+
+    /**
+     * Verify if the entered password matches the password of the customer with the given email.
+     *
+     * @param string $email The email of the customer.
+     * @param string $password The password to verify.
+     * @return bool True if the password matches, false otherwise.
+     */
+    public function verifyCustomerPassword(string $email, string $password): bool {
+        $customer = $this->getCustomerByEmail($email);
+        if ($customer !== null) {
+            return password_verify($password, $customer->getPassword());
+        }
+        return false;
+    }
+
+    /**
+     * Verify if the entered email and password belong to a registered customer.
+     *
+     * @param string $email The email of the customer.
+     * @param string $password The password to verify.
+     * @return array|null If authentication succeeds, returns null. If authentication fails, returns an array containing error messages.
+     */
+    public function verifyCustomer(string $email, string $password): ?array {
+        $errors = $this->getCustomerVerificationErrors($email, $password);
+        if (!empty($errors)) {
+            return $errors;
+        }
+        return null;
+    }
+
+    /**
+     * Get errors from customer verification process.
+     *
+     * @param string $email The email of the customer.
+     * @param string $password The password to verify.
+     * @return array Array of error messages, if any.
+     */
+    public function getCustomerVerificationErrors(string $email, string $password): array {
+        $errors = [];
+
+        // Check if email is empty
+        if (empty($email)) {
+            $errors['email'] = "Email is required";
+        } else {
+            // Check if email is found
+            if (!$this->verifyCustomerEmail($email)) {
+                $errors['email'] = "Email not found";
+            }
+        }
+
+        // Check if password is empty
+        if (empty($password)) {
+            $errors['password'] = "Password is required";
+        } else {
+            // Check if password is incorrect
+            if (!$this->verifyCustomerPassword($email, $password)) {
+                $errors['password'] = "Incorrect password";
+            }
+        }
+
+        return $errors;
     }
 }
