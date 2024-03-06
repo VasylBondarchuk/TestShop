@@ -1,4 +1,15 @@
 <?php
+$error = '';
+if ($_SERVER["REQUEST_METHOD"] == "POST") {    
+    $uploadDir = PRODUCT_IMAGE_UPLOAD_DIR;      
+    if (!file_exists($uploadDir)) {
+        mkdir($uploadDir, 0777, true);
+    }   
+    $uploadFile = $uploadDir . basename($_FILES['product_image']['name']);
+    if (!move_uploaded_file($_FILES['product_image']['tmp_name'], $uploadFile)) {
+        $error =  "Виникла проблема з завантаженням зображення.";
+    }
+}
 // Get the product ID from the query parameter
 $productId = (int) Helper::getQueryParam('product_id');
 
@@ -15,8 +26,8 @@ if ($product) {
 
     // Check if the user is logged in and is an admin
     $isAdmin = $customerModel->isLogedIn()
-            && $customerModel->getCustomerById($customerModel->getLoggedInCustomerId())->isAdmin();
-
+            && $customerModel->getCustomerById($customerModel->getLoggedInCustomerId())->isAdmin();   
+    
     if ($isAdmin) {
         ?>
         <!-- Display the form only if the user is an admin -->
@@ -30,6 +41,7 @@ if ($product) {
                 <label for="product_image">Product Photo:</label>
                 <input type="file" name="product_image" id="product_image" accept="image/*"><br>
                 <input type="hidden" name="product_id" value="<?= $productId ?>">
+                <input type="hidden" name="error" value="<?= $error;?>">
                 <input class="button" name="Edit" type="submit">
             </div>
         </form>

@@ -17,6 +17,7 @@ abstract class Model {
     protected string $id_column;
     // масив імен колонок таблиці БД
     protected array $columns = [];
+    
     protected array $collection;
     // рядок sql-запита
     protected $sql;

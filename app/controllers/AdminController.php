@@ -11,7 +11,7 @@ class AdminController extends Controller
         $this->setTitle("Вхід");
 
         // Повідомлення при порожньому введенні Email
-        $this->registry['empty_email']= "Введіть Email";
+        $this->registry['empty_email'] = "Введіть Email";
 
         // Повідомлення при порожньому введенні паролю
         $this->registry['empty_password']="Введіть пароль";

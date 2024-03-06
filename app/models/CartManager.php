@@ -26,7 +26,7 @@ class CartManager {
         foreach ($this->cartItems as &$cartItem) {
             // If the product ID was found in the cart, increase qty
             if ($cartItem->getProductId() === $cartItemToBeAdded->getProductId()) {
-                $cartItem->setQuantity($cartItem->getQuantity() + $cartItemToBeAdded->getQuantity());
+                $cartItem->setQuantity($cartItem->getQuantity() + $cartItemToBeAdded->getQuantity());                
                 $this->updateSessionCart();
                 return true; // Item added successfully
             }
@@ -53,14 +53,15 @@ class CartManager {
         $_SESSION['cart'] = $this->cartItems;
     }
 
-    // Get total quantity of all ordered items
     public function getTotalQty(): int {
-        $totalQty = 0;
-        foreach ($this->getItems() as $cartItem) {
-            $totalQty += $cartItem->getQuantity();
-        }
-        return $totalQty;
-    }
+    $totalQty = 0;
+    $cartItems = $this->getItems(); // Store cart items in a variable
+    foreach ($cartItems as $cartItem) {
+        $totalQty += $cartItem->getQuantity();
+    }     
+    return $totalQty;
+}
+
 
     // Get total amount of all ordered items
     public function totalAmount() {

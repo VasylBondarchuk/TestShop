@@ -122,15 +122,7 @@ class Product extends Model {
         });
 
         return $productsInCategory;
-    }
-
-    public function addToCategory(int $productId, int $categoryId): void {
-        // You need to implement the logic to add the product to the specified category here
-
-        $db = new DB();
-        $sql = "INSERT INTO product_category (product_id, category_id) VALUES (?, ?)";
-        $db->query($sql, [$productId, $categoryId]);
-    }
+    }    
 
     public function removeFromAllCategories(int $productId): void {
         // You need to implement the logic to remove the product from all categories here
@@ -139,14 +131,12 @@ class Product extends Model {
         $sql = "DELETE FROM product_category WHERE product_id = ?";
         $db->query($sql, [$productId]);
     }
-
-    //МЕТОД ДОДАВАННЯ НОВОГО ТОВАРУ    
+    
     public function addProduct() {
         $columnNames = $this->getColumnsNames();
-        $this->params = Helper::getFormData($columnNames);
+        $data = Helper::getFormData($columnNames);        
         array_shift($columnNames);
-        $this->addItem($columnNames);
-        $this->addProductToCategory($this->getLastId(), $_POST['category_id']);
+        $this->addItem($columnNames, $data);        
     }
 
     // Separate method to handle file upload and update data array
@@ -205,6 +195,14 @@ class Product extends Model {
         // Check if any product other than the specified one has the same SKU
         return $result['count'] == 0;
     }
+    
+    public function addToCategory(int $productId, int $categoryId): void {
+        // You need to implement the logic to add the product to the specified category here
+
+        $db = new DB();
+        $sql = "INSERT INTO product_category (product_id, category_id) VALUES (?, ?)";
+        $db->query($sql, [$productId, $categoryId]);
+    }
 
     public function updateProductCategories(int $productId, array $categoryIds): void {
         // Get the product instance
@@ -225,7 +223,7 @@ class Product extends Model {
 
         // Assign the product to the specified categories
         foreach ($categoryIds as $categoryId) {
-            $product->addToCategory($categoryId);
+            $product->addToCategory($productId, $categoryId);
         }
     }
 
@@ -318,6 +316,7 @@ class Product extends Model {
     public function isProductInCategory(int $productId, int $categoryId): bool {
         // Validate input parameters
         if ($productId <= 0 || $categoryId <= 0) {
+            MessageManager::setError("Product ID and category ID must be positive integers.");           
             throw new InvalidArgumentException("Product ID and category ID must be positive integers.");
         }
 
@@ -376,4 +375,51 @@ class Product extends Model {
     public function sortProductsByPrice(array $products, ?string $order = 'asc'): array {
         return $this->sortCollectionByProperty($products, 'price', $order);
     }
+
+
+/**
+     * Retrieve a paginated collection of products.
+     * 
+     * @param int $perPage Number of products per page.
+     * @param int $currentPage Current page number.
+     * @return array Paginated collection of Product objects.
+     */
+    public function getPaginatedCollection(int $perPage, int $currentPage): array {
+        $db = new DB();
+
+        // Calculate the offset based on current page and number of products per page
+        $offset = ($currentPage - 1) * $perPage;
+
+        // Fetch products with LIMIT and OFFSET for pagination
+        $query = "SELECT * FROM $this->table_name LIMIT $perPage OFFSET $offset";
+        $productsData = $db->query($query);
+
+        $products = [];
+        foreach ($productsData as $productData) {
+            $product = new Product();
+            $product->setProductId($productData[self::PRODUCT_ID]);
+            $product->setSku($productData[self::SKU]);
+            $product->setName($productData[self::NAME]);
+            $product->setPrice($productData[self::PRICE]);
+            $product->setQty($productData[self::QTY]);
+            $product->setDescription($productData[self::DESCRIPTION]);
+            $product->setProductImage($productData[self::PRODUCT_IMAGE]);
+            $products[] = $product;            
+        }
+        return $products;
+    }
+
+    public function getTotalProducts(): int {
+    $db = new DB();
+    $result = $db->query("SELECT COUNT(*) AS total FROM $this->table_name");
+    
+    // Check if the result is not empty
+    if (!empty($result['total'])) {
+        return (int) $result['total'];
+    } else {
+        // If no products found, return 0
+        return 0;
+    }
+}
+
 }

@@ -260,6 +260,11 @@ class Customer extends Model {
         $_SESSION['last_name'] = $this->getFirstName();
     }
 
+    public function isEmailUnique(string $email): bool {
+        $customer = $this->getCustomerByEmail($email);
+        return $customer == null;
+    }
+
     /**
      * Verify if the entered email belongs to a registered customer.
      *
@@ -308,7 +313,7 @@ class Customer extends Model {
      * @param string $password The password to verify.
      * @return array Array of error messages, if any.
      */
-    public function getCustomerVerificationErrors(string $email, string $password): array {
+    public function getLoginCustomerVerificationErrors(string $email, string $password): array {
         $errors = [];
 
         // Check if email is empty
@@ -329,6 +334,40 @@ class Customer extends Model {
             if (!$this->verifyCustomerPassword($email, $password)) {
                 $errors['password'] = "Incorrect password";
             }
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Get errors from customer registration process.
+     *
+     * @param string $email The email of the customer.
+     * @return array Array of error messages, if any.
+     */
+    public function getRegistrationCustomerVerificationErrors(string $email): string {
+        $errors = '';
+
+        // Check if email is empty
+        if (FormValidator::isValidEmail($email) && !$this->isEmailUnique($email)) {
+            $errors = "This email is already registered";
+        }
+        return $errors;
+    }
+
+    public function getRegistrationCustomerErrors(array $formData) {
+        $errors = [];
+
+        // Retrieve form validation errors
+        $validationErrors = FormValidator::validateRegistrationForm($formData);
+        if (!empty($validationErrors)) {
+            $errors = $validationErrors;
+        }
+
+        // Retrieve customer verification errors
+        $verificationErrors = $this->getRegistrationCustomerVerificationErrors($formData['email']);
+        if (!empty($verificationErrors)) {
+            $errors['email'] = $verificationErrors;
         }
 
         return $errors;

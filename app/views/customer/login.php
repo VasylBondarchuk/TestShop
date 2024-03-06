@@ -1,4 +1,5 @@
 <?php
+$errors = []; // Initialize $errors variable
 // Check if the login form is submitted
 if (isset($_POST['login'])) {    
     $formFields = array_keys($_POST);    
@@ -7,7 +8,7 @@ if (isset($_POST['login'])) {
     $loginFormData = Helper::getFormData($formFields);
     $model = $this->getModel('Customer');
     // Retrieve errors
-    $errors = $model->getCustomerVerificationErrors(
+    $errors = $model->getLoginCustomerVerificationErrors(
             $loginFormData['email'],
             $loginFormData['password']
             );  
@@ -29,18 +30,20 @@ require_once FORMS_HANDLER_PATH . DS . 'customer_login_fields.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/var/www/html/css/style.css">
-    <title>Авторизація на сайті</title>
+    <title>Log in</title>
+</head>
 <body>
-<center><h2> Log in </h2></center>
-<body class="login-form">
-<form method="POST">
-    <div class="container">
-        <?= FormGenerator::generateFields($customerLoginFormFields); ?>
-        <input class="button" type="submit" name="login" value="Log in">
-    </div>
-</form>
+    <center><h2> Log in </h2></center>
+    <form method="POST" class="login-form">
+        <div class="container">
+            <?= FormGenerator::generateFields($customerLoginFormFields, $errors); ?>
+            <input class="button" type="submit" name="login" value="Log in">
+        </div>
+    </form>
 </body>
 </html>
-    
+
+
+
 
 

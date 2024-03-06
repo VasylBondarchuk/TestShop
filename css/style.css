@@ -295,9 +295,74 @@ select:focus {
 }
 
 .error {
-        color: #FF0000;
-    }
+    color: #FF0000;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.input-group label {
+    margin-bottom: 5px;
+}
 
 
+message.error-box {
+    background-color: #f44336; /* Red background */
+    color: white; /* White text */
+    padding: 10px; /* Padding around the content */
+    border-radius: 5px; /* Rounded corners */
+    margin-bottom: 10px; /* Spacing between boxes */
+}
 
+
+message.warning-box {
+    background-color: #ff9800; /* Orange background */
+    color: white; /* White text */
+    padding: 10px; /* Padding around the content */
+    border-radius: 5px; /* Rounded corners */
+    margin-bottom: 10px; /* Spacing between boxes */
+}
+
+
+message.info-box {
+    background-color: #2196F3; /* Blue background */
+    color: white; /* White text */
+    padding: 10px; /* Padding around the content */
+    border-radius: 5px; /* Rounded corners */
+    margin-bottom: 10px; /* Spacing between boxes */
+}
+
+/* Pagination styles */
+.pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pagination a,
+.pagination span {
+    display: inline-block;
+    padding: 8px 16px;
+    margin: 0 4px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    color: #333;
+    text-decoration: none;
+}
+
+.pagination a:hover {
+    background-color: #f0f0f0;
+}
+
+.pagination span {
+    background-color: #ddd;
+    font-weight: bold;
+}
+
+.pagination .disabled {
+    pointer-events: none;
+    color: #999;
+}
 

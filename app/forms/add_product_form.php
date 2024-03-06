@@ -1,6 +1,6 @@
 <?php
 if ($_SERVER["REQUEST_METHOD"] == "POST") {    
-    $uploadDir = PRODUCT_IMAGE_UPLOAD_DIR;    
+    $uploadDir = PRODUCT_IMAGE_UPLOAD_DIR;      
     if (!file_exists($uploadDir)) {
         mkdir($uploadDir, 0777, true);
     }   

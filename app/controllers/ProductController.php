@@ -61,14 +61,14 @@ class ProductController extends Controller {
         $this->setTitle("Додавання товару");
         $model = $this->getModel('Customer');        
         if ($model->isLogedIn()) {
-            $customer = $model->getCustomerById($model->getLoggedInCustomerId());            
-            if ($customer->getAdminRole() == 1) {
+            $customer = $model->getCustomerById($model->getLoggedInCustomerId());                       
+            if ($customer->isAdmin()) {                
                 $product = $this->getModel('Product');
-                if (isset($_POST['Add'])) {
-                    $enteredSku = Helper::getPostValue('sku');
-                    if ($product->isValueUnique($enteredSku, self::SKU)) {
+                if (isset($_POST['Add'])) {                                     
+                    if ($product->isValueUnique(Helper::getPostValue('sku'),'sku')) {
                         $product->addProduct();
-                        $productId = $product->getLastId(); // Get the last inserted product ID
+                        $productId = $product->getLastId();
+                        $product->assignProductToCategories($productId, Helper::getPostValue('category_id'));                        
                         Helper::redirect("/product/edit?product_id=$productId");
                     }
                 }

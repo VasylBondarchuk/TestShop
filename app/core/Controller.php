@@ -4,45 +4,53 @@
  * Class Controller
  */
 class Controller {
-
-    // Заголовок сторінки
+    
     protected $title = null;
-    // Назва вигляду
-    protected $view = null;
-    // Масив для виводу данних у вигляди (views)
 
-    protected $registry = [];
-    // Ім'я моделі, що буде використовуватися
-    protected $modelName = '';
+    protected $view = null;    
 
-    // Метод отримання назви моделі
+    protected array $registry = [];
+    
+    protected string $modelName = '';
+    
+    protected array $messages = [];
+
+    
     public function getModelName() {
         return $this->modelName;
     }
-
-    // Метод встановлення назви моделі
+    
     public function setModelName($modelName) {
         $this->modelName = $modelName;
     }
-
-    // Метод отримання назви сторінки
+    
     public function getTitle(): string {
         return $this->title;
     }
-
-    // Метод встановлення назви вигляду
+    
     public function setView($view = null) {
         if ($view === null) {
             $view = Route::getAction();
         }
         $this->view = $view;
     }
-
-    // Метод отримання назви вигляду
+    
     public function getView() {
         return $this->view === null ? '404' : $this->view;
     }
-
+    
+    public function getMessages() : array {
+        return $this->messages;
+    }
+    
+    public function setMessages() {
+        $this->messages[] = Helper::getPostValue('error');
+    }
+    
+    public function retrieveMessages() : ?string{
+        return Helper::getPostValue('error');
+        
+    }
     public function renderPartialview($view_name) {
         $view_path = ROOT . '/app/layouts/' . $view_name . '.php';
         if (file_exists($view_path)) {
@@ -50,7 +58,7 @@ class Controller {
         }
     }
 
-    // Метод відображення вигляду
+    
     public function renderView() {
         $controller = $this->getView() === "404" ? 'error' : Route::getController();
         $view_path = ROOT . '/app/views/' . strtolower($controller) . '/' . strtolower($this->getView()) . '.php';
@@ -115,14 +123,15 @@ class Controller {
     $this->setModelName(get_class($model));
     
     return $model;
-}
     
-    // Повертає назву id-колонки
+    }
+    
+    
     public function getIdColumnName(string $name) {
         return $this->getModel($name)->getIdColumn();
     }
 
-    public function addToCart(Product $product): void {            
+    public function addToCart(Product $product): void {        
         $cartManger = $this->getModel('CartManager');
         $cartItem = $this->getModel(
                 'CartItem',
@@ -130,7 +139,7 @@ class Controller {
                 $product->getSku(),
                 $product->getName(),
                 $product->getPrice(),
-                Helper::getPostValue('qty'),
+                (int)Helper::getPostValue('qty'),
                 $product->getProductImage()
         );
         $cartManger->addItem($cartItem);

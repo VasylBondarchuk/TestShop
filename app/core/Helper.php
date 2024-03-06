@@ -2,7 +2,7 @@
 
 class Helper {
 
-    public static function urlBuilder($url, $linkText, $params = []): string {
+    public static function urlBuilder($url, $content, $params = []): string {
         // Ensure $url starts with a slash
         $url = '/' . ltrim($url, '/');
 
@@ -12,8 +12,8 @@ class Helper {
             $url .= '?' . $query;
         }
 
-        // Construct the anchor tag
-        return '<a href="' . route::getBP() . $url . '">' . htmlspecialchars($linkText) . '</a>';
+        // Construct the anchor tag with the provided content
+        return '<a href="' . route::getBP() . $url . '">' . $content . '</a>';
     }
 
     public static function redirect(string $path): void {
@@ -59,14 +59,21 @@ class Helper {
     }
 
     /**
-     * Get and sanitize a value from $_POST.
+     * Get and sanitize a value from $_POST, handling both string and array values.
      *
      * @param string $field The field name.
      * @return mixed The sanitized value from $_POST or null if not found.
      */
     public static function getPostValue(string $field) {
-        $rawValue = filter_input(INPUT_POST, $field, FILTER_SANITIZE_SPECIAL_CHARS);
-        return self::sanitizeInput($rawValue);
+        $rawValue = filter_input(INPUT_POST, $field, FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
+        if (is_array($rawValue)) {
+            // Sanitize each element of the array
+            return array_map('self::sanitizeInput', $rawValue);
+        } else {
+            $rawValue = filter_input(INPUT_POST, $field, FILTER_DEFAULT);
+            // If not an array, sanitize the single value
+            return self::sanitizeInput($rawValue);
+        }
     }
 
     public static function isEmpty(string $fieldName): bool {
@@ -111,7 +118,7 @@ class Helper {
             default:
                 echo "";
         }
-    }    
+    }
 
     public static function validateInput($input, $value) {
         switch ($input) {
@@ -161,7 +168,6 @@ class Helper {
     // Method to handle file uploads
     public static function handleFileUpload(): array {
         $filteredData = [];
-
         if (isset($_FILES['product_image'])) {
             $fileName = $_FILES['product_image']['name'];
             // Sanitize the file name
@@ -185,7 +191,6 @@ class Helper {
         }
         // Handle file uploads separately
         $filteredData += self::handleFileUpload();
-
         return $filteredData;
     }
 
