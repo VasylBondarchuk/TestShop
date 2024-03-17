@@ -1,32 +1,45 @@
 <?php
-
+use app\core\Route;
 /**
  * Bootstrap file responsible for initializing the application.
  */
+// Include the Route class
+include_once ROOT . '/app/core/Route.php';
+
 // Include the configuration file
 include_once ROOT . DS . 'app' . DS . 'etc' . DS . 'config.php';
 
-// Register an autoloader for classes in the core directory
+function capitalizeLastPathComponent($filePath) {
+    $parts = explode('/', $filePath);
+    $lastPart = end($parts);
+    $capitalizedLastPart = ucfirst($lastPart);
+    array_pop($parts);
+    array_push($parts, $capitalizedLastPart);
+    return implode('/', $parts);
+}
+
+// Register the autoloader for classes
 spl_autoload_register(function ($className) {
-    // Construct the file path for the core class
-    $coreFilePath = ROOT . DS . 'app' . DS . 'core' . DS . ucfirst($className) . '.php';
+    // Convert namespace separators to directory separators
+    $classPath = str_replace('\\', DIRECTORY_SEPARATOR, $className);    
+    // Define the base directory for classes
+    $baseDir = ROOT . DIRECTORY_SEPARATOR;    
 
-    // Check if the core class file exists
-    if (file_exists($coreFilePath)) {
-        // Include the core class file
-        include_once $coreFilePath;
-    }
-});
-
-// Register an autoloader for classes in the models directory
-spl_autoload_register(function ($class_name) {
-    // Construct the file path for the models class
-    $modelsFilePath = ROOT . DS . 'app' . DS . 'models' . DS . ucfirst($class_name) . '.php';
-
-    // Check if the class has not been defined and the models class file exists
-    if (!class_exists($class_name) && file_exists($modelsFilePath)) {
-        // Include the models class file
-        include_once $modelsFilePath;
+    // Check if the class file exists and include it
+    if (strpos($classPath, 'app\core\\') === 0) {
+        // Core class
+        $filePath = $baseDir . 'core' . DIRECTORY_SEPARATOR . substr($classPath, strlen('app\core\\')) . '.php';        
+    } elseif (strpos($classPath, 'app\modules\\') === 0) {
+        // Module class
+        $filePath = $baseDir . 'modules' . DIRECTORY_SEPARATOR . substr($classPath, strlen('app\modules\\')) . '.php';        
+    } else {
+        // Other classes
+        $filePath = $baseDir . $classPath . '.php';
+        // Adjust path if necessary
+    }      
+    
+    if (file_exists($filePath)) {
+        include_once $filePath;
     }
 });
 

@@ -1,7 +1,9 @@
 <?php
+namespace app\core;
 
 // Enable error reporting
 error_reporting(E_ALL);
+
 // Display errors on the screen
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -9,7 +11,7 @@ ini_set('display_startup_errors', 1);
 /**
  * Class Model
  */
-abstract class Model {
+class Model {
 
     // ім'я таблиці БД
     protected string $table_name;
@@ -31,15 +33,7 @@ abstract class Model {
             echo "Error: " . $e->getMessage();
         }
         return $idColumn;
-    }
-
-    /**
-     * Retrieve a collection of objects.
-     * This method must be implemented by child classes.
-     * 
-     * @return array Collection of objects.
-     */
-    abstract public function getCollection(): array;
+    }    
 
     public function addItem(array $columns, array $data) {
         $db = new DB();

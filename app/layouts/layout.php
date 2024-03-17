@@ -5,7 +5,7 @@
     <title><?= $this->getTitle(); ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="<?= route::getBP(); ?>/css/style.css">
+    <link rel="stylesheet" type="text/css" href="<?= app\core\Route::getBP(); ?>/css/style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 </head>
@@ -29,14 +29,12 @@
 
     <div id="header">
         <?php $this->renderPartialview('menu'); ?>
-    </div>
+    </div>   
+   
     
-    <div id="message">
-        <?php $this->renderMessageView(); ?>
-    </div>
-    
-    <div class="container">        
-        <?php $this->renderView(); ?>
+    <div class="container">
+        <!-- Insert the view content here -->
+            <?= $viewContent ?>
     </div>
 
     <hr style="margin:50px 5px;background-color: black;height: 1px;">

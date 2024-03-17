@@ -1,4 +1,7 @@
 <?php
+namespace app\core;
+
+use app\core\Route;
 
 class Helper {
 
@@ -13,7 +16,7 @@ class Helper {
         }
 
         // Construct the anchor tag with the provided content
-        return '<a href="' . route::getBP() . $url . '">' . $content . '</a>';
+        return '<a href="' . Route::getBP() . $url . '">' . $content . '</a>';
     }
 
     public static function redirect(string $path): void {
@@ -24,7 +27,7 @@ class Helper {
 
         // Construct full URL
         $server_host = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'];
-        $url = $server_host . route::getBP() . $path;
+        $url = $server_host . Route::getBP() . $path;
 
         // Perform redirect
         header("Location: $url");

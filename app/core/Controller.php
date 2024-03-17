@@ -1,4 +1,7 @@
 <?php
+namespace app\core;
+
+
 
 /**
  * Class Controller
@@ -56,31 +59,48 @@ class Controller {
         if (file_exists($view_path)) {
             include $view_path;
         }
-    }
+    } 
 
-    
-    public function renderView() {
-        $controller = $this->getView() === "404" ? 'error' : Route::getController();
-        $view_path = ROOT . '/app/views/' . strtolower($controller) . '/' . strtolower($this->getView()) . '.php';
-        if (file_exists($view_path)) {
-            include $view_path;
-        }
-    }
-    
-    // Метод відображення вигляду
-    public function renderMessageView() {        
-        $view_path = ROOT . '/app/views/message/message.php';
-        if (file_exists($view_path)) {
-            include $view_path;
-        }
-    }
+public function renderLayout($layout = 'layout', $viewContent = null) {
+    // Construct the layout file path
+    $layoutFilePath = ROOT . '/app/layouts/' . $layout . '.php';    
+    // Check if the layout file exists
+    if (file_exists($layoutFilePath)) {       
+        
+        // Start output buffering
+        ob_start();
 
-    // Метод відображення шаблону
-    public function renderLayout($layout = "layout") {
-        if (file_exists(ROOT . '/app/layouts/' . $layout . '.php')) {
-            include ROOT . '/app/layouts/' . $layout . '.php';
-        }
+        // Include the layout file
+        include $layoutFilePath;
+
+        // Get the layout content and clear the buffer
+        $layoutContent = ob_get_clean();
+
+        // Replace the placeholder with the view content
+        echo str_replace('{{ content }}', $viewContent, $layoutContent);
+    } else {
+        echo "Layout file does not exist!";
     }
+}
+
+protected function renderView($viewName, $params = []): string {
+    ob_start(); // Start output buffering to capture the view content
+    $viewModel = isset($params['viewModel']) ? $params['viewModel'] : null; // Extract the ViewModel if provided
+    $viewFile = ROOT . '/app/modules/product/view/front/' . $viewName . '.php';
+    if (file_exists($viewFile)) {
+        if ($viewModel !== null) {
+            // Extract the ViewModel object to make it available in the view
+            $viewModelVarName = 'viewModel';
+            $$viewModelVarName = $viewModel; // Variable variable to dynamically set the variable name
+        }
+        extract($params); // Extract other parameters to make them available in the view
+        include $viewFile;
+    } else {
+        echo 'View file not found: ' . $viewName;
+    }
+    return ob_get_clean(); // Return the captured view content and clear the buffer
+}
+
 
     /**
      * Retrieves the base URL of the home page.
@@ -124,13 +144,12 @@ class Controller {
     
     return $model;
     
-    }
-    
+    }    
     
     public function getIdColumnName(string $name) {
         return $this->getModel($name)->getIdColumn();
     }
-
+    
     public function addToCart(Product $product): void {        
         $cartManger = $this->getModel('CartManager');
         $cartItem = $this->getModel(
@@ -143,5 +162,9 @@ class Controller {
                 $product->getProductImage()
         );
         $cartManger->addItem($cartItem);
+    }
+    
+    public function action(){
+        echo "Core Controller";
     }
 }

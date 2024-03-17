@@ -1,10 +1,5 @@
 <?php
 
-/* error_reporting(E_ALL);
-  // Display errors on the screen
-  ini_set('display_errors', 1);
-  ini_set('display_startup_errors', 1); */
-
 class ProductController extends Controller {
 
     public function IndexAction() {

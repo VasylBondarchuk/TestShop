@@ -1,5 +1,7 @@
 <?php
+namespace app\models;
 
+use app\core\Route;
 /**
  * Class CartViewer
  */
@@ -44,6 +46,6 @@ class CartViewer {
 
     // Get cart path
     public function getPath(): string {
-        return route::getBP() . self::CART_PATH;
+        return Route::getBP() . self::CART_PATH;
     }    
 }

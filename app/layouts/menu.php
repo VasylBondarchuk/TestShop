@@ -3,7 +3,7 @@
         <ul class="nav navbar-nav">
             <?php
             
-            $customerModel = $this->getModel('Customer');            
+            $customerModel = $this->getModel('app\models\Customer');            
             $logedIn = $customerModel->isLogedIn();                      
             $customer = $logedIn ? $customerModel->getCustomerById($customerModel->getLoggedInCustomerId()) : null;
             $registrationOrCustomerFullName= $logedIn
@@ -22,14 +22,14 @@
             
             $registrationLink = $logedIn ? '<a/>' : '<a href=' . $customerModel->getRegisterPath() .'>';
 
-            $cartViewer = $this->getModel('CartViewer');            
-            $cartManager = $this->getModel('CartManager');            
+            $cartViewer = $this->getModel('app\models\CartViewer');            
+            $cartManager = $this->getModel('app\models\CartManager');            
             $cartLink = '<a href='. $cartViewer->getPath() .'>';                
             $cartItemsTotalQty = ' (' . $cartManager->getTotalQty() . ')';            
             
-            foreach($this->getModel('Menu')->getCollection() as $menuItem):?>
+            foreach($this->getModel('app\models\Menu')->getCollection() as $menuItem):?>
                 <li>
-                    <?= Helper::urlBuilder($menuItem->getPath(), $menuItem->getName()); ?>
+                    <?= app\core\Helper::urlBuilder($menuItem->getPath(), $menuItem->getName()); ?>
                 </li>
             <?php endforeach; ?>
         </ul>

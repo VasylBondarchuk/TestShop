@@ -1,5 +1,8 @@
 <?php
+namespace app\models;
 
+use app\core\Model;
+use app\core\Route;
 /**
  * Class Customer
  */
@@ -160,15 +163,15 @@ class Customer extends Model {
     }
 
     public function getLoginPath(): string {
-        return route::getBP() . self::LOGIN_PATH;
+        return Route::getBP() . self::LOGIN_PATH;
     }
 
     public function getLogoutPath(): string {
-        return route::getBP() . self::LOGOUT_PATH;
+        return Route::getBP() . self::LOGOUT_PATH;
     }
 
     public function getRegisterPath(): string {
-        return route::getBP() . self::REGISTER_PATH;
+        return Route::getBP() . self::REGISTER_PATH;
     }
 
     public function getCustomerFullName(): string {

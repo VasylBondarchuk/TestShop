@@ -6,7 +6,7 @@ class FormGenerator {
      * Generate a form field.
      *
      * @param array $fieldDetails An array containing details of the field.
-     *                            Each element should have keys: label, name, value, error, and optional required.
+     * Each element should have keys: label, name, value, error, and optional required.
      * @return string The HTML markup for the field.
      */
     public static function generateField(array $fieldDetails): string {

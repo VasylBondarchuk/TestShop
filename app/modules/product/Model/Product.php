@@ -1,5 +1,7 @@
 <?php
+namespace app\modules\product\Model;
 
+use app\core\Model;
 /**
  * Class Product
  */
@@ -80,31 +82,7 @@ class Product extends Model {
 
     public function getProductImage(): string {
         return $this->productImage;
-    }    
-
-    /**
-     * Retrieve a collection of products.
-     * 
-     * @return array Collection of Product objects.
-     */
-    public function getCollection(): array {
-        $db = new DB();
-        $productsData = $db->query("SELECT * FROM $this->table_name");
-
-        $products = [];
-        foreach ($productsData as $productData) {
-            $product = new Product();
-            $product->setProductId($productData[self::PRODUCT_ID]);
-            $product->setSku($productData[self::SKU]);
-            $product->setName($productData[self::NAME]);
-            $product->setPrice($productData[self::PRICE]);
-            $product->setQty($productData[self::QTY]);
-            $product->setDescription($productData[self::DESCRIPTION]);
-            $product->setProductImage($productData[self::PRODUCT_IMAGE]);
-            $products[] = $product;
-        }
-        return $products;
-    }
+    } 
 
     /**
      * Retrieve a collection of products assigned to a certain category.

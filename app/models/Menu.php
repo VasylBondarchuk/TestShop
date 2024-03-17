@@ -1,4 +1,8 @@
 <?php
+namespace app\models;
+
+use app\core\Model;
+use app\core\DB;
 
 class Menu extends Model
 {
