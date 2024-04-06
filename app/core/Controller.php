@@ -1,8 +1,6 @@
 <?php
 namespace app\core;
 
-
-
 /**
  * Class Controller
  */
@@ -83,10 +81,10 @@ public function renderLayout($layout = 'layout', $viewContent = null) {
     }
 }
 
-protected function renderView($viewName, $params = []): string {
+protected function renderView(string $moduleName, string $viewName, array $params = []): string {
     ob_start(); // Start output buffering to capture the view content
-    $viewModel = isset($params['viewModel']) ? $params['viewModel'] : null; // Extract the ViewModel if provided
-    $viewFile = ROOT . '/app/modules/product/view/front/' . $viewName . '.php';
+    $viewModel = $params['viewModel'] ?? null; // Extract the ViewModel if provided
+    $viewFile = ROOT . "/app/modules/$moduleName/view/front/$viewName.php";
     if (file_exists($viewFile)) {
         if ($viewModel !== null) {
             // Extract the ViewModel object to make it available in the view
@@ -148,23 +146,15 @@ protected function renderView($viewName, $params = []): string {
     
     public function getIdColumnName(string $name) {
         return $this->getModel($name)->getIdColumn();
-    }
-    
-    public function addToCart(Product $product): void {        
-        $cartManger = $this->getModel('CartManager');
-        $cartItem = $this->getModel(
-                'CartItem',
-                $product->getProductId(),
-                $product->getSku(),
-                $product->getName(),
-                $product->getPrice(),
-                (int)Helper::getPostValue('qty'),
-                $product->getProductImage()
-        );
-        $cartManger->addItem($cartItem);
-    }
+    }   
+
     
     public function action(){
-        echo "Core Controller";
+        $this->indexAction();
     }
+    
+    private function indexAction(){
+         Helper::redirect('/category/index');
+    }   
+    
 }

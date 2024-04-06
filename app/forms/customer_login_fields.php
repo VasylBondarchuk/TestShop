@@ -1,4 +1,7 @@
 <?php
+namespace app\forms;
+
+use app\core\Helper;
 
 $emailFieldDetails = [
     'required' => false,

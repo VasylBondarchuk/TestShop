@@ -2,10 +2,13 @@
     <div class="container-fluid">
         <ul class="nav navbar-nav">
             <?php
+            use app\modules\customer\Factory\CustomerRepositoryFactory;
+            use app\modules\customer\Model\Customer;
             
-            $customerModel = $this->getModel('app\models\Customer');            
+            $customerRepository = CustomerRepositoryFactory::create();
+            $customerModel = new Customer();
             $logedIn = $customerModel->isLogedIn();                      
-            $customer = $logedIn ? $customerModel->getCustomerById($customerModel->getLoggedInCustomerId()) : null;
+            $customer = $logedIn ? $customerRepository->getById($customerModel->getLoggedInCustomerId()) : null;
             $registrationOrCustomerFullName= $logedIn
                     ? $customer->getCustomerFullName()
                     : 'Registration';
@@ -22,10 +25,10 @@
             
             $registrationLink = $logedIn ? '<a/>' : '<a href=' . $customerModel->getRegisterPath() .'>';
 
-            $cartViewer = $this->getModel('app\models\CartViewer');            
-            $cartManager = $this->getModel('app\models\CartManager');            
+            $cartViewer = $this->getModel('app\modules\cart\Model\CartViewer');            
+            $cart = $this->getModel('app\modules\cart\Model\CartResourceModel');            
             $cartLink = '<a href='. $cartViewer->getPath() .'>';                
-            $cartItemsTotalQty = ' (' . $cartManager->getTotalQty() . ')';            
+            $cartItemsTotalQty = ' (' . $cart->getTotalQty() . ')';            
             
             foreach($this->getModel('app\models\Menu')->getCollection() as $menuItem):?>
                 <li>

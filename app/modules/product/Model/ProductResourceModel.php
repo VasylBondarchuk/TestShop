@@ -3,13 +3,15 @@ namespace app\modules\product\Model;
 
 use app\core\ResourceModel;
 use app\modules\product\Model\Product;
+use app\core\DataMapper;
 
 class ProductResourceModel extends ResourceModel
-{
+{    
+    
     public function __construct()
-    {
+    {        
         // Specify the table name for the Product model
-        parent::__construct('product');
+        parent::__construct(Product::TABLE_NAME, Product::PRODUCT_ID);
     }
 
     public function getProductCollection() : array
@@ -19,16 +21,25 @@ class ProductResourceModel extends ResourceModel
         
         $products = [];
         foreach ($productsData as $productData) {
-            $product = new Product();
-            $product->setProductId($productData[Product::PRODUCT_ID]);
-            $product->setSku($productData[Product::SKU]);
-            $product->setName($productData[Product::NAME]);
-            $product->setPrice($productData[Product::PRICE]);
-            $product->setQty($productData[Product::QTY]);
-            $product->setDescription($productData[Product::DESCRIPTION]);
-            $product->setProductImage($productData[Product::PRODUCT_IMAGE]);
+            $product = $this->mapProductDataToModel($productData);
             $products[] = $product;
         }
         return $products;
+    } 
+    
+    public function fetchProductById(int $productId): ?Product
+    {
+        $productData = $this->fetchById($productId);
+        if (!$productData) {
+            return null;
+        }        
+        return $this->mapProductDataToModel($productData);
+    }
+
+    private function mapProductDataToModel(array $productData): Product
+    {        
+        $product = new Product();
+        DataMapper::mapDataToObject($productData, $product);           
+        return $product;
     }
 }

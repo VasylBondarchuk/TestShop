@@ -1,4 +1,5 @@
 <?php
+use app\core\Helper;
 
 $firstNameFieldDetails = [
     'required' => false,

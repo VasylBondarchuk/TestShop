@@ -1,8 +1,11 @@
 <?php
-namespace app\models;
+namespace app\modules\customer\Model;
 
 use app\core\Model;
+use app\core\DB;
 use app\core\Route;
+use app\core\FormValidator;
+use app\modules\customer\Factory\CustomerRepositoryFactory;
 /**
  * Class Customer
  */
@@ -12,6 +15,16 @@ class Customer extends Model {
     const LOGOUT_PATH = '/customer/logout';
     const REGISTER_PATH = '/customer/register';
     const ADMIN_ROLE_ID = 1;
+    
+    const TABLE_NAME = 'customer';
+    const CUSTOMER_ID = 'customer_id';
+    const FIRST_NAME = 'first_name';
+    const LAST_NAME = 'last_name';
+    const TELEPHONE = 'telephone';
+    const EMAIL = 'email';
+    const CITY = 'city';
+    const PASSWORD = 'password';
+    const ADMIN_ROLE = 'admin_role';
 
     private int $customerId;
     private string $lastName;
@@ -23,8 +36,8 @@ class Customer extends Model {
     private int $adminRole = 0; // Initialize adminRole with a default value
 
     function __construct() {
-        $this->table_name = "customer";
-        $this->id_column = "customer_id";
+        $this->table_name = self::TABLE_NAME;
+        $this->id_column = self::CUSTOMER_ID;
     }
 
     // Getters and Setters
@@ -185,86 +198,22 @@ class Customer extends Model {
         } else {
             return false;
         }
-    }
-
-    /**
-     * Retrieve a customer object by email.
-     *
-     * @param string $email The email of the customer to retrieve.
-     * @return Customer|null The customer object if found, or null if not found.
-     */
-    public function getCustomerByEmail(string $email): ?Customer {
-        // Sanitize the email input
-        $email = filter_var($email, FILTER_VALIDATE_EMAIL);
-        if (!$email) {
-            return null; // Invalid email format
-        }
-
-        // Perform a database query to retrieve the customer by email
-        $db = new DB();
-        $sql = "SELECT * FROM $this->table_name WHERE email = :email LIMIT 1";
-        $parameters = [':email' => $email];
-        $customerData = $db->query($sql, $parameters);
-
-        // If customer data is found, create a Customer object and return it
-        if (!empty($customerData)) {
-            $customerRow = array_shift($customerData);
-            $customer = new Customer();
-            $customer->setCustomerId($customerRow['customer_id']);
-            $customer->setLastName($customerRow['last_name']);
-            $customer->setFirstName($customerRow['first_name']);
-            $customer->setTelephone($customerRow['telephone']);
-            $customer->setEmail($customerRow['email']);
-            $customer->setPassword($customerRow['password']);
-            $customer->setCity($customerRow['city']);
-            $customer->setAdminRole($customerRow['admin_role']);
-
-            return $customer;
-        } else {
-            return null; // Customer not found
-        }
-    }
-
-    /**
-     * Retrieve a customer object by ID.
-     *
-     * @param int $customerId The ID of the customer to retrieve.
-     * @return Customer|null The customer object if found, or null if not found.
-     */
-    public function getCustomerById(int $customerId): ?Customer {
-        // Perform a database query to retrieve the customer by ID
-        $db = new DB();
-        $sql = "SELECT * FROM $this->table_name WHERE customer_id = :customer_id LIMIT 1";
-        $parameters = [':customer_id' => $customerId];
-        $customerData = $db->query($sql, $parameters);
-
-        // If customer data is found, create a Customer object and return it
-        if (!empty($customerData)) {
-            $customerRow = array_shift($customerData);
-            $customer = new Customer();
-            $customer->setCustomerId($customerRow['customer_id']);
-            $customer->setLastName($customerRow['last_name']);
-            $customer->setFirstName($customerRow['first_name']);
-            $customer->setTelephone($customerRow['telephone']);
-            $customer->setEmail($customerRow['email']);
-            $customer->setPassword($customerRow['password']);
-            $customer->setCity($customerRow['city']);
-            $customer->setAdminRole($customerRow['admin_role']);
-
-            return $customer;
-        } else {
-            return null; // Customer not found
-        }
-    }
+    }    
 
     public function loginCustomer() {
         $_SESSION['customer_id'] = $this->getCustomerId(); // Assuming you have the ID of the newly registered customer
         $_SESSION['first_name'] = $this->getFirstName();
         $_SESSION['last_name'] = $this->getFirstName();
     }
+    
+    public function loginRegisteredCustomer(){
+        $customerRepository = CustomerRepositoryFactory::create(); 
+        $customer = $customerRepository->getById($this->getLastId());
+        $customer->loginCustomer();
+    }
 
     public function isEmailUnique(string $email): bool {
-        $customer = $this->getCustomerByEmail($email);
+        $customer = CustomerRepositoryFactory::create()->getByEmail($email);
         return $customer == null;
     }
 
@@ -275,7 +224,7 @@ class Customer extends Model {
      * @return bool True if the email belongs to a registered customer, false otherwise.
      */
     public function verifyCustomerEmail(string $email): bool {
-        $customer = $this->getCustomerByEmail($email);
+        $customer = CustomerRepositoryFactory::create()->getByEmail($email);
         return $customer !== null;
     }
 
@@ -287,7 +236,7 @@ class Customer extends Model {
      * @return bool True if the password matches, false otherwise.
      */
     public function verifyCustomerPassword(string $email, string $password): bool {
-        $customer = $this->getCustomerByEmail($email);
+        $customer = CustomerRepositoryFactory::create()->getByEmail($email);
         if ($customer !== null) {
             return password_verify($password, $customer->getPassword());
         }
@@ -368,7 +317,9 @@ class Customer extends Model {
         }
 
         // Retrieve customer verification errors
-        $verificationErrors = $this->getRegistrationCustomerVerificationErrors($formData['email']);
+        $verificationErrors = isset($formData['email'])
+                ? $this->getRegistrationCustomerVerificationErrors($formData['email'])
+                : [];
         if (!empty($verificationErrors)) {
             $errors['email'] = $verificationErrors;
         }

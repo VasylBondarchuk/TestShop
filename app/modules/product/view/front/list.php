@@ -97,9 +97,9 @@ foreach ($subset as $item) {
 <div class="pagination">
     <?php if ($currentPage > 1): ?>
         <!-- Button for the first page -->
-        <a href="?page=1">&laquo; First</a>
+        <a href="?page=1">First</a>
         <!-- Button for the previous page -->
-        <a href="?page=<?= $currentPage - 1 ?>">&lsaquo; Previous</a>
+        <a href="?page=<?= $currentPage - 1 ?>">Previous</a>
     <?php endif; ?>
 
     <!-- Display page numbers -->
@@ -116,9 +116,9 @@ foreach ($subset as $item) {
 
     <?php if ($currentPage < $totalPages): ?>
         <!-- Button for the next page -->
-        <a href="?page=<?= $currentPage + 1 ?>">Next &rsaquo;</a>
+        <a href="?page=<?= $currentPage + 1 ?>">Next</a>
         <!-- Button for the last page -->
-        <a href="?page=<?= $totalPages ?>">Last &raquo;</a>
+        <a href="?page=<?= $totalPages ?>">Last</a>
     <?php endif; ?>
 </div>
 

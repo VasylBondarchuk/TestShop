@@ -12,28 +12,7 @@ ini_set('display_startup_errors', 1);
  * Class Model
  */
 class Model {
-
-    // ім'я таблиці БД
-    protected string $table_name;
-    // назва id-колонки таблиці
-    protected string $id_column;
-    // масив імен колонок таблиці БД
-    protected array $columns = [];
     
-    protected array $collection;
-    // рядок sql-запита
-    protected $sql;
-    protected $params = [];
-
-    // Метод отримання назва id-колонки таблиці
-    public function getIdColumn() {
-        try {
-            $idColumn = $this->id_column;
-        } catch (PDOException $e) {
-            echo "Error: " . $e->getMessage();
-        }
-        return $idColumn;
-    }    
 
     public function addItem(array $columns, array $data) {
         $db = new DB();

@@ -1,19 +1,17 @@
 <?php
+namespace app\modules\category\Model;
 
-class Category extends Model {
+class Category  {
 
+    const TABLE_NAME = 'category';
+    const CATEGORY_ID = 'category_id';    
+    const CATEGORY_NAME = 'category_name';
+    const CATEGORY_ACTIVE = 'category_active';    
+    
     private int $categoryId;
     private string $categoryName;
     private int $categoryActive;
     private array $products = [];
-
-    /**
-     * Category constructor.
-     */
-    public function __construct() {
-        $this->table_name = "category";
-        $this->id_column = "category_id";
-    }
 
     /**
      * Retrieve a collection of categories.
@@ -132,7 +130,6 @@ class Category extends Model {
     // Масив категорій
     public function getCategories(): array {        
         return array_combine($this->getCategoriesIds(), $this->getCategoriesNames());
-    }    
-
+    } 
     // Implement setters and getters for other properties similarly
 }

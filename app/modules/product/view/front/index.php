@@ -3,14 +3,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product List</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
 </head>
 <body>
 <!-- Display products -->
 <?php 
-
-foreach ($viewModel->getProductsCollection() as $product): ?>
+foreach ($viewModel->getProductsInCategory() as $product): ?>
     <!-- Product HTML -->
     <div class="product">
         <!-- Product details -->
@@ -50,7 +48,12 @@ foreach ($viewModel->getProductsCollection() as $product): ?>
                         <input type="number" name="qty" min="1" max="<?= $product->getQty() ?>" value="1"/>
                         <button <?= $product->getQty() == 0 ? 'disabled' : '' ?> class="w3-button w3-black">Buy</button>
                         <input type="hidden" name="<?= $product->getProductId() ?>" value="<?= $product->getName() ?>"/>
-                    </form>                    
+                    </form>
+                    <?php
+                    if (isset($_POST[$product->getProductId()])) {
+                        $product->addToCart($product);
+                    }                    
+                    ?>                    
                 </td>
             </tr>
         </table>

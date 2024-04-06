@@ -1,4 +1,9 @@
 <?php
+
+namespace app\views\customer;
+
+use app\core\FormGenerator;
+
 $errors = []; // Initialize $errors variable
 // Check if the login form is submitted
 if (isset($_POST['login'])) {    

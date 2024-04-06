@@ -1,15 +1,15 @@
 <?php
 // Include necessary files
-$cartManager = $this->getModel('CartManager');
-$cartViewer = $this->getModel('CartViewer');
+$cartResourceModel = $viewModel->getResourceModel();
+$cartViewer = $viewModel->getCartViewer();
 
 // Handle form submissions
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (isset($_POST['empty'])) {
-        $cartManager->emptyCart();
+        $cartResourceModel->emptyCart();
     } elseif (isset($_POST['delete_item']) && is_numeric($_POST['delete_item'])) {
         $cartItemIndex = $_POST['delete_item'];
-        $cartManager->deleteItem($cartItemIndex);
+        $cartResourceModel->deleteItem($cartItemIndex);
     }
 }
 ?>
@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </head>
     <body>
         <div class="container">
-            <?php if ($cartManager->isEmpty()): ?>
+            <?php if ($cartResourceModel->isEmpty()): ?>
                 <p><?= $cartViewer->getTitle() . ' is empty'; ?></p>
             <?php else: ?>
                 <form method="POST" class="cart-form">
@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($cartManager->getItems() as $cartItemIndex => $cartItem): ?>
+                        <?php foreach ($cartResourceModel->getItems() as $cartItemIndex => $cartItem): ?>
                             <tr>                        
                                 <td width="20%"><img src="<?= PRODUCT_IMAGE_PATH . $cartItem->getProductImage() ?>"
                                                      alt="<?= $cartItem->getName(); ?>" class="product-image"></td>

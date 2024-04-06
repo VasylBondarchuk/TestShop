@@ -1,4 +1,5 @@
 <?php
+namespace app\core;
 
 class Pagination {
     private $totalItems;
@@ -51,5 +52,4 @@ class Pagination {
         return 1;
     }
 }
-?>
 

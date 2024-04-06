@@ -1,12 +1,13 @@
-<table>	
-    
-    <?php
-    // Категорії
-    $categories = $this->getModel('Category')->getCollection();       
+<table>	    
+    <?php    
+    $categories = $viewModel->getCategoryCollection();       
         foreach ($categories as $category) : ?>	
         <th>
         <center>
-    <?=Helper::urlBuilder('/category/show', $category->getCategoryName(), array('category_id' => $category->getCategoryId())); ?>
+    <?=app\core\Helper::urlBuilder(
+            '/product/index',
+            $category->getCategoryName(),
+            array('category_id' => $category->getCategoryId())); ?>
         </center>
     </th> 
     <?php endforeach; ?>    

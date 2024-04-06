@@ -1,19 +1,24 @@
 <?php
+
 namespace app\modules\product\Model;
 
-use app\core\Model;
+use app\core\DB;
+use app\core\Helper;
+use app\modules\cart\Model\CartResourceModel;
+use app\modules\cart\Model\CartItem;
 /**
  * Class Product
  */
-class Product extends Model {
+class Product {
 
+    const TABLE_NAME = 'product';
     const PRODUCT_ID = 'product_id';
     const SKU = 'sku';
     const NAME = 'name';
     const PRICE = 'price';
     const QTY = 'qty';
     const DESCRIPTION = 'description';
-    const PRODUCT_IMAGE = 'product_image';    
+    const PRODUCT_IMAGE = 'product_image';
 
     protected int $productId;
     protected string $sku;
@@ -22,11 +27,7 @@ class Product extends Model {
     protected int $qty;
     protected string $description;
     protected string $productImage;
-
-    function __construct() {
-        $this->table_name = 'product';
-        $this->id_column = 'product_id';
-    }
+    
 
     public function setProductId(int $productId): void {
         $this->productId = $productId;
@@ -82,7 +83,7 @@ class Product extends Model {
 
     public function getProductImage(): string {
         return $this->productImage;
-    } 
+    }
 
     /**
      * Retrieve a collection of products assigned to a certain category.
@@ -90,9 +91,7 @@ class Product extends Model {
      * @param int $categoryId The ID of the category.
      * @return array Collection of Product objects assigned to the specified category.
      */
-    public function getProductsByCategory(int $categoryId): array {
-        // Call the existing getCollection() method to fetch all products
-        $products = $this->getCollection();
+    public function getProductsByCategoryId(int $categoryId, array $products): array {        
 
         // Filter the products to retain only those assigned to the specified category
         $productsInCategory = array_filter($products, function ($product) use ($categoryId) {
@@ -100,7 +99,7 @@ class Product extends Model {
         });
 
         return $productsInCategory;
-    }    
+    }
 
     public function removeFromAllCategories(int $productId): void {
         // You need to implement the logic to remove the product from all categories here
@@ -109,12 +108,12 @@ class Product extends Model {
         $sql = "DELETE FROM product_category WHERE product_id = ?";
         $db->query($sql, [$productId]);
     }
-    
+
     public function addProduct() {
         $columnNames = $this->getColumnsNames();
-        $data = Helper::getFormData($columnNames);        
+        $data = Helper::getFormData($columnNames);
         array_shift($columnNames);
-        $this->addItem($columnNames, $data);        
+        $this->addItem($columnNames, $data);
     }
 
     // Separate method to handle file upload and update data array
@@ -173,7 +172,7 @@ class Product extends Model {
         // Check if any product other than the specified one has the same SKU
         return $result['count'] == 0;
     }
-    
+
     public function addToCategory(int $productId, int $categoryId): void {
         // You need to implement the logic to add the product to the specified category here
 
@@ -294,7 +293,7 @@ class Product extends Model {
     public function isProductInCategory(int $productId, int $categoryId): bool {
         // Validate input parameters
         if ($productId <= 0 || $categoryId <= 0) {
-            MessageManager::setError("Product ID and category ID must be positive integers.");           
+            MessageManager::setError("Product ID and category ID must be positive integers.");
             throw new InvalidArgumentException("Product ID and category ID must be positive integers.");
         }
 
@@ -354,8 +353,7 @@ class Product extends Model {
         return $this->sortCollectionByProperty($products, 'price', $order);
     }
 
-
-/**
+    /**
      * Retrieve a paginated collection of products.
      * 
      * @param int $perPage Number of products per page.
@@ -382,22 +380,34 @@ class Product extends Model {
             $product->setQty($productData[self::QTY]);
             $product->setDescription($productData[self::DESCRIPTION]);
             $product->setProductImage($productData[self::PRODUCT_IMAGE]);
-            $products[] = $product;            
+            $products[] = $product;
         }
         return $products;
     }
 
     public function getTotalProducts(): int {
-    $db = new DB();
-    $result = $db->query("SELECT COUNT(*) AS total FROM $this->table_name");
-    
-    // Check if the result is not empty
-    if (!empty($result['total'])) {
-        return (int) $result['total'];
-    } else {
-        // If no products found, return 0
-        return 0;
-    }
-}
+        $db = new DB();
+        $result = $db->query("SELECT COUNT(*) AS total FROM $this->table_name");
 
+        // Check if the result is not empty
+        if (!empty($result['total'])) {
+            return (int) $result['total'];
+        } else {
+            // If no products found, return 0
+            return 0;
+        }
+    }
+    
+        public function addToCart(Product $product): void {        
+            $cart = new CartResourceModel();
+            $cartItem = new CartItem(
+                    $product->getProductId(),
+                    $product->getSku(),
+                    $product->getName(),
+                    $product->getPrice(),
+                    (int)Helper::getPostValue('qty'),
+                    $product->getProductImage()
+            );
+            $cart->addItem($cartItem);
+    }
 }

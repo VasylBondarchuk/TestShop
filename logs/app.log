@@ -1,0 +1,24 @@
+[2024-03-20 21:36:29] Error fetching product: 
+[2024-03-20 21:37:21] Error fetching product: 
+[2024-03-29 18:32:40] Error fetching all records: SQLSTATE[HY000] [2002] Connection refused
+[2024-04-01 21:13:58] Error fetching all records: SQLSTATE[HY000] [2002] Connection refused
+[2024-04-02 18:40:37] Error fetching all records: SQLSTATE[HY000] [2002] Connection refused
+[2024-04-03 19:56:33] Error fetching all records: SQLSTATE[HY000] [2002] Connection refused
+[2024-04-04 17:01:42] Error fetching all records: SQLSTATE[HY000] [2002] Connection refused
+[2024-04-05 16:46:06] Error fetching all records: SQLSTATE[HY000] [2002] Connection refused
+[2024-04-06 13:01:45] Error fetching all records: SQLSTATE[HY000] [2002] Connection refused
+[2024-04-06 14:40:45] Error fetching record by param: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'param' in 'where clause'
+[2024-04-06 14:42:12] Error fetching record by param: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'param' in 'where clause'
+[2024-04-06 14:42:17] Error fetching record by param: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'param' in 'where clause'
+[2024-04-06 14:45:49] Error fetching record by param: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'param' in 'where clause'
+[2024-04-06 14:46:07] Error fetching record by param: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'param' in 'where clause'
+[2024-04-06 14:46:18] Error fetching record by param: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'param' in 'where clause'
+[2024-04-06 14:46:55] Error fetching record by param: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'param' in 'where clause'
+[2024-04-06 14:47:05] Error fetching record by param: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'param' in 'where clause'
+[2024-04-06 14:47:39] Error fetching record by param: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'param' in 'where clause'
+[2024-04-06 14:47:53] Error fetching record by param: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'param' in 'where clause'
+[2024-04-06 14:48:03] Error fetching record by param: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'param' in 'where clause'
+[2024-04-06 14:48:15] Error fetching record by param: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'param' in 'where clause'
+[2024-04-06 14:49:26] Error fetching record by param: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '@gmail.com = ?' at line 1
+[2024-04-06 14:49:28] Error fetching record by param: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '@gmail.com = ?' at line 1
+[2024-04-06 14:50:13] Error fetching record by param: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '@gmail.com = ?' at line 1

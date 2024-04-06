@@ -8,6 +8,7 @@ error_reporting(E_ALL);
 use app\core\Controller;
 use app\modules\product\Model\ProductResourceModel;
 use app\modules\product\ViewModel\ProductIndexViewModel;
+use app\modules\product\Factory\ProductIndexViewModelFactory;
 
 class Index extends Controller
 {
@@ -15,15 +16,14 @@ class Index extends Controller
     {        
         $this->setTitle('Products');
         $viewModel = $this->createViewModel();
-        $viewContent = $this->renderView('index', ['viewModel' => $viewModel]);        
+        $viewContent = $this->renderView('product', 'index', ['viewModel' => $viewModel]);        
         $this->renderLayout('layout', $viewContent);
     }
 
     protected function createViewModel(): ProductIndexViewModel
-    {
-        $title = "Products";
+    {   
         $productsCollection = $this->getProductsCollection(); // Retrieve product data
-        return new ProductIndexViewModel($title, $productsCollection);
+        return ProductIndexViewModelFactory::create($productsCollection);
     }
 
     protected function getProductsCollection()
