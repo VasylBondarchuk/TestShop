@@ -1,12 +1,18 @@
 <?php
 namespace app\core;
 
+
 class Pagination {
+    
+    const DEFAULT_ITEMS_PER_PAGE = 5;
+    
     private $totalItems;
     private $itemsPerPage;
     private $currentPage;
 
-    public function __construct(int $totalItems, int $itemsPerPage, int $currentPage = 1) {
+    public function __construct(int $totalItems,
+            int $itemsPerPage = self::DEFAULT_ITEMS_PER_PAGE,
+            int $currentPage = 1) {
         $this->totalItems = $totalItems;
         $this->itemsPerPage = $itemsPerPage;
         $this->currentPage = $currentPage;
